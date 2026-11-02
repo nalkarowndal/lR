@@ -1,7 +1,7 @@
 # luxuryRental M1 — 논리 ERD · MySQL 데이터 모델 v1.0
 
 **대상:** [lR Node.js API](https://github.com/nalkarowndal/lR) · **기준일:** 2026-11-02 · **형태:** 스키마 설계서(DDL 아님, 실제 DB 미변경).
-**DB 전략:** 기존 웹 MySQL 데이터 보존 우선. 신규 앱 초기 MySQL/InnoDB. 과거 SQLite ERP 스타터는 모델·테스트의 참고이지 운영 데이터 원본이 아님.
+**DB 전략:** 기존 웹 MySQL 데이터 보존 우선. 신규 앱 초기 MySQL/InnoDB. 과거 SQLite ERP 스타터는 모델·테스트의 참고이지 운영 데이터 원본이 아님. **논리 테이블명은 아래와 같지만 실제 물리 테이블은 충돌을 방지하기 위해 신규 `lr_*` 프리픽스를 기본 채택**한다(예: `lr_products`, `lr_inventory_units`, `lr_rentals`). 원본 `products`는 변경하지 않는다.
 
 ## 1. 논리 ERD (핵심 도메인)
 ```mermaid
@@ -117,7 +117,7 @@ erDiagram
 | `price DECIMAL` | dayRateKrw 또는 salePriceKrw | 유형별 분리, 정수 변환시 소수·범위 검증 |
 | `created_at` | `products.createdAt` | 시간대/타임스탬프 일관성 |
 
-**기본 방침:** 기존 MySQL 원본 테이블 보존, 스테이징 DB에서 읽기 전용 변환 및 `legacy_product_mapping` 기록. 충돌/중복 및 총 건수·금액 교차검증 후 신규 앱의 canonical `products`로 절체. 동일 DB에서 테이블명이 겹치면 `lr_*` 스키마 프리픽스를 사용하고 DB 이름·스키마를 확정한다. 이전 중 기존 웹에 수정 기능이 추가되면 일방향 동기화/변경 이벤트/컷오버 정책이 필요.
+**기본 방침:** 기존 MySQL 원본 테이블 보존, 스테이징 DB에서 읽기 전용 변환 및 `legacy_product_mapping` 기록. 충돌/중복 및 총 건수·금액 교차검증 후 신규 앱의 canonical `products`로 절체. 실제 신규 테이블은 `lr_*` 명칭을 사용하고, 연결 DB·스키마와 동기화/읽기 경로는 M3에서 정한다. 이전 중 기존 웹에 수정 기능이 추가되면 일방향 동기화/변경 이벤트/컷오버 정책이 필요.
 
 **금지:** 백업 없이 `db push --force-reset`, `DROP TABLE`, 원본 테이블 재생성, 또는 운영 DB에 테스트 seed 삽입. Prisma 도입은 현 MySQL을 지원하는 **검증된 버전**에 한하며, 공식 introspection/baseline 가이드를 따라 검증한다.
 
