@@ -10,6 +10,14 @@
 - 상태: `SUBMITTED -> UNDER_REVIEW -> INFO_REQUESTED -> UNDER_REVIEW` 또는 `UNDER_REVIEW -> DEMO_CLOSED`; `CANCELED`/`DEMO_CLOSED`는 종료 상태. 고객 취소는 위 조건에서만 가능. 동일 상태 재전송은 읽기만 수행하여 idempotent 반환.
 - 감사 이력에는 행위자와 이전/다음 상태만 저장. 사진/민감 신분증/결제·배송정보, 실제 견적·정산/물품 인수는 저장하지 않음.
 
+## CI 검증 결과 — 2026-11-02
+- [PR #23 main 병합](https://github.com/nalkarowndal/lR/pull/23)
+- [Node API / MySQL 8.4 CI #41407821483](https://github.com/nalkarowndal/lR/actions/runs/41407821483): **94/94 PASS**; 테스트 Node↔모바일 HTTP **5/5 PASS**; TypeScript 빌드 PASS.
+- [Expo CI #41407821496](https://github.com/nalkarowndal/lR/actions/runs/41407821496): **25/25 PASS** 및 Expo 웹 export PASS.
+- 최초 SQL 주석 세미콜론 파서 문제는 `cc82a3b`에서 수정했고 **최신 커밋으로 전체 재검증 후 병합**했다.
+- 외부 운영 데이터, 실제 사진, 원본 웹/ERP, PG 결제·환불 전혀 변경하지 않음.
+- 다음 [Issue #24](https://github.com/nalkarowndal/lR/issues/24)는 **격리 ERP Outbox 기반** 개발; 스크린샷 UX [Issue #19](https://github.com/nalkarowndal/lR/issues/19)는 개발 완료 후 진행.
+
 ## 보안·품질 기준
 - API1:2023 객체 수준 권한 검증: ID 추측으로 타인 신청을 조회/변경할 수 없어야 함.
 - 등록은 401(비로그인), 422(본문/키 부정), 409(멱등 키 충돌), 201/200(최초/재전송).
