@@ -1,6 +1,6 @@
 # luxuryRental — Premium Rental & Luxury Boutique App
 
-> Status: **Planning (M0–M2)** · Updated: 2026-11-02  
+> Status: **M1 requirements & logical data baseline documented; M2 design pending** · Updated: 2026-11-02  
 > Repository: **nalkarowndal/lR**  
 > This repository is for the **new mobile app and its Node.js backend**. It is not a replacement for the original luxuryRental website.
 
@@ -16,7 +16,7 @@ Build a mobile-first premium experience that combines luxury goods **rental**, *
 | Product name | `luxuryRental` (preserve existing branding) |
 | Mobile | React Native + Expo + TypeScript (planned) |
 | Backend | **Node.js + TypeScript + Express** (selected baseline; not yet implemented) |
-| Database | Legacy website uses **MySQL**; decide MySQL retention vs PostgreSQL + Prisma migration **after schema/data audit** |
+| Database | **MySQL/InnoDB selected for initial API development** to preserve legacy compatibility; current data not migrated. Prisma optional after version verification |
 | API | Versioned REST API, planned `/api/v1` |
 | Admin | Preserve and integrate with existing luxuryRental web/ERP/CMS where feasible |
 | Development phase | Requirements, UI/UX, architecture, and technical verification **before implementing app code** |
@@ -38,6 +38,13 @@ Build a mobile-first premium experience that combines luxury goods **rental**, *
 - [M0 source audit — pinned commits and verified architecture](docs/SOURCE_AUDIT.md)
 - [M0 feature matrix — UI/API/demo/missing](docs/FEATURE_MATRIX.md)
 - [M0 risk register — security, booking, payment and QA](docs/RISK_REGISTER.md)
+- [M1 architectural decisions and policy gaps](docs/DECISIONS_M1.md)
+- [M1 functional and nonfunctional requirements](docs/REQUIREMENTS.md)
+- [M1 mobile information architecture](docs/INFORMATION_ARCHITECTURE.md)
+- [M1 user journeys and error states](docs/USER_FLOWS.md)
+- [M1 MySQL logical ERD and migrations strategy](docs/DATA_MODEL.md)
+- [M1 Node.js versioned REST API contract](docs/API_CONTRACT.md)
+- [M1 acceptance and QA gate matrix](docs/ACCEPTANCE_TESTS.md)
 
 ## Source-of-truth and preservation policy
 
@@ -64,7 +71,14 @@ lR/
 │   ├── ROADMAP.md
 │   ├── SOURCE_AUDIT.md
 │   ├── FEATURE_MATRIX.md
-│   └── RISK_REGISTER.md
+│   ├── RISK_REGISTER.md
+│   ├── DECISIONS_M1.md
+│   ├── REQUIREMENTS.md
+│   ├── INFORMATION_ARCHITECTURE.md
+│   ├── USER_FLOWS.md
+│   ├── DATA_MODEL.md
+│   ├── API_CONTRACT.md
+│   └── ACCEPTANCE_TESTS.md
 ├── analysis-artifacts/         # Phase-scoped reports; do not commit archives/secrets
 └── README.md
 ```
