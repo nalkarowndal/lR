@@ -12,3 +12,7 @@ apps/api/uploads/
 apps/api/data/
 *.db
 *.sqlite
+
+# CI browser screenshot/trace artifacts
+playwright-report/
+test-results/
