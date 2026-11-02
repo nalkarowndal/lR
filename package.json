@@ -3,13 +3,17 @@
   "version": "0.2.0",
   "private": true,
   "workspaces": [
-    "apps/mobile"
+    "apps/mobile",
+    "apps/api"
   ],
   "scripts": {
     "mobile": "npm run start --workspace @luxuryrental/mobile",
     "typecheck:mobile": "npm run typecheck --workspace @luxuryrental/mobile",
     "web:mobile": "npm run web --workspace @luxuryrental/mobile",
     "test:mobile": "npm run test:domain --workspace @luxuryrental/mobile",
-    "build:mobile:web": "npm run build:web --workspace @luxuryrental/mobile"
+    "build:mobile:web": "npm run build:web --workspace @luxuryrental/mobile",
+    "api:dev": "npm run dev --workspace @luxuryrental/api",
+    "api:build": "npm run build --workspace @luxuryrental/api",
+    "api:test": "npm run test --workspace @luxuryrental/api"
   }
 }

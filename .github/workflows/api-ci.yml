@@ -1,0 +1,49 @@
+name: Node API MySQL integration
+on:
+  pull_request:
+    paths:
+      - 'apps/api/**'
+      - 'package.json'
+      - '.github/workflows/api-ci.yml'
+permissions:
+  contents: read
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: testpass
+          MYSQL_DATABASE: lr_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -p$$MYSQL_ROOT_PASSWORD"
+          --health-interval=5s
+          --health-timeout=4s
+          --health-retries=20
+    env:
+      NODE_ENV: test
+      APP_MODE: demo
+      DB_HOST: 127.0.0.1
+      DB_PORT: '3306'
+      DB_USER: root
+      DB_PASSWORD: testpass
+      DB_NAME: lr_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install workspaces
+        run: npm install --no-audit --no-fund
+      - name: Compile Node API TypeScript
+        run: npm run api:build
+      - name: Create isolated lr_test tables only
+        run: npm run db:migrate:test --workspace @luxuryrental/api
+      - name: Seed synthetic demo product, two units and one hold
+        run: npm run db:seed:test --workspace @luxuryrental/api
+      - name: Run API integration tests
+        run: npm run api:test
