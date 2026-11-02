@@ -3,7 +3,7 @@ export interface RentalDraft{productId:string;startDate:string;returnDate:string
 interface State{
   favorites:string[]; cart:string[]; draft:RentalDraft|null;
   toggleFavorite:(id:string)=>void; addToCart:(id:string)=>void; removeCart:(id:string)=>void; clearCart:()=>void;
-  setDraft:(value:RentalDraft|null)=>void;
+  setDraft:(value:RentalDraft|null)=>void; resetPrivateState:()=>void;
 }
 const StateContext=createContext<State|null>(null);
 export function AppStateProvider({children}:{children:React.ReactNode}){
@@ -15,7 +15,8 @@ export function AppStateProvider({children}:{children:React.ReactNode}){
   toggleFavorite:(id)=>setFavorites(current=>current.includes(id)?current.filter(x=>x!==id):[...current,id]),
   addToCart:(id)=>setCart(current=>current.includes(id)?current:[...current,id]),
   removeCart:(id)=>setCart(current=>current.filter(x=>x!==id)),
-  clearCart:()=>setCart([])
+  clearCart:()=>setCart([]),
+  resetPrivateState:()=>{setFavorites([]);setCart([]);setDraft(null)}
  }),[favorites,cart,draft]);
  return <StateContext.Provider value={value}>{children}</StateContext.Provider>;
 }
