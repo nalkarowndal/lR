@@ -5,6 +5,7 @@ on:
     paths:
       - 'apps/api/**'
       - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/api-ci.yml'
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -42,9 +43,9 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
-          cache-dependency-path: 'package.json'
+          cache-dependency-path: 'package-lock.json'
       - name: Install workspaces
-        run: npm install --no-audit --no-fund --prefer-offline
+        run: npm ci --include=dev --no-audit --no-fund
       - name: Compile Node API TypeScript
         run: npm run api:build
       - name: Create isolated lr_test tables only
