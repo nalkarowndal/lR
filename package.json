@@ -9,6 +9,7 @@
     "mobile": "npm run start --workspace @luxuryrental/mobile",
     "typecheck:mobile": "npm run typecheck --workspace @luxuryrental/mobile",
     "web:mobile": "npm run web --workspace @luxuryrental/mobile",
-    "test:mobile": "npm run test:domain --workspace @luxuryrental/mobile"
+    "test:mobile": "npm run test:domain --workspace @luxuryrental/mobile",
+    "build:mobile:web": "npm run build:web --workspace @luxuryrental/mobile"
   }
 }

@@ -1,7 +1,5 @@
 name: Mobile UI checks
 on:
-  push:
-    branches: [feat/m2-mobile-foundation]
   pull_request:
 permissions:
   contents: read
@@ -22,3 +20,5 @@ jobs:
         run: npm run typecheck:mobile
       - name: Rental date policy tests
         run: npm run test:mobile
+      - name: Expo web bundle smoke build
+        run: npm run build:mobile:web
