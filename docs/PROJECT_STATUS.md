@@ -10,7 +10,7 @@
 | M3.1 Node API·MySQL | [PR #3](https://github.com/nalkarowndal/lR/pull/3) main 병합, [CI](https://github.com/nalkarowndal/lR/actions/runs/41377221663) | Express/MySQL 읽기·시연 견적 API, 테스트 9/9 |
 | M3.2 내부 재고 홀드 | [PR #4](https://github.com/nalkarowndal/lR/pull/4), [CI](https://github.com/nalkarowndal/lR/actions/runs/41378216156) | **main 병합 완료**, 격리 DB 통합 18/18 PASS. 내부 API 재사용 |
 | M3.3 인증·RBAC·홀드 API | [PR #7](https://github.com/nalkarowndal/lR/pull/7), [PR #8](https://github.com/nalkarowndal/lR/pull/8), [CI](https://github.com/nalkarowndal/lR/actions/runs/41380191605), [설명](M3_3_AUTH_HOLD_API.md) | **main 병합 완료·시연 구현 통과**, MySQL/API 33/33 + Expo CI PASS. 운영회원·결제 출시 불가 |
-| M4 고객 API 연결 | 아직 PR 없음 | Expo 현재 샘플 데이터 사용 |
+| M4 고객 API 연결 | [PR #9](https://github.com/nalkarowndal/lR/pull/9), [Node live CI](https://github.com/nalkarowndal/lR/actions/runs/41381735806), [Expo CI](https://github.com/nalkarowndal/lR/actions/runs/41381735807), [M4 문서](M4_MOBILE_API.md) | **main 병합: 상품·검색·상세·가용성·견적 API 연결**, API 34/34 + 실제 HTTP 4/4 + 모바일 14/14 PASS. Android/iOS 시각 QA 미실행 |
 | M5 운영/PG/ERP | 아직 PR 없음 | 실제 PG·운영 데이터·ERP 미연동 |
 | M6 실기기·시각·성능·보안 | 없음 | 완료 주장 불가 |
 
@@ -21,11 +21,13 @@
 
 ## 다음 연속 작업 패키지
 
-**M4 통합 목표:** Expo의 로컬 시연 상품·견적 화면을 **Node API의 실제 조회 응답**과 연결. 구성 가능한 API Base URL, 로딩/빈 목록/오류/재시도, 테스트 환경 구분, 토큰 저장소 보안 가이드 및 계약 테스트를 우선한다.
-- A/공통 API 클라이언트 + 상품 상세·검색·가용성: API 계약, 시연 데이터 격리
-- B/견적/임시 홀드 UI는 **별도의 동의·정책 결정과 안전한 세션 저장 방법 검증** 후 연동; 실제 주문/PG는 여전히 501
-- **M4 완료 조건:** 고객 화면에서 테스트용 Node API로 읽기/견적 흐름 검증 + Android/iOS 시각 검수 증거(또는 미실시 명시)
-- **운영/출시 차단:** 이메일 본인 확인, 분산 로그인 레이트 리밋, 승인된 개인정보 처리·보증금·물류/취소 정책, PG, 운영 DB 마이그레이션/감사로그, 원본 앱 데이터 검증.
+**M4 네이티브 UX 검수 및 M5 준비:** 현재 M4 데이터 연동은 **코드/계약/HTTP CI 검증 완료**. 실제 Android/iOS 화면·네트워크/접근성은 검증되지 않았으므로 M4의 **출시 Gate는 미통과**.
+
+1. M4-N: 360px/390px/태블릿·실기기에서 5탭, 날짜 달력, API 오류/재시도, 검색/장바구니, 보안·접근성 시각 QA. 증거 스크린샷·버그 기록 후 PR.
+2. M5-1: 견적/홀드 만료·결제 실패/취소/반납 정책 확정, 인증 UI와 안전한 Expo 토큰 보관 설계. 실제 회원가입/PG는 승인 전 활성화 금지.
+3. M5-2: 샌드박스 PG 및 승인된 정책에 의한 서버 금액 재검증·주문/재고 상태 전이·감사 로그. `lr_test`에서만 검증하며 운영 데이터에 접근하지 않음.
+4. M5-3: 수선 사진/위탁/관리자·원본 ERP 연계는 API·권한·모바일 UX를 각각 검증하며 기존 원본 RecruitApp을 보존.
+5. M6: 네이티브 E2E/회귀/보안/시각/성능·접근성·운영 릴리스 게이트.
 
 **CI 현황:** npm workspace에 현재 `package-lock.json`이 없음. 매번 의존성 버전 선택이 달라질 수 있어 **다음 인프라 패키지에서 lockfile 생성 및 `npm ci`로 이전 필수**. 현행 `npm install`+캐시는 임시 조치일 뿐 재현성 완료가 아님.
 

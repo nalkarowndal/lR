@@ -1,6 +1,6 @@
 # luxuryRental — Premium Rental & Luxury Boutique App
 
-> Status: **M0–M2 documented, Expo mobile UI + M3.1 Node API merged; M3.2 holds PR #4 QA passed (review pending)** · Updated: 2026-11-02
+> Status: **M3.3 server auth/holds and M4 Expo↔Node data integration merged and CI verified; real checkout and native-device QA still open** · Updated: 2026-11-02
 > Repository: **nalkarowndal/lR**  
 > This repository is for the **new mobile app and its Node.js backend**. It is not a replacement for the original luxuryRental website.
 
@@ -15,11 +15,11 @@ Build a mobile-first premium experience that combines luxury goods **rental**, *
 | Repository | `https://github.com/nalkarowndal/lR` |
 | Product name | `luxuryRental` (preserve existing branding) |
 | Mobile | React Native + Expo + TypeScript (initial demo UI implemented) |
-| Backend | **Node.js + TypeScript + Express 5** (M3.1 API implemented; production auth/booking not yet) |
+| Backend | **Node.js + TypeScript + Express 5** (M3.3 demo auth/holds + M4 catalog/availability/quote APIs; production booking not yet) |
 | Database | **MySQL/InnoDB selected for initial API development** to preserve legacy compatibility; current data not migrated. Prisma optional after version verification |
-| API | Versioned REST API, initial catalog/availability/demo quote endpoints at `/api/v1` |
+| API | Versioned REST API at `/api/v1`; typed Expo client connected to catalog/availability/demo quote in M4 |
 | Admin | Preserve and integrate with existing luxuryRental web/ERP/CMS where feasible |
-| Development phase | M3 backend implementation active; staged security/commerce gates |
+| Development phase | M4 data-read integration complete with CI; device UX QA and commerce safety gates pending |
 
 ## Scope
 
@@ -48,7 +48,9 @@ M2 design documentation and an editable Figma wireframe prototype are prepared f
 
 - [Current status and QA references](docs/PROJECT_STATUS.md) — **open this first** when resuming work
 - [Lean M3–M6 delivery policy](docs/WORKFLOW_ACCELERATION.md) — linked features, PR/CI rules and safe automation
-- [M3.2 concurrency-tested inventory holds PR #4](https://github.com/nalkarowndal/lR/pull/4) — review pending, not public API
+- [M3.2 concurrency-tested inventory holds PR #4](https://github.com/nalkarowndal/lR/pull/4) — merged; demo holds via M3.3 auth API only
+- [M3.3 auth/RBAC + demo holds](docs/M3_3_AUTH_HOLD_API.md) — merged, 33/33 MySQL tests
+- [M4 mobile API integration](docs/M4_MOBILE_API.md) — [PR #9 merged](https://github.com/nalkarowndal/lR/pull/9), [34/34 MySQL + 4/4 live HTTP](https://github.com/nalkarowndal/lR/actions/runs/41381735806) and [14/14 mobile CI](https://github.com/nalkarowndal/lR/actions/runs/41381735807)
 - [M3 Node.js API package](apps/api/README.md), [Expo mobile UI package](apps/mobile/README.md)
 
 ## Planning documents
@@ -101,4 +103,4 @@ lR/
 └── README.md
 ```
 
-> **Current state:** Expo mobile demo UI and Node.js product/availability/demo quote API are in main with recorded CI. User auth, live checkout, production DB migration and native visual QA are **not completed**. See [PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
+> **Current state:** M4 mobile reads the test Node API only when explicitly configured; otherwise it runs the local design demo. M3.3 **demo-only** authentication/temporary holds exist, but production account verification, live checkout/PG, operating DB migration and native-device visual QA are **not completed**. See [PROJECT_STATUS.md](docs/PROJECT_STATUS.md).

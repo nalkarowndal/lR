@@ -1,44 +1,37 @@
-# luxuryRental Expo Mobile — M2 implementation preview
+# luxuryRental Expo Mobile — M4 data API integration
 
-This is the **first actual React Native / Expo UI implementation** based on `docs/m2-*` and the 33-frame Figma prototype at https://www.figma.com/design/6mmceyHRPsWoR1JxUAnMja.
+Expo SDK 58 + React Native + Expo Router. Preserves the original luxuryRental white/ink/pastel M2 UI and 5 customer tabs (홈/렌탈/스토어/수선/마이).
 
-## Local development
+## Data modes (explicit)
+- **Offline demo:** No `EXPO_PUBLIC_API_URL`. Screens use bundled synthetic M2 sample products and an explicitly fake rental quote. No server, booking, personal information or payment.
+- **Node TEST API:** Set `EXPO_PUBLIC_API_URL` to the reachable Node API origin. Catalog, search, product detail, favorites/cart product lookups, date availability and quote request use the **real HTTP response** backed by the isolated `lr_test` MySQL database.
+- **API failure means error**, not an invisible fallback to synthetic products. Retry and empty/loading/network errors are handled by the UI.
+- The **checkout and cart are visual demonstrations only**; no order/rental, payment or authenticated hold is sent from the mobile client. No token/session is saved on the phone.
 
-From repository root:
-```bash
+## Run
+```sh
 npm install
+# (optional) copy apps/mobile/.env.example into apps/mobile/.env.local and set EXPO_PUBLIC_API_URL
 npm run mobile
+npm run web:mobile
+npm run typecheck:mobile
+npm run test:mobile
+npm run build:mobile:web
 ```
-Then use Expo Go or Android/iOS simulator if supported by the installed Expo SDK. For browser preview: `npm run web:mobile`. Check types: `npm run typecheck:mobile`.
 
-Official references: [Expo SDK 58](https://expo.dev/changelog/sdk-58), [Expo Router](https://docs.expo.dev/router/installation/).
+For testing against a local backend see [M4 mobile/API setup](../../docs/M4_MOBILE_API.md). On physical devices, `localhost` refers to the device itself, **not** the development PC: configure the PC's private LAN IP and use a trusted test Wi-Fi only. Expo public environment values are visible inside bundles; do not include keys or credentials.
 
-## Included
+Backend setup: [API README](../api/README.md). Exact web browser CORS origins need `API_CORS_ORIGINS` in the Node environment.
 
-- Five-tab luxuryRental shell: 홈 / 렌탈 / 스토어 / 수선 / 마이
-- Original white/ink/pastel design token values from source `567890` and M2 documentation
-- Product sample visuals, search, product detail, wishlist and cart state
-- Responsive calendar with full month and small-device text-input fallback
-- Rental quote, clear return date, subtotal / deposit / total; purchase total and store-context result
-- Repair form preview and three-step consignment form preview
-- Explicit **DEMO** banners and results; no API, real payment, authentication, customer photo upload, booking or persistence
+## CI evidence
+- [Mobile checks #41381735807](https://github.com/nalkarowndal/lR/actions/runs/41381735807): TypeScript, **14/14 unit/DTO/network contract tests**, Expo web export PASS
+- [Node/MySQL + real mobile client #41381735806](https://github.com/nalkarowndal/lR/actions/runs/41381735806): **34/34 API tests** and **4/4 real HTTP client integration tests** PASS (isolated MySQL 8.4)
+- **Not tested:** actual Android/iOS devices, keyboard/screen reader visual QA, production HTTPS and distribution builds.
 
-## Deliberately excluded
+## Preserved but not implemented
+- Real images/licensing and exact editorial Figma parity approval
+- Real account login on mobile (M3 demo server API exists but not securely wired into Expo)
+- Payment, order, saved wishlist, address, upload, repair ticket, ERP/CMS sync
+- Existing web's staff RecruitApp is separate from customer mobile tabs
 
-- Node.js API and MySQL write operations: target M3; existing live database untouched
-- Actual inventory availability or hold: NEVER represent local demo selection as reserved
-- Real login, file uploads, payment capture and shipping
-- Admin/ERP staffing module: remains in original web project; not customer-facing navigation
-- AI image/styling, commercial authenticity or approved photo rights
-
-## Verification status
-
-Code is committed for review but **dependencies have not been installed and device UI/typecheck/visual QA have not been run through this connector**. Do not report TEST_PASS until CI logs and screenshots exist. SDK 58 compatibility must be confirmed with `npx expo-doctor` after install.
-
-## Next implementation gates
-
-1. Install dependencies, run typecheck and fix any SDK 58 peer mismatches.
-2. Inspect real Android/iOS navigation, safe areas, compact 360px (manual date fallback), 390px and tablet layouts.
-3. Confirm design parity with Figma and fix outstanding Figma PR notes.
-4. Implement Node.js + Express + TypeScript `/api/v1` and MySQL `lr_*` tables on **test DB only**.
-5. Add server-side auth, availability locks, idempotent holds and payments (sandbox) before enabling any real checkout.
+Reference: [M4 contract and limitations](../../docs/M4_MOBILE_API.md).

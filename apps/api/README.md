@@ -58,8 +58,13 @@ See `.github/workflows/api-ci.yml`: MySQL 8.4 Docker service, schema/fixture, TS
 - The **physical** DB tables are only a minimal test subset of the [logical ERD](../../docs/DATA_MODEL.md). payment ledger, repairs, inventory event log, full policy versions, audit logs and real admin workflows are not implemented. Demo-only `lr_users`, `lr_user_roles`, `lr_sessions` are implemented.
 - `SELECT ... FOR UPDATE` physical-unit holds and 20-request concurrency tests are implemented. Actual confirmed rental/checkout, approved quote/hold policies, PG, production identity verification and release gate are not implemented.
 - Policies POL-01~POL-05, user account and business signoff remain unapproved.
-- Connect mobile client using a configurable API base URL and security/authorization gates in a later PR; current mobile app still uses explicit DEMO state.
+- M4 Expo mobile catalog/availability/demo quote client is now connected to this Node API through an explicit `EXPO_PUBLIC_API_URL`. Without that value the UI stays in clearly labeled offline sample mode. See [M4 details](../../docs/M4_MOBILE_API.md).
 
+## M4 browser development CORS
+- Set `API_CORS_ORIGINS=http://localhost:8081,http://127.0.0.1:8081` (exact browser origins) for Expo web; default is no cross-origin browser access.
+- `API_HOST=127.0.0.1` is local only; for a trusted private LAN phone test you may explicitly use `API_HOST=0.0.0.0` and firewall restrictions. Never expose a demo or unencrypted account API publicly.
+- [CI #41381735806](https://github.com/nalkarowndal/lR/actions/runs/41381735806) validated 34/34 API tests and four real HTTP requests via the M4 mobile API client.
+ 
 ## M3.3 account/hold hardening
 - Authentication and role verification use server-issued opaque bearer tokens, stored **hashed** in MySQL; `actorId` is always resolved from the session, never from client JSON.
 - Strict Zod schemas, Argon2id hashed demo passwords, token revocation and rotation, admin role checks and 404 ownership boundaries are tested.
