@@ -112,7 +112,7 @@ export function mountAuthRoutes(app:Express,db:Database,{demoMode}:{demoMode:boo
   const user=rows[0];
   const valid=await argon2.verify(user?.password_hash??await dummyHash,password);
   if(!valid||user?.status!=='ACTIVE'){
-   const previous=limit?.until>now?limit.fails:0;
+   const previous=limit && limit.until>now ? limit.fails : 0;
    rateLimit.set(key,{fails:previous+1,until:now+10*60_000});
    problem(req,res,401,'UNAUTHENTICATED','이메일 또는 비밀번호를 확인해 주세요');return;
   }
