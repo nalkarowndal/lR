@@ -1,4 +1,4 @@
--- M5-3A: additive TEST ONLY workflow; never apply outside lr_test.
+-- M5-3A: additive TEST ONLY workflow. Never apply outside lr_test.
 -- No actual item intake, pickup, repair contract, photos or consignment sales.
 CREATE TABLE IF NOT EXISTS lr_demo_service_requests (
  id VARCHAR(40) PRIMARY KEY,
