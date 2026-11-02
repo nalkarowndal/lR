@@ -3,6 +3,7 @@ import {Pressable,ScrollView,StyleSheet,Text,View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import {colors} from '../theme';
+import {apiEnabled} from '../api/client';
 
 export function Screen({title,children,subtitle,right,padBottom=24}:{title:string;children:ReactNode;subtitle?:string;right?:ReactNode;padBottom?:number}){
  const insets=useSafeAreaInsets();
@@ -25,7 +26,7 @@ export function Action({label,onPress,secondary=false,disabled=false,loading=fal
  <Text style={[styles.actionLabel,secondary?{color:colors.ink}:null]}>{loading?'처리 중…':label}</Text></Pressable>
 }
 export function DemoNotice(){
- return <View style={styles.demo}><Ionicons name="information-circle-outline" color={colors.sub} size={20}/><Text style={{color:colors.sub,flex:1,fontSize:13,lineHeight:19}}>디자인 시연용 상품과 금액입니다. 예약·결제·개인정보는 실제 저장되지 않습니다.</Text></View>;
+ return <View style={styles.demo}><Ionicons name="information-circle-outline" color={colors.sub} size={20}/><Text style={{color:colors.sub,flex:1,fontSize:13,lineHeight:19}}>{apiEnabled()?'테스트 API 시연입니다. 테스트 계정 등록 시 이메일 식별자·비밀번호 해시가 격리 DB에 저장됩니다. 실제 개인정보를 입력하지 마세요. 예약·결제는 실행되지 않습니다.':'오프라인 디자인 시연입니다. 상품·금액은 합성 데이터이며 회원가입·예약·결제 요청을 전송하지 않습니다.'}</Text></View>;
 }
 export function Badge({label}:{label:string}){return <Text style={styles.badge}>{label}</Text>}
 export function RowLink({title,subtitle,onPress,icon='chevron-forward-outline'}:{title:string;subtitle?:string;onPress:()=>void;icon?:keyof typeof Ionicons.glyphMap}){
