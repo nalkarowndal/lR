@@ -8,6 +8,7 @@ import {getAvailability,getProduct,listProducts} from './products.js';
 import {rentalDays} from './date.js';
 import {mountAuthRoutes} from './auth.js';
 import {mountRentalHoldRoutes} from './rental-hold-routes.js';
+import {mountServiceRequestRoutes} from './service-request-routes.js';
 
 const listSchema=z.object({
  q:z.string().trim().max(100).optional(),brand:z.string().trim().max(120).optional(),
@@ -35,7 +36,7 @@ export function createApp(db:Database,{demoMode=false,corsOrigins=[]}:{demoMode?
    if(!origin||!corsOrigins.includes(origin)){next();return;}
    res.setHeader('Access-Control-Allow-Origin',origin);
    res.setHeader('Vary','Origin');
-   res.setHeader('Access-Control-Allow-Methods','GET,POST,DELETE,OPTIONS');
+   res.setHeader('Access-Control-Allow-Methods','GET,POST,PATCH,DELETE,OPTIONS');
    res.setHeader('Access-Control-Allow-Headers','Accept,Content-Type,Authorization,Idempotency-Key');
    res.setHeader('Access-Control-Max-Age','600');
    if(req.method==='OPTIONS'){res.sendStatus(204);return;}
@@ -46,6 +47,7 @@ export function createApp(db:Database,{demoMode=false,corsOrigins=[]}:{demoMode?
  const meta=(res:Response)=>({requestId:res.locals.requestId});
  mountAuthRoutes(app,db,{demoMode});
  mountRentalHoldRoutes(app,db,{demoMode});
+ mountServiceRequestRoutes(app,db,{demoMode});
  app.get('/health',(_req,res)=>{res.json({status:'ok'});});
  app.get('/ready',async(req,res)=>{
    try{await db.query('SELECT 1');res.json({status:'ready'});}
