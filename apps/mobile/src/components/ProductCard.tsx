@@ -18,7 +18,7 @@ export function ProductCard({product,channel='RENTAL'}:{product:Product;channel?
     <ProductVisual background={product.art} small/>
     <Text numberOfLines={1} style={{fontSize:11,color:colors.sub,letterSpacing:1,fontWeight:'700',marginTop:11}}>{product.brand}</Text>
     <Text numberOfLines={2} style={{fontSize:14,fontWeight:'700',color:colors.ink,marginTop:4,minHeight:39}}>{product.title}</Text>
-    <Text style={{fontSize:13,fontWeight:'700',color:colors.ink}}>{channel==='RENTAL'?formatKrw(product.dayRateKrw)+' / 일':formatKrw(product.salePriceKrw)}</Text>
+    <Text style={{fontSize:13,fontWeight:'700',color:colors.ink}}>{product.channels.includes(channel)?(channel==='RENTAL'?formatKrw(product.dayRateKrw)+' / 일':formatKrw(product.salePriceKrw)):'이용 불가'}</Text>
   </Pressable>
   <Pressable accessibilityRole="button" accessibilityLabel={saved?'찜 해제':'찜 추가'} onPress={()=>toggleFavorite(product.id)}
    style={{position:'absolute',top:17,right:17,width:44,height:44,alignItems:'center',justifyContent:'center',backgroundColor:colors.surface,borderRadius:22}}>

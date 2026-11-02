@@ -1,13 +1,15 @@
 import {View,Text,Pressable} from 'react-native';
 import {useRouter} from 'expo-router';
-import {products} from '../../domain/catalog';
+import {useProductList} from '../../api/hooks';
+import {DataSourceNotice,NetworkFeedback,LoadMore} from '../../components/NetworkFeedback';
 import {colors} from '../../theme';
 import {Screen,DemoNotice,Heading,Body} from '../../components/ui';
 import {ProductGrid} from '../../components/ProductGrid';
 export default function Rental(){
  const router=useRouter();
+ const catalog=useProductList({channel:'RENTAL'});
  return <Screen title="렌탈" subtitle="필요한 기간만, 나에게 맞는 명품을">
-   <DemoNotice/>
+   <DemoNotice/><DataSourceNotice/>
    <View style={{backgroundColor:colors.rental,padding:18,borderRadius:16,gap:8}}>
     <Text style={{fontSize:12,fontWeight:'700',color:colors.sub}}>LUXURY RENTAL</Text><Heading>렌탈 컬렉션</Heading><Body>상품을 선택하고 반납 예정일까지 지정해 견적을 확인해 보세요.</Body>
    </View>
@@ -15,6 +17,7 @@ export default function Rental(){
      <Text style={{color:colors.sub}}>⌕  브랜드·상품 검색하기</Text>
    </Pressable>
    <Heading>추천 렌탈</Heading>
-   <ProductGrid items={products} channel="RENTAL"/>
+   <NetworkFeedback status={catalog.status} error={catalog.error} retry={catalog.retry}/>
+   {catalog.status==="ready"?(catalog.items.length?<><ProductGrid items={catalog.items} channel="RENTAL"/><LoadMore hasNext={catalog.hasNext} loading={catalog.loadingMore} onPress={catalog.loadMore}/></>:<Body muted>현재 표시할 렌탈 상품이 없습니다.</Body>):null}
  </Screen>;
 }

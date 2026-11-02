@@ -4,6 +4,7 @@ const envSchema=z.object({
   APP_MODE:z.enum(['demo','disabled']).default('demo'),
   API_HOST:z.string().default('127.0.0.1'),
   API_PORT:z.coerce.number().int().min(1).max(65535).default(4000),
+  API_CORS_ORIGINS:z.string().default(''),
   DB_HOST:z.string().min(1),
   DB_PORT:z.coerce.number().int().min(1).max(65535).default(3306),
   DB_USER:z.string().min(1),
