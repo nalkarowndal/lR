@@ -171,7 +171,10 @@ test('after three adapter failures DEAD blocks later events for same request',as
  assert.equal((await outbox(id)).length,2);
  const later=(await outbox(id))[1];assert.equal(later.state,'PENDING');
  // The dead predecessor blocks that later event; no out of order delivery.
- assert.equal((await dispatchOneDemoErpOutbox(db,ok)).outcome,'EMPTY');
+ await dispatchOneDemoErpOutbox(db,async(e)=>{
+  assert.notEqual(e.eventId,later.event_id,'DEAD predecessor must block a later event');
+ });
+ assert.equal((await outbox(id))[1].state,'PENDING');
 });
 test('stale lease worker cannot mark event DELIVERED after a new lease succeeds',async()=>{
  const {id}=await createRecord(),eventId=(await outbox(id))[0].event_id;
@@ -184,14 +187,13 @@ test('stale lease worker cannot mark event DELIVERED after a new lease succeeds'
   const p=dispatchOneDemoErpOutbox(db,async(e)=>{
    if(e.eventId===eventId){started();await pending;}
   });
-  // Probe via db to know if this event was leased, not arbitrary sleeps.
-  const state=(await outbox(id))[0].state;
-  if(state==='LEASED'){
-   oldPromise=p;
-   await startedSignal;
-   break;
-  }
-  await p;
+  // Await the callback signal OR this one-shot worker result.
+  // Do not await the pending promise before it has actually acquired our lease.
+  const result=await Promise.race([
+   startedSignal.then(()=>true),
+   p.then(()=>false)
+  ]);
+  if(result){oldPromise=p;break;}
  }
  if(!oldPromise)throw Error('failed to claim synthetic lease');
  await db.execute(`UPDATE lr_demo_erp_outbox
