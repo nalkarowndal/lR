@@ -1,0 +1,50 @@
+name: M4N browser visual QA
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'apps/mobile/**'
+      - 'package.json'
+      - '.github/workflows/m4n-visual.yml'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  visual:
+    name: Chromium ${{ matrix.mode }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [offline, api-unreachable]
+    env:
+      CI: '1'
+      M4N_MODE: ${{ matrix.mode }}
+      EXPO_NO_TELEMETRY: '1'
+      EXPO_PUBLIC_API_URL: ${{ matrix.mode == 'api-unreachable' && 'http://127.0.0.1:5999' || '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: package.json
+      - name: Install npm workspaces
+        run: npm install --no-audit --no-fund --prefer-offline
+      - name: Install Chromium Playwright browser
+        run: npx playwright install --with-deps chromium
+      - name: Run Expo web mobile emulation and collect screenshots
+        run: npm run qa:web --workspace @luxuryrental/mobile
+      - name: Upload screenshots, trace and HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m4n-web-${{ matrix.mode }}-${{ github.run_id }}
+          path: |
+            apps/mobile/playwright-report/
+            apps/mobile/test-results/
+          if-no-files-found: warn
+          retention-days: 14
