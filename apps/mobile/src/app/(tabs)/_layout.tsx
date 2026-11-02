@@ -1,9 +1,10 @@
 import {Tabs} from 'expo-router';
+import type {ColorValue} from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import {colors} from '../../theme';
 export default function TabLayout(){
  const renderIcon=(name:keyof typeof Ionicons.glyphMap)=>
-  ({color,size}:{color:string;size:number})=><Ionicons name={name} size={Math.min(size,23)} color={color}/>;
+  ({color,size}:{color:ColorValue;size:number})=><Ionicons name={name} size={Math.min(size,23)} color={color as string}/>;
  return <Tabs screenOptions={{
   headerShown:false,tabBarActiveTintColor:colors.ink,tabBarInactiveTintColor:colors.sub,
   tabBarStyle:{backgroundColor:colors.surface,borderTopWidth:1,borderTopColor:colors.divider,height:65,paddingBottom:9,paddingTop:6},
