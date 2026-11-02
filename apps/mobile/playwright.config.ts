@@ -2,11 +2,11 @@ import {defineConfig} from '@playwright/test';
 const ci=!!process.env.CI;
 export default defineConfig({
  testDir:'./e2e',
- timeout:60_000,
- expect:{timeout:20_000},
+ timeout:45_000,
+ expect:{timeout:10_000},
  fullyParallel:false,
  forbidOnly:ci,
- retries:ci?1:0,
+ retries:0,
  workers:1,
  reporter:ci?[['list'],['html',{outputFolder:'playwright-report',open:'never'}]]:[['list']],
  outputDir:'test-results',
@@ -14,7 +14,7 @@ export default defineConfig({
   baseURL:'http://127.0.0.1:8081',
   browserName:'chromium',
   screenshot:'only-on-failure',
-  trace:'on-first-retry',
+  trace:'retain-on-failure',
   actionTimeout:15_000,
   navigationTimeout:30_000,
  },
