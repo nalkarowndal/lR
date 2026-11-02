@@ -17,6 +17,14 @@
 - 재시도/DEAD은 유한 테스트 단계이며, 인프라/운영 경고 알림과 수동 재처리 승인 기능은 별도 미구현.
 - [AWS Transactional Outbox](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html), [MySQL InnoDB SKIP LOCKED](https://dev.mysql.com/doc/refman/8.4/en/innodb-locking-reads.html) 기준.
 
+## 2026-11-02 최종 검증
+- [PR #25 — main 병합](https://github.com/nalkarowndal/lR/pull/25)
+- [Node/MySQL CI #41409390813](https://github.com/nalkarowndal/lR/actions/runs/41409390813): **102/102 PASS**, Node↔모바일 HTTP **5/5 PASS**, TypeScript 빌드 통과.
+- [Expo CI #41409390982](https://github.com/nalkarowndal/lR/actions/runs/41409390982): **25/25 PASS**, Expo 웹 번들/export 통과.
+- 초기 워커 테스트 2건은 다른 테스트가 만든 유효 이벤트와 임대 획득 시점에 대한 테스트 조건을 수정(`94b0c310`), 최종 전체 재검증 PASS.
+- 시연 Outbox의 at-least-once 보장 경계를 테스트한 것임. 실제 ERP, 프로덕션 승인, 외부 사진/배송/수선 계약/PG는 연결/승인하지 않았음.
+- 다음 [M6-0 Issue #26](https://github.com/nalkarowndal/lR/issues/26)에서 lockfile/npm ci 재현성 및 릴리스 보안·QA 수행.
+
 ## 검증·미완료
 - Node 22 + MySQL 8.4의 `lr_test`에만 테스트. 신규/상태전이 이벤트 1:1, 20중 경쟁 워커와 멱등 재전송, 실패→재시도→복구, 임대 분실·토큰 fencing, 전이 순서, 과금·운영 ERP/API 차단.
 - 실제 ERP 전송은 법무/업무 정책 승인 뒤 별도 구현. 인가·Outbox 데이터 파기 정책, 운영 모니터링, 교차 시스템 클라이언트 idempotency, 실제 기기/성능·보안 QA 미실행.
