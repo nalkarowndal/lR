@@ -12,7 +12,8 @@
 | M3.3 인증·RBAC·홀드 API | [PR #7](https://github.com/nalkarowndal/lR/pull/7), [PR #8](https://github.com/nalkarowndal/lR/pull/8), [CI](https://github.com/nalkarowndal/lR/actions/runs/41380191605), [설명](M3_3_AUTH_HOLD_API.md) | **main 병합 완료·시연 구현 통과**, MySQL/API 33/33 + Expo CI PASS. 운영회원·결제 출시 불가 |
 | M4 고객 API 연결 | [PR #9](https://github.com/nalkarowndal/lR/pull/9), [Node live CI](https://github.com/nalkarowndal/lR/actions/runs/41381735806), [Expo CI](https://github.com/nalkarowndal/lR/actions/runs/41381735807), [M4 문서](M4_MOBILE_API.md) | **main 병합: 상품·검색·상세·가용성·견적 API 연결**, API 34/34 + 실제 HTTP 4/4 + 모바일 14/14 PASS. Android/iOS 시각 QA 미실행 |
 | M4-N Chromium 시각 QA | [PR #11](https://github.com/nalkarowndal/lR/pull/11), [CI](https://github.com/nalkarowndal/lR/actions/runs/41383695339), [스크린샷](https://github.com/nalkarowndal/lR/actions/runs/41383695339/artifacts/13114721964), [명세](M4N_WEB_QA.md) | **main 병합**, 360·390·768px Chrome 모바일 에뮬레이션 12/12 오프라인+3/3 API 실패 = 15/15 PASS. 실기기 Android/iOS·수동 시각 QA 미실시, [Issue #10](https://github.com/nalkarowndal/lR/issues/10) 계속 OPEN |
-| M5 운영/PG/ERP | 아직 PR 없음 | 실제 PG·운영 데이터·ERP 미연동 |
+| M5-1 데모 로그인·정책 게이트 | [PR #12](https://github.com/nalkarowndal/lR/pull/12), [mobile CI](https://github.com/nalkarowndal/lR/actions/runs/41385121007), [Node/MySQL](https://github.com/nalkarowndal/lR/actions/runs/41385121036), [Chromium](https://github.com/nalkarowndal/lR/actions/runs/41385121132), [미승인 정책표](M5_1_POLICY_GATE.md) | **main 병합** · 모바일 21/21, API 35/35, HTTP 5/5, Chromium 21/21 PASS. 실사용자·실결제·네이티브 SecureStore QA 미검증 |
+| M5-2 PG·정산/ERP | 아직 PR 없음 | 실제 PG·운영 데이터·ERP 미연동; POL-01~05 미승인 |
 | M6 실기기·시각·성능·보안 | 없음 | 완료 주장 불가 |
 
 ## 변경하지 않는 안전 제한
@@ -22,10 +23,10 @@
 
 ## 다음 연속 작업 패키지
 
-**M4 네이티브 UX 검수 및 M5 준비:** 현재 M4 데이터 연동은 **코드/계약/HTTP CI 검증 완료**. 실제 Android/iOS 화면·네트워크/접근성은 검증되지 않았으므로 M4의 **출시 Gate는 미통과**.
+**M5-1 데모 로그인 코드 통과, M5-2 사전 정책 승인·거래 안전 설계 준비:** M4/M5.1 자동 검증 완료. 실제 Android/iOS 기기·접근성, 운영 계정·PG·보증금/취소/물류 정책 미승인으로 **상용 출시 Gate는 미통과**.
 
 1. M4-N: Chromium **웹 에뮬레이션 QA 15/15 PASS, PR #11 병합**. [Issue #10](https://github.com/nalkarowndal/lR/issues/10)의 실제 Android/iOS·VoiceOver/TalkBack·스크린샷 수동 판독 및 Expo Doctor 확인은 **계속 미완료**.
-2. M5-1: 견적/홀드 만료·결제 실패/취소/반납 정책 확정, 인증 UI와 안전한 Expo 토큰 보관 설계. 실제 회원가입/PG는 승인 전 활성화 금지.
+2. M5-1: 데모 계정 UI와 SecureStore 네이티브 저장 코드는 [PR #12](https://github.com/nalkarowndal/lR/pull/12)에서 구현·테스트 통과. **운영 정책은 아직 확정하지 않음**. [M5-1 정책표](M5_1_POLICY_GATE.md) 승인 전 실제 결제·회원가입 차단, 네이티브 실기기 보안 저장소 검증 필요.
 3. M5-2: 샌드박스 PG 및 승인된 정책에 의한 서버 금액 재검증·주문/재고 상태 전이·감사 로그. `lr_test`에서만 검증하며 운영 데이터에 접근하지 않음.
 4. M5-3: 수선 사진/위탁/관리자·원본 ERP 연계는 API·권한·모바일 UX를 각각 검증하며 기존 원본 RecruitApp을 보존.
 5. M6: 네이티브 E2E/회귀/보안/시각/성능·접근성·운영 릴리스 게이트.
