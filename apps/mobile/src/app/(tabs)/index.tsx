@@ -17,8 +17,7 @@ export default function Home(){
    <DemoNotice/>
    <View style={{backgroundColor:colors.ink,borderRadius:22,padding:25,gap:13,minHeight:190,justifyContent:'center'}}>
      <Text style={{color:'#D1D5DB',fontSize:11,fontWeight:'700',letterSpacing:3}}>CURATED FOR YOU</Text>
-     <Text style={{color:colors.surface,fontSize:27,fontWeight:'800',lineHeight:38}}>오늘의 스타일,{'
-'}소유보다 자유롭게.</Text>
+     <Text style={{color:colors.surface,fontSize:27,fontWeight:'800',lineHeight:38}}>오늘의 스타일,{'\n'}소유보다 자유롭게.</Text>
      <Text style={{color:'#E5E7EB',fontSize:13,lineHeight:21}}>다양한 명품을 둘러보고 나에게 맞는 이용 방식을 찾아보세요.</Text>
    </View>
    <Heading>어떤 서비스를 찾으세요?</Heading>
