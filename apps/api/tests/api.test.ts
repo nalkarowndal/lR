@@ -89,3 +89,16 @@ test('unavailable item returns conflict; no checkout created',async()=>{
   connection.release();
  }
 });
+
+test('CORS preflight permits only configured Expo web origin',async()=>{
+ const corsApp=createApp(pool,{demoMode:true,corsOrigins:['http://localhost:8081']});
+ const good=await request(corsApp).options('/api/v1/rentals/quote')
+  .set('Origin','http://localhost:8081')
+  .set('Access-Control-Request-Method','POST');
+ assert.equal(good.status,204);
+ assert.equal(good.headers['access-control-allow-origin'],'http://localhost:8081');
+ assert.equal(good.headers['access-control-allow-headers'].includes('Content-Type'),true);
+ const rejected=await request(corsApp).get('/health').set('Origin','https://attacker.example');
+ assert.equal(rejected.status,200);
+ assert.equal(rejected.headers['access-control-allow-origin'],undefined);
+});

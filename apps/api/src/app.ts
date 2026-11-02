@@ -24,10 +24,23 @@ const quoteSchema=dateSchema.extend({
  shippingOption:z.string().max(30).optional()
 });
 const detailSchema=z.object({id:z.string().min(1).max(40)});
-export function createApp(db:Database,{demoMode=false}:{demoMode?:boolean}={}){
+export function createApp(db:Database,{demoMode=false,corsOrigins=[]}:{demoMode?:boolean;corsOrigins?:string[]}={}){
  const app=express();
  app.disable('x-powered-by');
  app.use(helmet());
+ // Only explicitly configured browser origins can access the test API.
+ // Native Expo clients are unaffected because they do not rely on browser CORS.
+ app.use((req,res,next)=>{
+   const origin=req.get('Origin');
+   if(!origin||!corsOrigins.includes(origin)){next();return;}
+   res.setHeader('Access-Control-Allow-Origin',origin);
+   res.setHeader('Vary','Origin');
+   res.setHeader('Access-Control-Allow-Methods','GET,POST,DELETE,OPTIONS');
+   res.setHeader('Access-Control-Allow-Headers','Accept,Content-Type,Authorization,Idempotency-Key');
+   res.setHeader('Access-Control-Max-Age','600');
+   if(req.method==='OPTIONS'){res.sendStatus(204);return;}
+   next();
+ });
  app.use(express.json({limit:'32kb'}));
  app.use((req,res,next)=>{const requestId=randomUUID();res.locals.requestId=requestId;res.setHeader('X-Request-Id',requestId);next();});
  const meta=(res:Response)=>({requestId:res.locals.requestId});

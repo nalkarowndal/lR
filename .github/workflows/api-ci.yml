@@ -53,3 +53,17 @@ jobs:
         run: npm run db:seed:test --workspace @luxuryrental/api
       - name: Run API integration tests
         run: npm run api:test
+
+      - name: Start test Node API and validate live mobile↔API contracts
+        env:
+          API_HOST: 127.0.0.1
+          API_PORT: '4000'
+          TEST_API_URL: http://127.0.0.1:4000
+        run: |
+          npm run start --workspace @luxuryrental/api > /tmp/lr-test-api.log 2>&1 &
+          for attempt in $(seq 1 25); do
+            if curl --silent --fail http://127.0.0.1:4000/ready > /dev/null; then break; fi
+            sleep 1
+          done
+          curl --fail http://127.0.0.1:4000/ready
+          node --experimental-strip-types --test apps/mobile/integration/live-api.test.mjs

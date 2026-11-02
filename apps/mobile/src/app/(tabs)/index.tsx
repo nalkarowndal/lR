@@ -1,12 +1,14 @@
 import {Pressable,Text,View} from 'react-native';
 import {useRouter} from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import {products} from '../../domain/catalog';
+import {useProductList} from '../../api/hooks';
+import {DataSourceNotice,NetworkFeedback,LoadMore} from '../../components/NetworkFeedback';
 import {colors} from '../../theme';
 import {Screen,Panel,Action,Heading,Body,DemoNotice} from '../../components/ui';
 import {ProductGrid} from '../../components/ProductGrid';
 export default function Home(){
  const router=useRouter();
+ const catalog=useProductList({channel:'RENTAL'});
  const categories=[
   {label:'명품 렌탈',hint:'필요한 순간에 유연하게',bg:colors.rental,icon:'calendar-outline' as const,to:'/(tabs)/rental' as const},
   {label:'프리미엄 스토어',hint:'오래 간직할 선택',bg:colors.store,icon:'bag-handle-outline' as const,to:'/(tabs)/store' as const},
@@ -14,7 +16,7 @@ export default function Home(){
   {label:'수선 · 복원',hint:'소중한 가치를 오래',bg:colors.care,icon:'construct-outline' as const,to:'/(tabs)/care' as const}
  ];
  return <Screen title="LUXURYRENTAL" subtitle="Premium Rental & Boutique" right={<Pressable accessibilityRole="button" accessibilityLabel="상품 검색" onPress={()=>router.push('/search')} style={{height:48,width:48,alignItems:'center',justifyContent:'center'}}><Ionicons name="search-outline" size={23} color={colors.ink}/></Pressable>}>
-   <DemoNotice/>
+   <DemoNotice/><DataSourceNotice/>
    <View style={{backgroundColor:colors.ink,borderRadius:22,padding:25,gap:13,minHeight:190,justifyContent:'center'}}>
      <Text style={{color:'#D1D5DB',fontSize:11,fontWeight:'700',letterSpacing:3}}>CURATED FOR YOU</Text>
      <Text style={{color:colors.surface,fontSize:27,fontWeight:'800',lineHeight:38}}>오늘의 스타일,{'\n'}소유보다 자유롭게.</Text>
@@ -29,7 +31,8 @@ export default function Home(){
      </Pressable>)}
    </View>
    <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}><Heading>이달의 셀렉션</Heading><Pressable accessibilityRole="button" onPress={()=>router.push('/search')} style={{padding:12}}><Text style={{color:colors.accent,fontWeight:'700'}}>전체 보기</Text></Pressable></View>
-   <ProductGrid items={products.slice(0,4)}/>
+   <NetworkFeedback status={catalog.status} error={catalog.error} retry={catalog.retry}/>
+   {catalog.status==='ready'?(catalog.items.length?<><ProductGrid items={catalog.items}/><LoadMore hasNext={catalog.hasNext} loading={catalog.loadingMore} onPress={catalog.loadMore}/></>:<Panel><Body muted>등록된 상품이 없습니다.</Body></Panel>):null}
    <Panel><Heading>이용 안내</Heading><Body muted>대여료·보증금·배송 조건은 최종 서버 견적을 기준으로 안내합니다. 현재 화면에서는 결제가 발생하지 않습니다.</Body><Action label="렌탈 이용 방식 보기" onPress={()=>router.push('/(tabs)/rental')} secondary/></Panel>
  </Screen>;
 }
