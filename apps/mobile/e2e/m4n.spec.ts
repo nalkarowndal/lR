@@ -25,9 +25,9 @@ test('search, product detail and rental calendar flow without charging',async({p
  await page.getByRole('button',{name:'상품 검색'}).click();
  await expect(page.getByText('상품 검색',{exact:true}).first()).toBeVisible();
  await page.getByRole('textbox',{name:'상품 검색어'}).fill('Sera');
- await expect(page.getByText('The Sera Top Handle').first()).toBeVisible();
- await page.getByRole('button',{name:/The Sera Top Handle 상세 보기/}).click();
- await expect(page.getByText('The Sera Top Handle').first()).toBeVisible();
+ await expect(page.getByRole('button',{name:'The Sera Top Handle 상세 보기'})).toBeVisible();
+ await page.getByRole('button',{name:'The Sera Top Handle 상세 보기'}).click();
+ await expect(page.getByRole('button',{name:'렌탈 기간 선택'})).toBeVisible();
  await page.getByRole('button',{name:'렌탈 기간 선택'}).click();
  await expect(page.getByText('대여 기간 선택')).toBeVisible();
  await page.getByRole('textbox',{name:'대여 시작일 YYYY-MM-DD'}).fill('2026-11-10');
@@ -46,7 +46,7 @@ test('wishlist is a visual state and keeps product in client navigation',async({
  await page.getByRole('button',{name:'찜 추가'}).first().click();
  await tab(page,'마이').click();
  await page.getByText('찜한 상품',{exact:true}).click();
- await expect(page.getByText('The Sera Top Handle').first()).toBeVisible();
+ await expect(page.getByRole('button',{name:'The Sera Top Handle 상세 보기'})).toBeVisible();
  await capture(page,info,'wishlist-demo');
 });
 test('all interactive controls on home have nonempty accessible names',async({page},info)=>{
