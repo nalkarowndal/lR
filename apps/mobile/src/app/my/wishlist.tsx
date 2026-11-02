@@ -9,8 +9,9 @@ export default function Wishlist(){
  const router=useRouter();const {favorites}=useAppState();
  const resource=useProductIds(favorites);
  const items=resource.data||[];
- return <Screen title="찜한 상품" subtitle={favorites.length+'개 · 앱 메모리에만 임시 저장'} right={<Back/>}>
+ return <Screen title="찜한 상품" subtitle={favorites.length+'개 · 현재 앱 화면에서만 유지'} right={<Back/>}>
    <DemoNotice/><DataSourceNotice/>
+   <Body muted>찜은 시연용으로 현재 실행 중인 앱에서만 유지되며 새로고침 또는 재시작 시 초기화됩니다. 실제 회원 계정에는 저장되지 않습니다.</Body>
    <NetworkFeedback status={resource.status} error={resource.error} retry={resource.retry}/>
    {resource.status==='ready'?(items.length?<ProductGrid items={items}/>:<Panel>
     <Heading>아직 찜한 상품이 없어요</Heading>
