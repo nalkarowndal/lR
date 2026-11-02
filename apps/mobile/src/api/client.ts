@@ -1,9 +1,13 @@
-import type{Channel,Product,ProductArt} from '../domain/catalog.ts';
+import type{Channel,Product,ProductArt} from '../domain/catalog';
 
 export type ApiErrorKind='HTTP'|'NETWORK'|'TIMEOUT'|'CONFIG'|'CONTRACT';
 export class ApiError extends Error {
-  constructor(readonly kind:ApiErrorKind,message:string,readonly status?:number,readonly code?:string){
+  readonly kind:ApiErrorKind;
+  readonly status?:number;
+  readonly code?:string;
+  constructor(kind:ApiErrorKind,message:string,status?:number,code?:string){
     super(message);this.name='ApiError';
+    this.kind=kind;this.status=status;this.code=code;
   }
 }
 export interface PageResult{products:Product[];cursor:string|null;hasNext:boolean}
