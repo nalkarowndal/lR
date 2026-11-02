@@ -1,4 +1,4 @@
-# M5-2B1 — Toss Payments 웹훅 서명·조회 교차 검증 경계 (구현 검증 단계)
+# M5-2B1 — Toss Payments 웹훅 서명·조회 교차 검증 경계 (내부 테스트 통과)
 
 ## 목적
 M5-2A는 `lr_test` 내부에만 존재하는 **모의 주문/결제 원장**이다. 본 패키지는 실제 PG 연동 전에, Toss 웹훅의 **원본 바이트 서명 확인과 PG 조회 데이터 불일치 거절**을 라이브 키·네트워크 없이 검증한다. 공급자 계약, 영업 정책, PG 실거래는 **아직 미승인·미구현**이다.
@@ -9,13 +9,19 @@ M5-2A는 `lr_test` 내부에만 존재하는 **모의 주문/결제 원장**이�
 - `inspectSignedTossSandboxEvent` — 유효한 HMAC 확인 후 이벤트 본문 파싱, `PAYMENT_STATUS_CHANGED` 식별과 orderId, paymentKey 확인. **서버 주입형 테스트 조회 어댑터**의 `mId`(상점 ID), `orderId`, `paymentKey`, `totalAmount`(KRW 정수), `status`까지 교차 검증. DONE만 `SANDBOX_MATCH_ONLY`를 반환하고 취소/실패/만료/조회 오류는 `REVIEW_REQUIRED`.
 - **중요:** 이 결과는 내부 데이터 판독 결과이지 예약/결제 승인 명령이 아니다. 반환값으로 `lr_demo_orders`, 재고, `lr_rentals`, `lr_inventory_holds`를 변경하지 않는다. 공급자 조회 함수는 테스트 주입에만 존재하며 실 Toss API 호출·서명키 설정·HTTP 공개 라우트는 없다.
 
+## 검증 현황 (2026-11-02)
+- [PR #16 main 병합](https://github.com/nalkarowndal/lR/pull/16)
+- [Node/MySQL CI #41391225316](https://github.com/nalkarowndal/lR/actions/runs/41391225316): **60/60 PASS**, 서버↔모바일 HTTP **5/5 PASS**, 타입 빌드 PASS.
+- [Expo CI #41391225393](https://github.com/nalkarowndal/lR/actions/runs/41391225393): **21/21 PASS** 및 웹 번들 PASS.
+- 주의: 위 검증은 **합성 키/주입된 모의 PG 조회**로 실행. 실제 Toss sandbox와의 통신이나 실거래 보안 검증을 의미하지 않음.
+
 ## 검증과 보안 취약 사례
 - HMAC 원문 변경·서명 변조·타임스탬프 변조·키 교체·복수 서명·위조·크기/인코딩 제한
 - 서명 오류 시 결제 조회 함수 호출 금지
 - 웹훅 Order spoofing, provider lookup mId/orderId/paymentKey/amount/status 불일치
 - 미완료·취소·부분 취소·조회 실패 시 주문 확정 금지
 - 기존 `POST /api/v1/payments/confirm`과 `/api/v1/orders`는 501, Toss 공개 웹훅 경로는 404
-- 테스트 코드는 Node.js `node:test` + TypeScript `tsx` 기반. Node/MySQL CI, Expo CI 녹색을 확인 후 `main` 병합.
+- 테스트 코드는 Node.js `node:test` + TypeScript `tsx` 기반. Node/MySQL CI, Expo CI 녹색을 확인하고 `main` 병합.
 
 ## 다음 단계 (Issue #14 남음)
 1. 결제 사업자·통신·개인정보 처리·약관 및 POL-01~05 **영업/법률 승인**. PG 샌드박스 test key/secret은 GitHub에 커밋하지 않음.
