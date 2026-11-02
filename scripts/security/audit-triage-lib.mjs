@@ -3,7 +3,7 @@ import { summarizeAudit } from './audit-lib.mjs';
 // Evidence-only dependency triage; no assumption of app runtime reachability.
 const isRecord = v => v !== null && typeof v === 'object' && !Array.isArray(v);
 const validName = v => typeof v === 'string' && /^(?:@[a-zA-Z0-9_.-]+\/)?[a-zA-Z0-9_.-]+$/.test(v);
-const safeRange = v => typeof v === 'string' && /^[a-zA-Z0-9 .^~<>|=*+-]{1,100}$/.test(v) ? v.replaceAll('|', '/') : 'review';
+const safeRange = v => typeof v === 'string' && /^[a-zA-Z0-9 .^~<>=*+-]{1,100}$/.test(v) ? v.replaceAll('|', '/') : 'review';
 const safeVersion = v => typeof v === 'string' && /^[0-9a-zA-Z.+_-]{1,80}$/.test(v) ? v : 'unknown';
 function packageAt(path) {
   const at = path.lastIndexOf('node_modules/');
@@ -12,7 +12,7 @@ function packageAt(path) {
 }
 function ghsa(value) {
   if (typeof value !== 'string') return null;
-  const matched = value.match(/(?:^|\/)(GHSA-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4})(?:$|[?#])/i);
+  const matched = value.match(/^https:\/\/github\.com\/advisories\/(GHSA-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4})(?:$|[?#])/i);
   return matched ? matched[1].toUpperCase() : null;
 }
 export function analyzeAdvisories(lock, audit, scope = 'production') {
