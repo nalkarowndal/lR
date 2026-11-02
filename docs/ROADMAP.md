@@ -106,23 +106,12 @@
 - Report `Completed / Pending / Risk / QA evidence` at each phase boundary.
 - Do **not** claim a test passed when not run or a feature exists when only documented.
 
-## Current work status (2026-11-02)
+## Current status (2026-11-02)
 
-| Work item | Status |
-| --- | --- |
-| Designated repository and writing permission | Verified |
-| Node.js backend decision | Confirmed |
-| Architecture and phase definitions | Documented |
-| Latest original site source comparison | GitHub static audit completed; live DB/ZIP parity pending |
-| M1 requirements, IA, data model and API design | Documents completed; business policies pending |
-| M2 documents and Figma wireframes | Review artifacts prepared; 29 customer screens + 4 exception frames; see M2_VISUAL_QA.md for remaining corrections |
-| Approved Figma wireframes | Pending user visual review; native QA NOT_TESTED |
-| Node.js API source code | Not started |
-| React Native app source code | Not started |
-| Database migration / CI / QA | Not started |
+This is the historical M0–M6 scope and acceptance-gate document. **For the verified implementation/QA/PR state use [PROJECT_STATUS.md](PROJECT_STATUS.md).** For the new development cadence use [WORKFLOW_ACCELERATION.md](WORKFLOW_ACCELERATION.md).
 
-**Current next activity:** Review [M2 artifacts](M2_OVERVIEW.md), resolve the explicit [Figma corrections](M2_VISUAL_QA.md), and record user visual approval. The Starter-plan MCP limit prevented the final visual corrections; do not treat the wireframes as fully approved. M3 API/DB implementation starts only after actual MySQL schema/data checks and outstanding operational policy decisions.
-
-**M1 committed deliverables (2026-11-02):** [DECISIONS](DECISIONS_M1.md), [REQUIREMENTS](REQUIREMENTS.md), [INFORMATION_ARCHITECTURE](INFORMATION_ARCHITECTURE.md), [USER_FLOWS](USER_FLOWS.md), [DATA_MODEL](DATA_MODEL.md), [API_CONTRACT](API_CONTRACT.md), [ACCEPTANCE_TESTS](ACCEPTANCE_TESTS.md). M1 design baseline is complete, but customer business policies POL-01~05, live DB inspection, payment-provider selection and QA execution are not completed.
-
-**Important:** `docs/ARCHITECTURE.md` began as an M0 conceptual sketch. M1 detailed documents supersede older examples on dates, state transitions, database choice and endpoint shapes.
+- M2: Expo UI demo merged; Figma visual approval and physical-device QA not completed.
+- M3.1: Node.js/Express 5/MySQL catalog, availability, demo quote merged and CI verified.
+- M3.2: Internal idempotent unit holds implemented in [PR #4](https://github.com/nalkarowndal/lR/pull/4), 18/18 test cases passed; remains Draft and not merged or public.
+- M3.3 onward: Plan authentication/RBAC plus authenticated hold API in a **single user-visible implementation package**, safely split into focused PRs and tested before opening checkout.
+- No production data, real payment, authentication or commercial launch readiness claim.

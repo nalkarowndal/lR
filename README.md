@@ -1,6 +1,6 @@
 # luxuryRental — Premium Rental & Luxury Boutique App
 
-> Status: **M1 baseline documented; M2 design artifacts ready for review, visual approval pending** · Updated: 2026-11-02  
+> Status: **M0–M2 documented, Expo mobile UI + M3.1 Node API merged; M3.2 holds PR #4 QA passed (review pending)** · Updated: 2026-11-02
 > Repository: **nalkarowndal/lR**  
 > This repository is for the **new mobile app and its Node.js backend**. It is not a replacement for the original luxuryRental website.
 
@@ -14,12 +14,12 @@ Build a mobile-first premium experience that combines luxury goods **rental**, *
 | --- | --- |
 | Repository | `https://github.com/nalkarowndal/lR` |
 | Product name | `luxuryRental` (preserve existing branding) |
-| Mobile | React Native + Expo + TypeScript (planned) |
-| Backend | **Node.js + TypeScript + Express** (selected baseline; not yet implemented) |
+| Mobile | React Native + Expo + TypeScript (initial demo UI implemented) |
+| Backend | **Node.js + TypeScript + Express 5** (M3.1 API implemented; production auth/booking not yet) |
 | Database | **MySQL/InnoDB selected for initial API development** to preserve legacy compatibility; current data not migrated. Prisma optional after version verification |
-| API | Versioned REST API, planned `/api/v1` |
+| API | Versioned REST API, initial catalog/availability/demo quote endpoints at `/api/v1` |
 | Admin | Preserve and integrate with existing luxuryRental web/ERP/CMS where feasible |
-| Development phase | Requirements, UI/UX, architecture, and technical verification **before implementing app code** |
+| Development phase | M3 backend implementation active; staged security/commerce gates |
 
 ## Scope
 
@@ -33,7 +33,7 @@ Build a mobile-first premium experience that combines luxury goods **rental**, *
 
 ## M2 UI/UX design review
 
-M2 design documentation and an editable Figma wireframe prototype are prepared for review. Final visual approval remains pending; see the explicit Figma limitations and native QA status below. No app or Node.js code has been started.
+M2 design documentation and an editable Figma wireframe prototype are prepared for review. Final visual approval remains pending; see the explicit Figma limitations and native QA status below. Expo UI and basic Node.js API code have now been merged; this M2 section describes design artifact history.
 
 - [M2 design overview and deliverable index](docs/M2_OVERVIEW.md)
 - [Design system and source identity](docs/DESIGN_SYSTEM.md)
@@ -43,6 +43,13 @@ M2 design documentation and an editable Figma wireframe prototype are prepared f
 - [Responsive and accessibility guidance](docs/RESPONSIVE_ACCESSIBILITY.md)
 - [Figma prototype, visual QA and remaining work](docs/M2_VISUAL_QA.md)
 - [Editable Figma design](https://www.figma.com/design/6mmceyHRPsWoR1JxUAnMja)
+
+## Active development and lean workflow
+
+- [Current status and QA references](docs/PROJECT_STATUS.md) — **open this first** when resuming work
+- [Lean M3–M6 delivery policy](docs/WORKFLOW_ACCELERATION.md) — linked features, PR/CI rules and safe automation
+- [M3.2 concurrency-tested inventory holds PR #4](https://github.com/nalkarowndal/lR/pull/4) — review pending, not public API
+- [M3 Node.js API package](apps/api/README.md), [Expo mobile UI package](apps/mobile/README.md)
 
 ## Planning documents
 
@@ -69,16 +76,14 @@ M2 design documentation and an editable Figma wireframe prototype are prepared f
 6. Separate demo/mock payment and data from live operations.
 7. Do not commit `.env`, credentials, customer information, private uploads, build outputs or analysis ZIP archives.
 
-## Proposed repository structure (NOT YET CREATED)
+## Repository structure (existing plus planned shared packages)
 
 ```text
 lR/
 ├── apps/
 │   ├── mobile/                 # React Native / Expo
 │   └── api/                    # Node.js / Express / TypeScript
-├── packages/
-│   ├── shared-types/           # DTOs / enums / shared contracts
-│   └── api-client/             # Typed API client
+├── packages/                  # NOT CREATED; proposed shared-types and API client
 ├── docs/
 │   ├── ARCHITECTURE.md
 │   ├── ROADMAP.md
@@ -96,4 +101,4 @@ lR/
 └── README.md
 ```
 
-> **Current state:** planning documents only. No claim of a working API, database migration, build, or QA pass.
+> **Current state:** Expo mobile demo UI and Node.js product/availability/demo quote API are in main with recorded CI. User auth, live checkout, production DB migration and native visual QA are **not completed**. See [PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
