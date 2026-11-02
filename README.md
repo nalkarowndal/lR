@@ -1,6 +1,6 @@
 # luxuryRental — Premium Rental & Luxury Boutique App
 
-> Status: **M1 requirements & logical data baseline documented; M2 design pending** · Updated: 2026-11-02  
+> Status: **M1 baseline documented; M2 design artifacts ready for review, visual approval pending** · Updated: 2026-11-02  
 > Repository: **nalkarowndal/lR**  
 > This repository is for the **new mobile app and its Node.js backend**. It is not a replacement for the original luxuryRental website.
 
@@ -30,6 +30,19 @@ Build a mobile-first premium experience that combines luxury goods **rental**, *
 - Account: authentication, favorites, bookings, orders, returns, care requests
 - Admin integration: products, individual units, inventory statuses, rentals/orders, editorials and audits
 - Existing ancillary modules (including consignment and store **staffing management**, not a public hiring page) must be mapped before final IA is approved
+
+## M2 UI/UX design review
+
+M2 design documentation and an editable Figma wireframe prototype are prepared for review. Final visual approval remains pending; see the explicit Figma limitations and native QA status below. No app or Node.js code has been started.
+
+- [M2 design overview and deliverable index](docs/M2_OVERVIEW.md)
+- [Design system and source identity](docs/DESIGN_SYSTEM.md)
+- [29-screen wireframes](docs/SCREEN_WIREFRAMES.md)
+- [Component specifications](docs/COMPONENT_SPECIFICATIONS.md)
+- [Interactions and API gaps](docs/INTERACTION_SPEC.md)
+- [Responsive and accessibility guidance](docs/RESPONSIVE_ACCESSIBILITY.md)
+- [Figma prototype, visual QA and remaining work](docs/M2_VISUAL_QA.md)
+- [Editable Figma design](https://www.figma.com/design/6mmceyHRPsWoR1JxUAnMja)
 
 ## Planning documents
 
