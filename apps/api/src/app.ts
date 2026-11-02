@@ -7,6 +7,7 @@ import {problem} from './problem.js';
 import {getAvailability,getProduct,listProducts} from './products.js';
 import {rentalDays} from './date.js';
 import {mountAuthRoutes} from './auth.js';
+import {mountRentalHoldRoutes} from './rental-hold-routes.js';
 
 const listSchema=z.object({
  q:z.string().trim().max(100).optional(),brand:z.string().trim().max(120).optional(),
@@ -31,6 +32,7 @@ export function createApp(db:Database,{demoMode=false}:{demoMode?:boolean}={}){
  app.use((req,res,next)=>{const requestId=randomUUID();res.locals.requestId=requestId;res.setHeader('X-Request-Id',requestId);next();});
  const meta=(res:Response)=>({requestId:res.locals.requestId});
  mountAuthRoutes(app,db,{demoMode});
+ mountRentalHoldRoutes(app,db,{demoMode});
  app.get('/health',(_req,res)=>{res.json({status:'ok'});});
  app.get('/ready',async(req,res)=>{
    try{await db.query('SELECT 1');res.json({status:'ready'});}
