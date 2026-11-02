@@ -8,8 +8,12 @@ if(config.DB_NAME!=='lr_test'||config.NODE_ENV==='production'){
 }
 const pool=openPool(config);
 try{
- const sql=await readFile(fileURLToPath(new URL('../sql/001_test_schema.sql',import.meta.url)),'utf8');
- const statements=sql.split(';').map(s=>s.trim()).filter(Boolean);
- for(const statement of statements)await pool.query(statement);
- console.log('Installed '+statements.length+' additive test-schema statements in lr_test');
+ const filenames=['001_test_schema.sql','002_test_hold_requests.sql'];
+ let installed=0;
+ for(const filename of filenames){
+   const sql=await readFile(fileURLToPath(new URL('../sql/'+filename,import.meta.url)),'utf8');
+   const statements=sql.split(';').map(s=>s.trim()).filter(Boolean);
+   for(const statement of statements){await pool.query(statement);installed++;}
+ }
+ console.log('Installed '+installed+' additive test-schema statements in lr_test');
 }finally{await pool.end();}
