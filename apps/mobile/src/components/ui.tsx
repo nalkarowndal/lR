@@ -22,7 +22,7 @@ export function Action({label,onPress,secondary=false,disabled=false,loading=fal
  return <Pressable accessibilityRole="button" accessibilityState={{disabled:disabled||loading,busy:loading}} onPress={onPress} disabled={disabled||loading}
  style={({pressed})=>[styles.action,secondary?styles.secondary:null,(disabled||loading)?{opacity:.5}:null,pressed?{opacity:.78}:null]}>
  {icon?<Ionicons name={icon} size={20} color={secondary?colors.ink:colors.surface}/>:null}
- <Text style={[styles.actionLabel,secondary?{color:colors.ink}:null]}>{loading?'처리 중…':label}</Text></Press>
+ <Text style={[styles.actionLabel,secondary?{color:colors.ink}:null]}>{loading?'처리 중…':label}</Text></Pressable>
 }
 export function DemoNotice(){
  return <View style={styles.demo}><Ionicons name="information-circle-outline" color={colors.sub} size={20}/><Text style={{color:colors.sub,flex:1,fontSize:13,lineHeight:19}}>디자인 시연용 상품과 금액입니다. 예약·결제·개인정보는 실제 저장되지 않습니다.</Text></View>;
