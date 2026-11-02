@@ -23,7 +23,8 @@
 | M5-3A 수선·위탁 신청·관리자 RBAC | [PR #23](https://github.com/nalkarowndal/lR/pull/23), [Node/MySQL CI](https://github.com/nalkarowndal/lR/actions/runs/41407821483), [Expo CI](https://github.com/nalkarowndal/lR/actions/runs/41407821496), [문서](M5_3A_SERVICE_REQUESTS.md) | **main 병합** · API/MySQL **94/94**, HTTP **5/5**, 모바일 **25/25 PASS**. 고객 본인 신청/조회/취소, 관리자 RBAC/상태머신·동시 멱등·감사. **test-only**; 실물 수선/위탁·ERP 미연동 |
 | M5-3B 테스트 ERP Outbox·임대 재처리 | [PR #25](https://github.com/nalkarowndal/lR/pull/25), [Node CI](https://github.com/nalkarowndal/lR/actions/runs/41409390813), [Expo CI](https://github.com/nalkarowndal/lR/actions/runs/41409390982), [명세](M5_3B_ERP_OUTBOX.md) | **main 병합**, MySQL/API **102/102 PASS**, HTTP **5/5**, 모바일 **25/25 PASS**. 원자 이벤트·감사·임대/재시도/DEAD, 모의 ERP 전용. 운영 ERP 미연결 |
 | M6-0 의존성 잠금·CI 설치 재현성 | [PR #27](https://github.com/nalkarowndal/lR/pull/27), [API CI](https://github.com/nalkarowndal/lR/actions/runs/41411032537), [모바일 CI](https://github.com/nalkarowndal/lR/actions/runs/41411032534), [Chromium CI](https://github.com/nalkarowndal/lR/actions/runs/41411032533), [문서](M6_0_REPRODUCIBLE_CI.md) | **main 병합** · root package-lock v3, 세 CI `npm ci` + lockfile 캐시. API **102/102**, HTTP **5/5**, 모바일 **25/25**, Chromium **40/40 PASS**. 임시 lock 생성 워크플로 삭제 |
-| M6-1 보안·릴리스 게이트 | [Issue #28](https://github.com/nalkarowndal/lR/issues/28) | **다음 개발** · 의존성 보안·권한/성능/장애 QA. Android/iOS 실기기·POL-01~05 승인 미완료, 상용 출시 차단 |
+| M6-1A npm 취약점 인벤토리·API 보안 회귀 | [PR #29](https://github.com/nalkarowndal/lR/pull/29), [감사 CI](https://github.com/nalkarowndal/lR/actions/runs/41412864760), [API CI](https://github.com/nalkarowndal/lR/actions/runs/41412864705), [모바일 CI](https://github.com/nalkarowndal/lR/actions/runs/41412864825), [문서](M6_1A_SECURITY_AUDIT.md) | **main 병합**, API/MySQL **106/106**, HTTP **5/5**, 모바일 **25/25 PASS**. npm audit critical 0/high 0/**moderate 11**(운영·전체 동일). 인벤토리/실제 출시 차단 회귀 완료. **취약점 미해결 및 상용 출시 차단** |
+| M6-1B 취약점 분류·SDK 58 호환성 조치 | [Issue #30](https://github.com/nalkarowndal/lR/issues/30) | **다음 개발**, Expo/CLI/glob/minimatch 계열 보통 11 영향 패키지 분석·안전한 수정·CI 검증. 네이티브 QA/운영승인 별도 |
 | M6 실기기·시각·성능·보안 | 없음 | 완료 주장 불가 |
 
 ## 변경하지 않는 안전 제한
@@ -43,16 +44,16 @@
 
 ## 다음 연속 작업 패키지
 
-**M6-0 npm lockfile·npm ci 재현 가능한 CI 패키지 완료, 다음 M6-1 보안/실기기 QA:** API/MySQL 102/102, HTTP 5/5, 모바일 25/25, Chromium 40/40 PASS. 실제 PG 테스트 키·운영 정책 승인은 여전히 미완료. 실제 Android/iOS 기기·접근성, 운영 계정·PG·보증금/취소/물류 정책 미승인으로 **상용 출시 Gate는 미통과**.
+**M6-1A 의존성 보안 감사·릴리스 API 차단 회귀 병합 완료, 다음 M6-1B 취약점 11개 패키지 분류:** API/MySQL 106/106, HTTP 5/5, 모바일 25/25 PASS. 직전 Chromium 40/40 PASS(이번 PR 미실행). 실제 PG 테스트 키·운영 정책 승인은 여전히 미완료. 실제 Android/iOS 기기·접근성, 운영 계정·PG·보증금/취소/물류 정책 미승인으로 **상용 출시 Gate는 미통과**.
 
 1. M4-N: Chromium 화면 QA를 [UX-A PR #17](https://github.com/nalkarowndal/lR/pull/17)와 [UX-BC PR #18](https://github.com/nalkarowndal/lR/pull/18)에서 확장했고 최신 브라우저 **40/40 PASS**. [Issue #10](https://github.com/nalkarowndal/lR/issues/10)의 실제 Android/iOS·VoiceOver/TalkBack·스크린샷 수동 판독 및 Expo Doctor 확인은 **계속 미완료**.
 2. M5-1: 데모 계정 UI와 SecureStore 네이티브 저장 코드는 [PR #12](https://github.com/nalkarowndal/lR/pull/12)에서 구현·테스트 통과. **운영 정책은 아직 확정하지 않음**. [M5-1 정책표](M5_1_POLICY_GATE.md) 승인 전 실제 결제·회원가입 차단, 네이티브 실기기 보안 저장소 검증 필요.
 3. M5-2: [PR #15](https://github.com/nalkarowndal/lR/pull/15) 모의 원장, [PR #16](https://github.com/nalkarowndal/lR/pull/16) HMAC, [PR #20](https://github.com/nalkarowndal/lR/pull/20) 읽기 전용 PG 테스트 어댑터, [PR #21](https://github.com/nalkarowndal/lR/pull/21) **영속 상태 재대조 83/83 PASS**. 실제 Toss 테스트 계정/키·사업 정책 승인은 [Issue #14](https://github.com/nalkarowndal/lR/issues/14)에서 보류. 운영 PG·환불·예약 확정 비활성 유지.
 4. M5-3: [PR #23](https://github.com/nalkarowndal/lR/pull/23) 수선·위탁/API/RBAC + [PR #25](https://github.com/nalkarowndal/lR/pull/25) **격리 Outbox·모의 ERP 임대/재시도 102/102 PASS**. 실제 운영 ERP·사진 업로드는 별도 안전 게이트로 유지, 기존 웹 `567890` 보존.
 5. UX-D: [Issue #19](https://github.com/nalkarowndal/lR/issues/19)에서 승인된 **실제 상품 사진** 사용권·공급 API·CDN/alt·관리자 검수와 Android/iOS 실기기 이미지 QA 필요. 현재 상품 사진 대신 시연용 일러스트를 표시.
-6. M6: [PR #27](https://github.com/nalkarowndal/lR/pull/27)에서 잠금 파일/npm ci·CI 설치 재현성 **모두 PASS**. 다음 [Issue #28](https://github.com/nalkarowndal/lR/issues/28) 보안 의존성·권한/성능 회귀 및 네이티브 E2E/실기기 QA는 별도 출시 게이트.
+6. M6: [PR #27](https://github.com/nalkarowndal/lR/pull/27) npm ci 설치 재현성, [PR #29](https://github.com/nalkarowndal/lR/pull/29) 보안 감사/운영 차단 회귀 **모두 CI PASS**. [Issue #30](https://github.com/nalkarowndal/lR/issues/30) moderate 11개 영향 패키지 검토, [Issue #28](https://github.com/nalkarowndal/lR/issues/28) 네이티브 E2E/보안·성능·실기기 QA는 미완료 출시 게이트.
 
-**CI 현황:** 루트 `package-lock.json`(Node 22/npm 10, lockfileVersion 3)을 커밋하고 3개 워크플로를 `npm ci --include=dev`로 전환 완료. [Chromium #41411032533](https://github.com/nalkarowndal/lR/actions/runs/41411032533) offline 34/34 + API 장애 6/6. **취약점 스캔·실기기 QA·사업/운영 승인 아직 미완료**.
+**CI 현황:** npm lockfile+`npm ci` 재현성, API 106/106, HTTP 5/5, 모바일 25/25. [npm 보안 #41412864760](https://github.com/nalkarowndal/lR/actions/runs/41412864760)은 실제 registry query 성공, **moderate 11개 영향 패키지 미해결**. 직전 [Chromium #41411032533](https://github.com/nalkarowndal/lR/actions/runs/41411032533) offline 34/34 + API 장애 6/6. **실기기 QA·사업/운영 승인 미완료, 릴리스 차단**.
 
 ## 상태 갱신 규칙
 한 패키지 종료마다 6줄만 갱신한다: 목표/변경 파일/PR·커밋/자동테스트 URL/남은 위험/다음 기능 패키지. 긴 페이즈 보고서 또는 전체 소스 재요약은 요청이 있을 때만 작성.
