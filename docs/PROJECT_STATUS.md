@@ -8,8 +8,8 @@
 | M1 요구사항·데이터·API 계약 | [REQUIREMENTS.md](REQUIREMENTS.md), [DATA_MODEL.md](DATA_MODEL.md), [API_CONTRACT.md](API_CONTRACT.md) | 설계 기준선 완료, POL-01~05 영업 정책 미승인 |
 | M2 고객 UI | [PR #2](https://github.com/nalkarowndal/lR/pull/2) main 병합, [모바일 CI](https://github.com/nalkarowndal/lR/actions/runs/41377221725) | Expo 5탭·시연 UI 코드 및 타입·번들 통과, Android/iOS 실기기 시각 QA 미실행 |
 | M3.1 Node API·MySQL | [PR #3](https://github.com/nalkarowndal/lR/pull/3) main 병합, [CI](https://github.com/nalkarowndal/lR/actions/runs/41377221663) | Express/MySQL 읽기·시연 견적 API, 테스트 9/9 |
-| M3.2 내부 재고 홀드 | [PR #4](https://github.com/nalkarowndal/lR/pull/4), [CI](https://github.com/nalkarowndal/lR/actions/runs/41378216156) | Draft PR, 격리 DB 통합 18/18 PASS. **main 미병합, 고객용 비공개** |
-| M3.3 인증·RBAC·홀드 API | 아직 PR 없음 | 미착수; 인증 뒤 연결 필요 |
+| M3.2 내부 재고 홀드 | [PR #4](https://github.com/nalkarowndal/lR/pull/4), [CI](https://github.com/nalkarowndal/lR/actions/runs/41378216156) | **main 병합 완료**, 격리 DB 통합 18/18 PASS. 내부 API 재사용 |
+| M3.3 인증·RBAC·홀드 API | [PR #7](https://github.com/nalkarowndal/lR/pull/7), [PR #8](https://github.com/nalkarowndal/lR/pull/8), [CI](https://github.com/nalkarowndal/lR/actions/runs/41380191605), [설명](M3_3_AUTH_HOLD_API.md) | **main 병합 완료·시연 구현 통과**, MySQL/API 33/33 + Expo CI PASS. 운영회원·결제 출시 불가 |
 | M4 고객 API 연결 | 아직 PR 없음 | Expo 현재 샘플 데이터 사용 |
 | M5 운영/PG/ERP | 아직 PR 없음 | 실제 PG·운영 데이터·ERP 미연동 |
 | M6 실기기·시각·성능·보안 | 없음 | 완료 주장 불가 |
@@ -20,12 +20,12 @@
 - Figma 검수 및 운영 정책 미승인 상태를 앱 출시 승인으로 간주하지 않음.
 
 ## 다음 연속 작업 패키지
-**M3.3 통합 목표:** 로그인/세션 → DB 기반 역할/소유권 검증 → 인증된 사용자의 임시 렌탈 홀드 API → 401/403/409·멱등성·20건 동시성 테스트 → Expo 연결 가능 DTO 명세.
-- A/인증+RBAC: 별도 PR (테스트: 잘못된 세션/권한/타 사용자 거부)
-- B/홀드 API 연결: A를 기반으로 별도 PR (테스트: 현재 홀드 서비스 재사용, 재고 충돌과 멱등성)
-- **이 두 PR을 하나의 사용자 요청/개발 목표로 연속 처리**하며 매번 다음 단계 착수 허락을 요구하지 않는다. 단 실제 서비스 로그인/결제 공개는 승인 게이트 적용.
-- **M3.3 완료:** 두 PR 변경이 main에 안전하게 병합되고 현재 커밋의 테스트·보고가 존재할 때만 사용.
-- **다음 기능 통합:** M4 Expo API client 연계 및 오류/로딩 UI, M5 샌드박스 결제/수선/관리자 작업, M6 기기 QA.
+
+**M4 통합 목표:** Expo의 로컬 시연 상품·견적 화면을 **Node API의 실제 조회 응답**과 연결. 구성 가능한 API Base URL, 로딩/빈 목록/오류/재시도, 테스트 환경 구분, 토큰 저장소 보안 가이드 및 계약 테스트를 우선한다.
+- A/공통 API 클라이언트 + 상품 상세·검색·가용성: API 계약, 시연 데이터 격리
+- B/견적/임시 홀드 UI는 **별도의 동의·정책 결정과 안전한 세션 저장 방법 검증** 후 연동; 실제 주문/PG는 여전히 501
+- **M4 완료 조건:** 고객 화면에서 테스트용 Node API로 읽기/견적 흐름 검증 + Android/iOS 시각 검수 증거(또는 미실시 명시)
+- **운영/출시 차단:** 이메일 본인 확인, 분산 로그인 레이트 리밋, 승인된 개인정보 처리·보증금·물류/취소 정책, PG, 운영 DB 마이그레이션/감사로그, 원본 앱 데이터 검증.
 
 **CI 현황:** npm workspace에 현재 `package-lock.json`이 없음. 매번 의존성 버전 선택이 달라질 수 있어 **다음 인프라 패키지에서 lockfile 생성 및 `npm ci`로 이전 필수**. 현행 `npm install`+캐시는 임시 조치일 뿐 재현성 완료가 아님.
 
