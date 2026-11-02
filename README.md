@@ -1,6 +1,6 @@
 # luxuryRental — Premium Rental & Luxury Boutique App
 
-> Status: **M3.3 server auth/holds and M4 Expo↔Node data integration merged and CI verified; real checkout and native-device QA still open** · Updated: 2026-11-02
+> Status: **M3.3/M4 Expo↔Node API integration and M4-N Chromium responsive browser QA merged and CI verified; real checkout and native-device QA still open** · Updated: 2026-11-02
 > Repository: **nalkarowndal/lR**  
 > This repository is for the **new mobile app and its Node.js backend**. It is not a replacement for the original luxuryRental website.
 
@@ -51,6 +51,7 @@ M2 design documentation and an editable Figma wireframe prototype are prepared f
 - [M3.2 concurrency-tested inventory holds PR #4](https://github.com/nalkarowndal/lR/pull/4) — merged; demo holds via M3.3 auth API only
 - [M3.3 auth/RBAC + demo holds](docs/M3_3_AUTH_HOLD_API.md) — merged, 33/33 MySQL tests
 - [M4 mobile API integration](docs/M4_MOBILE_API.md) — [PR #9 merged](https://github.com/nalkarowndal/lR/pull/9), [34/34 MySQL + 4/4 live HTTP](https://github.com/nalkarowndal/lR/actions/runs/41381735806) and [14/14 mobile CI](https://github.com/nalkarowndal/lR/actions/runs/41381735807)
+- [M4-N responsive browser QA](docs/M4N_WEB_QA.md) — [PR #11 merged](https://github.com/nalkarowndal/lR/pull/11), [Playwright 15/15 PASS](https://github.com/nalkarowndal/lR/actions/runs/41383695339); **actual Android/iOS and manual screenshot review still pending**
 - [M3 Node.js API package](apps/api/README.md), [Expo mobile UI package](apps/mobile/README.md)
 
 ## Planning documents

@@ -9,8 +9,15 @@
 
 ## CI
 - New `.github/workflows/m4n-visual.yml` invokes the Expo web development server, Playwright Chromium and stores HTML reports/screenshots/traces (14 days).
-- The existing Expo TypeScript/Node API/MySQL CI remains unchanged. Browser visual QA may reveal further bugs; only record PASS after the actual GitHub run confirms it.
+- The existing Expo TypeScript/Node API/MySQL CI remains unchanged. Browser test assertions **PASS** on [run #41383695339](https://github.com/nalkarowndal/lR/actions/runs/41383695339): offline 12/12 (3 viewport projects), API-unreachable 3/3; mobile TypeScript/domain/export [run #41383695435](https://github.com/nalkarowndal/lR/actions/runs/41383695435): PASS.
 - Review captured screenshots manually for clipped text, overlaps, responsive grid, calendar & keyboard focus. Automation detects only selected regressions.
+
+## Verified CI evidence (2026-11-02)
+- [Playwright Chromium CI](https://github.com/nalkarowndal/lR/actions/runs/41383695339): **15 tests PASS**, failure 0; [Expo mobile CI](https://github.com/nalkarowndal/lR/actions/runs/41383695435): PASS.
+- [Offline responsive screenshots and HTML report (14 days)](https://github.com/nalkarowndal/lR/actions/runs/41383695339/artifacts/13114721964) — tabs, demo quotation and wishlist.
+- [Unreachable API screenshots / report (14 days)](https://github.com/nalkarowndal/lR/actions/runs/41383695339/artifacts/13114786569) — network error / retry, no fixture fallback.
+- Earlier test failures were **locator issues** where an inactive Expo Router view retained hidden copies of product titles. Fixed selectors to use accessible, currently visible product-card controls. Existing app code wasn't modified for these test-only failures.
+- **Not independently inspected:** attached screenshots' visual fidelity, specific color contrast, keyboard, Android/iOS native app.
 
 ## Not yet verified / native acceptance gate
 - [ ] Android real hardware or emulator on representative resolution, OS and physical keyboard
