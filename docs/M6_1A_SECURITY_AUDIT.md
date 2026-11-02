@@ -8,6 +8,14 @@
 - 현재 검증 범위는 **자동 취약점 인벤토리 + 기존 API 안전 게이트 회귀**이며, 취약점을 자동 고치거나 운영 PG/ERP를 활성화하지 않는다. 실제 npm advisory 수치는 [Actions 기록](https://github.com/nalkarowndal/lR/actions/workflows/m6-security-audit.yml)에서 확인한다.
 - 새로운 회귀 테스트로 운영 모드 실결제/주문/렌탈/수선/인증 요청 501, CORS 허용 출처 일치, Helmet과 DB 오류 응답 개인정보 미노출을 검증한다.
 
+## 2026-11-02 CI 실측 감사 결과
+- [PR #29 main 병합](https://github.com/nalkarowndal/lR/pull/29) · [API/MySQL CI #41412864705](https://github.com/nalkarowndal/lR/actions/runs/41412864705): **106/106 PASS**, HTTP **5/5 PASS**. [Mobile CI #41412864825](https://github.com/nalkarowndal/lR/actions/runs/41412864825): **25/25 PASS**, Expo TS/web export PASS.
+- [npm Audit CI #41412864760](https://github.com/nalkarowndal/lR/actions/runs/41412864760): 실제 registry 응답에 대한 파서 테스트 **4/4 PASS**. 운영 의존성: **critical 0, high 0, moderate 11, low 0**. 전체 의존성 역시 **critical 0, high 0, moderate 11, low 0**.
+- 영향 패키지: `expo`, `@expo/cli`, `@expo/config`, `@expo/config-plugins`, `@expo/fingerprint`, `@expo/inline-modules`, `@expo/local-build-cache-provider`, `@expo/metro-config`, `@expo/prebuild-config`, `glob`, `minimatch`. **11개 서로 다른 CVE나 11개 실제 운영 공격 경로를 의미하지 않음.**
+- [원시 JSON/정제 Markdown 아티팩트](https://github.com/nalkarowndal/lR/actions/runs/41412864760/artifacts/13126751313)에서 advisory와 버전/수정 가능 여부를 조사. 모든 발견은 [Issue #30](https://github.com/nalkarowndal/lR/issues/30)에서 SDK58 호환성·영향 분석 후 안전 조치해야 하며, **현재 미해결**.
+- 이 PR에서 변경하지 않은 Chromium UI 검증은 [직전 M6-0 #41411032533](https://github.com/nalkarowndal/lR/actions/runs/41411032533)의 40/40 PASS를 참조하며 **M6-1A 최신 커밋의 브라우저 QA를 실행한 것은 아님**.
+- **보안 스캔 파이프라인 성공 = 보안 무결점/출시 가능 아님**. Android/iOS 기기 QA, 운영 개인정보/PG/ERP 정책 승인 등 별도 필수 조건은 계속 차단.
+
 ## 완료/릴리스 게이트
 - Audit report의 **inventory 성공은 보안 합격이 아니다**. 취약점별 실제 영향 패키지/전이 의존성/상위 버전/Expo SDK 58 호환성과 수정 가능성을 분석해야 한다. 발견된 고위험 항목은 개별 Issue/PR로 등록한다.
 - 릴리스 필수 외부 조건: [Issue #10](https://github.com/nalkarowndal/lR/issues/10) Android/iOS 실기기 QA, [Issue #14](https://github.com/nalkarowndal/lR/issues/14) POL-01~05/실 토스 샌드박스, 운영 ERP 승인, 실상품 사진 권리.
