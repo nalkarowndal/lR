@@ -1,6 +1,6 @@
 # luxuryRental — Premium Rental & Luxury Boutique App
 
-> Status: **M3.3–M5.1 demo authentication UI, Expo↔Node data integration, Chromium QA merged and CI verified; live payments/native-device QA not complete** · Updated: 2026-11-02
+> Status: **M3.3–M5.2A demo auth, API/UI and isolated simulated payment ledger merged with CI; real PG/native-device QA not complete** · Updated: 2026-11-02
 > Repository: **nalkarowndal/lR**  
 > This repository is for the **new mobile app and its Node.js backend**. It is not a replacement for the original luxuryRental website.
 
@@ -19,7 +19,7 @@ Build a mobile-first premium experience that combines luxury goods **rental**, *
 | Database | **MySQL/InnoDB selected for initial API development** to preserve legacy compatibility; current data not migrated. Prisma optional after version verification |
 | API | Versioned REST API at `/api/v1`; typed Expo client connected to catalog/availability/demo quote in M4 |
 | Admin | Preserve and integrate with existing luxuryRental web/ERP/CMS where feasible |
-| Development phase | M5.1 demo account UI and native SecureStore adapter merged with CI; operational auth/commerce approval and device QA still pending |
+| Development phase | M5.2A test-only simulated payment ledger merged with CI; approved business policies, real PG, operational auth and native-device QA all pending |
 
 ## Scope
 
@@ -53,6 +53,7 @@ M2 design documentation and an editable Figma wireframe prototype are prepared f
 - [M4 mobile API integration](docs/M4_MOBILE_API.md) — [PR #9 merged](https://github.com/nalkarowndal/lR/pull/9), [34/34 MySQL + 4/4 live HTTP](https://github.com/nalkarowndal/lR/actions/runs/41381735806) and [14/14 mobile CI](https://github.com/nalkarowndal/lR/actions/runs/41381735807)
 - [M4-N responsive browser QA](docs/M4N_WEB_QA.md) — [PR #11 merged](https://github.com/nalkarowndal/lR/pull/11), [Playwright 15/15 PASS](https://github.com/nalkarowndal/lR/actions/runs/41383695339); **actual Android/iOS and manual screenshot review still pending**
 - [M5.1 demo login + native SecureStore](docs/M5_1_POLICY_GATE.md) — [PR #12 merged](https://github.com/nalkarowndal/lR/pull/12), [mobile 21/21](https://github.com/nalkarowndal/lR/actions/runs/41385121007), [Node API 35/35 + HTTP 5/5](https://github.com/nalkarowndal/lR/actions/runs/41385121036), [Chromium 21/21](https://github.com/nalkarowndal/lR/actions/runs/41385121132). All business/PG policies **unapproved**.
+- [M5.2A test-only simulated payment ledger](docs/M5_2_SANDBOX_LEDGER.md) — [PR #15 merged](https://github.com/nalkarowndal/lR/pull/15), [Node/MySQL 46/46 + real HTTP 5/5](https://github.com/nalkarowndal/lR/actions/runs/41390133467), [Expo 21/21](https://github.com/nalkarowndal/lR/actions/runs/41390133334). No payment provider/checkout endpoints enabled; all POL-01~05 unapproved.
 - [M3 Node.js API package](apps/api/README.md), [Expo mobile UI package](apps/mobile/README.md)
 
 ## Planning documents
