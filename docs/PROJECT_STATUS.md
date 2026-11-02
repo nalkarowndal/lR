@@ -17,7 +17,8 @@
 | M5-2B1 Toss 보안 검증 경계 | [PR #16](https://github.com/nalkarowndal/lR/pull/16), [API CI](https://github.com/nalkarowndal/lR/actions/runs/41391225316), [Expo CI](https://github.com/nalkarowndal/lR/actions/runs/41391225393), [문서](M5_2B_TOSS_BOUNDARY.md) | **main 병합**, Node/MySQL **60/60**, 실제 HTTP **5/5**, 모바일 **21/21** PASS. **내부 HMAC+mock 조회 검증만**, 실 Toss API·공개 웹훅·결제 승인 미연결 |
 | UX-A 찜·캘린더 QA | [PR #17](https://github.com/nalkarowndal/lR/pull/17), [Chromium CI](https://github.com/nalkarowndal/lR/actions/runs/41394900864), [문서](UX_A_WISHLIST_CALENDAR_QA.md) | **main 병합** · Chromium 오프라인 27/27 + API 장애 6/6, Expo CI PASS. 360px 달력/반납일 제외·찜 목록 검증. 메모리 찜은 새로고침 시 사라짐 |
 | UX-BC 상품·검색·반응형 | [PR #18](https://github.com/nalkarowndal/lR/pull/18), [Chromium CI](https://github.com/nalkarowndal/lR/actions/runs/41396560622), [Expo CI](https://github.com/nalkarowndal/lR/actions/runs/41396560623), [문서](UX_BC_PRODUCT_DISCOVERY.md) | **main 병합** · Chromium 오프라인 34/34 + API 장애 6/6, Expo CI PASS. 이미지 HTTPS+alt 표시·시연 일러스트·상세 CTA·검색 필터·태블릿 3~4열. **실제 제품 사진 미공급** |
-| M5-2B2 실PG 샌드박스/정책·정산/ERP | [Issue #14](https://github.com/nalkarowndal/lR/issues/14) | 실제 PG·운영 데이터·정산/ERP 미연동; **POL-01~05 미승인**, 상용 출시 차단 |
+| M5-2B2A Toss 테스트 결제 조회 어댑터 | [PR #20](https://github.com/nalkarowndal/lR/pull/20), [Node CI](https://github.com/nalkarowndal/lR/actions/runs/41404347499), [Expo CI](https://github.com/nalkarowndal/lR/actions/runs/41404347557), [문서](M5_2B2_SANDBOX_LOOKUP.md) | **main 병합**, API/MySQL **71/71**, HTTP **5/5**, 모바일 **25/25** PASS. 내부 HTTPS GET 어댑터+신선도 검증, **모의 HTTP 응답만 CI 검증**·실토스 샌드박스 미연결 |
+| M5-2B2B 실PG 샌드박스/정책·정산/ERP | [Issue #14](https://github.com/nalkarowndal/lR/issues/14) | 실제 PG·운영 데이터·정산/ERP 미연동; **POL-01~05 미승인**, 상용 출시 차단 |
 | M6 실기기·시각·성능·보안 | 없음 | 완료 주장 불가 |
 
 ## 변경하지 않는 안전 제한
@@ -37,11 +38,11 @@
 
 ## 다음 연속 작업 패키지
 
-**UX-A/UX-BC UI/QA 고도화 PR #17·#18 완료, M5-2B2 운영 정책/PG 승인은 여전히 대기:** 기존 M4~M5-2B1과 신규 UX 자동 검증 모두 통과. 실제 Android/iOS 기기·접근성, 운영 계정·PG·보증금/취소/물류 정책 미승인으로 **상용 출시 Gate는 미통과**.
+**M5-2B2A 테스트 HTTPS 조회 어댑터 병합, M5-2B2B 재대조·실 PG 승인 대기:** M4~M5-2B2A 및 UX-A/UX-BC 자동 검증 통과. 실제 Android/iOS 기기·접근성, 운영 계정·PG·보증금/취소/물류 정책 미승인으로 **상용 출시 Gate는 미통과**.
 
 1. M4-N: Chromium 화면 QA를 [UX-A PR #17](https://github.com/nalkarowndal/lR/pull/17)와 [UX-BC PR #18](https://github.com/nalkarowndal/lR/pull/18)에서 확장했고 최신 브라우저 **40/40 PASS**. [Issue #10](https://github.com/nalkarowndal/lR/issues/10)의 실제 Android/iOS·VoiceOver/TalkBack·스크린샷 수동 판독 및 Expo Doctor 확인은 **계속 미완료**.
 2. M5-1: 데모 계정 UI와 SecureStore 네이티브 저장 코드는 [PR #12](https://github.com/nalkarowndal/lR/pull/12)에서 구현·테스트 통과. **운영 정책은 아직 확정하지 않음**. [M5-1 정책표](M5_1_POLICY_GATE.md) 승인 전 실제 결제·회원가입 차단, 네이티브 실기기 보안 저장소 검증 필요.
-3. M5-2: [PR #15](https://github.com/nalkarowndal/lR/pull/15)에서 테스트 주문 원장, [PR #16](https://github.com/nalkarowndal/lR/pull/16)에서 **내부 Toss HMAC/조회 데이터 대조 검증 60/60 PASS**. 다음 M5-2B2는 [Issue #14](https://github.com/nalkarowndal/lR/issues/14)의 승인된 공급자 **테스트 키·HTTPS 조회·수신 이벤트 보안 게이트**. 운영 PG·환불·예약 확정은 비활성 유지.
+3. M5-2: [PR #15](https://github.com/nalkarowndal/lR/pull/15) 모의 주문 원장, [PR #16](https://github.com/nalkarowndal/lR/pull/16) HMAC 교차 검증, [PR #20](https://github.com/nalkarowndal/lR/pull/20) **테스트용 HTTPS 조회 어댑터·신선도 검증 71/71 PASS**. 다음은 영속적 재대조 및 실제 공급자 테스트 키/HTTPS 호출 검증(승인 필요). 운영 PG·환불·예약 확정은 비활성 유지.
 4. M5-3: 수선 사진/위탁/관리자·원본 ERP 연계는 API·권한·모바일 UX를 각각 검증하며 기존 원본 RecruitApp을 보존.
 5. UX-D: [Issue #19](https://github.com/nalkarowndal/lR/issues/19)에서 승인된 **실제 상품 사진** 사용권·공급 API·CDN/alt·관리자 검수와 Android/iOS 실기기 이미지 QA 필요. 현재 상품 사진 대신 시연용 일러스트를 표시.
 6. M6: 네이티브 E2E/회귀/보안/시각/성능·접근성·운영 릴리스 게이트.
