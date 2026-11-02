@@ -1,6 +1,6 @@
-# Architecture Proposal — luxuryRental (M0–M2)
+# Architecture Baseline — luxuryRental (M0–M2)
 
-**Status:** PROPOSED / not implemented  
+**Status:** M1 logical architecture approved as design baseline; not implemented  
 **Updated:** 2026-11-02  
 **Project:** [nalkarowndal/lR](https://github.com/nalkarowndal/lR)
 
@@ -14,7 +14,7 @@
                                      |
           +--------------------------+---------------------------+
           |                          |                           |
-    [PostgreSQL / ORM]       [Private media storage]      [Payments/Shipping]
+     [MySQL/InnoDB]       [Private media storage]      [Payments/Shipping]
 ```
 
 - **Backend runtime: Node.js.** Baseline web framework: **Express + TypeScript** to align with the previously documented Express codebase. Verify the actual original source before reusing modules.
@@ -46,7 +46,7 @@ apps/api/src/
     favorites/
     notifications/
     admin/
-  db/                      Prisma integration and migration management
+  db/                      MySQL repositories, verified migrations, Prisma optional
 packages/shared-types/     API DTO contracts (no runtime secrets)
 packages/api-client/       Mobile/web API client
 docs/                      Product/architecture/QA design
@@ -156,9 +156,9 @@ These are **draft states**, not a declaration of current legacy database enums.
 
 ## 8. Existing source audit needed
 
-The original web report dated 2026-10-22 described React/Express/Prisma + SQLite and endpoints for products, rentals, repairs, favorites, auth, editorials and admin, but it is **not** proof of what is in the latest original web repository. Inspect the latest original source and map:
+M0 direct source audit verified the current legacy repository [567890](https://github.com/nalkarowndal/567890) is Node.js + Express 5 + **MySQL**, with a limited `products` schema and GET API, distinct from a previous 2026-10-22 report describing another Express/Prisma/SQLite variant. See [SOURCE_AUDIT.md](SOURCE_AUDIT.md), [DATA_MODEL.md](DATA_MODEL.md). Verify the live instance before migration:
 - Existing routes and API response fields
-- Prisma models and migration history
+- Actual MySQL table definitions, indexes, real data and migration history
 - Service functionality and all legacy screen names
 - Auth/session strategies and administrator roles
 - Media URLs, privacy and image licensing
@@ -173,4 +173,4 @@ The original web report dated 2026-10-22 described React/Express/Prisma + SQLite
 - React Native security: https://reactnative.dev/docs/security
 - Toss Payments server-authoritative integration: https://docs.tosspayments.com/guides/v2/get-started/llms-quick-reference
 
-> **Status disclaimer:** Architectural plan only; no backend service has been implemented, run, or deployed.
+> **M1 supersession:** Exact requirements, rental date interval, MySQL logical ERD, checkout state transitions, and API contracts are defined in [DECISIONS_M1.md](DECISIONS_M1.md), [REQUIREMENTS.md](REQUIREMENTS.md), [DATA_MODEL.md](DATA_MODEL.md), and [API_CONTRACT.md](API_CONTRACT.md). These M1 documents take precedence where the older architecture sketch differs. No backend service, DB schema migration, or native app has been implemented, run, or deployed.
