@@ -5,6 +5,7 @@ on:
     paths:
       - 'apps/mobile/**'
       - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/m4n-visual.yml'
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -31,9 +32,9 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: package.json
+          cache-dependency-path: package-lock.json
       - name: Install npm workspaces
-        run: npm install --no-audit --no-fund --prefer-offline
+        run: npm ci --include=dev --no-audit --no-fund
       - name: Install Chromium Playwright browser
         run: npx playwright install --with-deps chromium
       - name: Run Expo web mobile emulation and collect screenshots
