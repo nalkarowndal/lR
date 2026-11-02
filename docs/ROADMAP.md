@@ -1,7 +1,7 @@
 # luxuryRental — Implementation Roadmap and Acceptance Gates
 
 **Project:** [nalkarowndal/lR](https://github.com/nalkarowndal/lR)  
-**Status:** M0 source audit and M1 design documentation completed; M2 visual prototyping pending. No application code implemented  
+**Status:** M0/M1 documented; M2 design documents and wireframe prototype prepared for review. Visual approval pending; no application code implemented  
 **Updated:** 2026-11-02
 
 ## Guiding constraints
@@ -43,7 +43,7 @@
 ## M2 — UI/UX design system and interactive prototype
 
 ### Tasks
-1. Establish luxuryRental logo and original cream/ink/champagne-gold palette with contrast checks.
+1. Establish luxuryRental logo and source-verified white/ink/pastel palette with contrast checks. M2 source inspection found that the earlier cream/champagne-gold description does not match the current original web CSS; see DESIGN_SYSTEM.md.
 2. Produce real-device Android/iOS wireframes and refined Figma components.
 3. Prototype Home, Rental browse, product detail, calendar, price breakdown, checkout, Store, Repair request, Account.
 4. Specify safe areas, bottom tabs, sheets, keyboard behavior, screen transitions, touch areas, skeleton states, motion reduction.
@@ -115,12 +115,13 @@
 | Architecture and phase definitions | Documented |
 | Latest original site source comparison | GitHub static audit completed; live DB/ZIP parity pending |
 | M1 requirements, IA, data model and API design | Documents completed; business policies pending |
-| Approved Figma wireframes | Pending (M2) |
+| M2 documents and Figma wireframes | Review artifacts prepared; 29 customer screens + 4 exception frames; see M2_VISUAL_QA.md for remaining corrections |
+| Approved Figma wireframes | Pending user visual review; native QA NOT_TESTED |
 | Node.js API source code | Not started |
 | React Native app source code | Not started |
 | Database migration / CI / QA | Not started |
 
-**Current next activity:** M2 Figma design system + clickable prototype based on M1 requirements and ERD. M3 API/DB implementation starts only after actual MySQL schema/data checks and outstanding operational policy decisions.
+**Current next activity:** Review [M2 artifacts](M2_OVERVIEW.md), resolve the explicit [Figma corrections](M2_VISUAL_QA.md), and record user visual approval. The Starter-plan MCP limit prevented the final visual corrections; do not treat the wireframes as fully approved. M3 API/DB implementation starts only after actual MySQL schema/data checks and outstanding operational policy decisions.
 
 **M1 committed deliverables (2026-11-02):** [DECISIONS](DECISIONS_M1.md), [REQUIREMENTS](REQUIREMENTS.md), [INFORMATION_ARCHITECTURE](INFORMATION_ARCHITECTURE.md), [USER_FLOWS](USER_FLOWS.md), [DATA_MODEL](DATA_MODEL.md), [API_CONTRACT](API_CONTRACT.md), [ACCEPTANCE_TESTS](ACCEPTANCE_TESTS.md). M1 design baseline is complete, but customer business policies POL-01~05, live DB inspection, payment-provider selection and QA execution are not completed.
 
