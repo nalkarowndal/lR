@@ -14,10 +14,8 @@ test('UX-BC: search filter category and grade without falsely ranking unloaded p
  await page.getByRole('button',{name:'검색어·필터 초기화'}).click();
  await expect(page.getByRole('button',{name:'The Lune Shoulder Bag 상세 보기'})).toBeVisible();
  await page.getByRole('button',{name:'가격 낮은 순'}).click();
- await expect.poll(async()=>{
-  const labels=await page.getByTestId('product-grid-item').allTextContents();
-  return labels[0]||'';
- }).toContain('The Atelier Bucket');
+ await expect(page.getByRole('button',{name:/ 상세 보기$/}).first())
+  .toHaveAttribute('aria-label','The Atelier Bucket 상세 보기');
  await info.attach('search-filtered',{body:await page.screenshot({fullPage:true,animations:'disabled'}),contentType:'image/png'});
 });
 test('UX-BC: detail shows honest illustration and route-aware primary action',async({page},info)=>{
