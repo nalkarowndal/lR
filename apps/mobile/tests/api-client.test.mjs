@@ -90,3 +90,18 @@ test('abort signal cancels in-flight requests, not marked as offline',async()=>{
 test('unconfigured URL cannot produce a mock HTTP request',()=>{
  assert.throws(()=>createApiClient('not-an-origin'),ApiError);
 });
+
+test('product media contract rejects insecure and deceptive external origins',()=>{
+ const parsed=parseProduct({...sample,media:[
+  {url:'https://cdn.example.invalid/catalog/bag.webp',alt:'제품 앞면 예시 사진'}
+ ]});
+ assert.equal(parsed.media.length,1);
+ assert.equal(parsed.media[0].alt,'제품 앞면 예시 사진');
+ for(const url of ['http://cdn.example.invalid/bag.jpg','data:image/png;base64,aaaa',
+  'javascript:alert(1)','https://user:password@cdn.example.invalid/photo.jpg']){
+  assert.throws(()=>parseProduct({...sample,media:[{url,alt:'테스트 사진'}]}),ApiError);
+ }
+ assert.throws(()=>parseProduct({...sample,media:[{url:'https://cdn.example.invalid/x.webp',alt:''}]}),ApiError);
+ assert.throws(()=>parseProduct({...sample,media:Array(9).fill({url:'https://cdn.example.invalid/x.webp',alt:'테스트'})}),ApiError);
+ assert.deepEqual(parseProduct(sample).media,[]);
+});

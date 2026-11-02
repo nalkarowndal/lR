@@ -1,4 +1,4 @@
-import type{Channel,Product,ProductArt} from '../domain/catalog';
+import type{Channel,Product,ProductArt,ProductMedia} from '../domain/catalog';
 
 export type ApiErrorKind='HTTP'|'NETWORK'|'TIMEOUT'|'CONFIG'|'CONTRACT';
 export class ApiError extends Error {
@@ -28,6 +28,19 @@ const amount=(v:unknown,name:string)=>{if(typeof v!=='number'||!Number.isSafeInt
 const nullable=(v:unknown,name:string)=>v===null?0:amount(v,name);
 const palette:ProductArt[]=['#FDF2F8','#EFF6FF','#F0FDF4','#F3F4F6'];
 const stableArt=(id:string):ProductArt=>palette[Array.from(id).reduce((sum,x)=>sum+x.charCodeAt(0),0)%palette.length];
+/** Never render untrusted data: URLs or cleartext remote image origins. */
+export function parseProductMedia(value:unknown):ProductMedia[]{
+ if(value===undefined||value===null)return [];
+ if(!Array.isArray(value)||value.length>8)throw new ApiError('CONTRACT','상품 이미지 목록이 올바르지 않습니다');
+ return value.map(item=>{
+  if(!isObject(item)||typeof item.url!=='string'||typeof item.alt!=='string'||!item.alt.trim()||item.alt.length>160)
+   throw new ApiError('CONTRACT','상품 이미지 설명이 올바르지 않습니다');
+  let url:URL;try{url=new URL(item.url);}catch{throw new ApiError('CONTRACT','상품 이미지 주소가 잘못되었습니다');}
+  if(url.protocol!=='https:'||!url.hostname||url.username||url.password||item.url.length>2048)
+   throw new ApiError('CONTRACT','상품 이미지는 승인된 HTTPS 출처여야 합니다');
+  return {url:item.url,alt:item.alt.trim()};
+ });
+}
 export const apiBaseUrl=()=>process.env.EXPO_PUBLIC_API_URL?.trim().replace(/\/+$/,'')||null;
 export const apiEnabled=()=>!!apiBaseUrl();
 export function parseProduct(value:unknown):Product{
@@ -38,7 +51,7 @@ export function parseProduct(value:unknown):Product{
   category:str(value.category,'category'),condition:str(value.condition,'condition'),
   channels:value.channels,dayRateKrw:nullable(value.dayRateKrw,'dayRateKrw'),
   salePriceKrw:nullable(value.salePriceKrw,'salePriceKrw'),
-  depositKrw:amount(value.depositKrw,'depositKrw'),demo:value.demo,art:stableArt(value.id as string)};
+  depositKrw:amount(value.depositKrw,'depositKrw'),demo:value.demo,art:stableArt(value.id as string),media:parseProductMedia(value.media)};
 }
 export function parsePage(value:unknown):PageResult{
  if(!isObject(value)||!Array.isArray(value.data)||!isObject(value.meta)||!isObject(value.meta.page))
