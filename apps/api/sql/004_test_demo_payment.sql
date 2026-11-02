@@ -37,3 +37,10 @@ CREATE TABLE IF NOT EXISTS lr_demo_payment_audit (
  KEY ix_demo_audit_order(order_id,id),
  CONSTRAINT fk_demo_payment_audit_order FOREIGN KEY(order_id) REFERENCES lr_demo_orders(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- A mock provider payment identifier must not be claimed by unrelated orders.
+CREATE TABLE IF NOT EXISTS lr_demo_provider_claims (
+ provider_payment_id VARCHAR(80) PRIMARY KEY,
+ order_id VARCHAR(40) NOT NULL,
+ CONSTRAINT fk_demo_provider_claim_order FOREIGN KEY(order_id) REFERENCES lr_demo_orders(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

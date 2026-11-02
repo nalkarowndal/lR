@@ -131,6 +131,10 @@ export async function applyVerifiedMockEvent(db:Database,event:SimulatedEvent,lo
  try{
   await conn.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
   await conn.beginTransaction();
+  // Lock unit before order (same global order as hold acquisition and release).
+  const [target]=await conn.execute<UnitRow[]>('SELECT unit_id AS id FROM lr_demo_orders WHERE id=?',[event.orderId]);
+  if(!target[0])throw new DemoPaymentError('ORDER_NOT_FOUND');
+  await conn.execute('SELECT id FROM lr_inventory_units WHERE id=? FOR UPDATE',[target[0].id]);
   const [orders]=await conn.execute<Row[]>('SELECT * FROM lr_demo_orders WHERE id=? FOR UPDATE',[event.orderId]);
   const order=assertOrder(orders[0]);
   if(verified!==money(order.payable_krw))throw new DemoPaymentError('AMOUNT_MISMATCH');
@@ -144,16 +148,22 @@ export async function applyVerifiedMockEvent(db:Database,event:SimulatedEvent,lo
    await conn.commit();
    return {status:order.status,replayed:true};
   }
-  // Prevent one verified mock payment id being claimed by two separate orders.
-  const [conflicting]=await conn.execute<EventRow[]>(`SELECT order_id,provider_payment_id,status,verified_amount_krw,result_status
-   FROM lr_demo_payment_events WHERE provider_payment_id=? AND order_id<>? LIMIT 1`,
-   [event.providerPaymentId,event.orderId]);
-  if(conflicting.length)throw new DemoPaymentError('PROVIDER_MISMATCH');
+  // A unique database claim prevents cross-order reuse even under races.
+  await conn.execute(`INSERT INTO lr_demo_provider_claims(provider_payment_id,order_id)
+    VALUES(?,?) ON DUPLICATE KEY UPDATE provider_payment_id=provider_payment_id`,
+    [event.providerPaymentId,event.orderId]);
+  const [claims]=await conn.execute<Array<RowDataPacket&{order_id:string}>>(
+    'SELECT order_id FROM lr_demo_provider_claims WHERE provider_payment_id=? FOR UPDATE',[event.providerPaymentId]);
+  if(claims[0]?.order_id!==event.orderId)throw new DemoPaymentError('PROVIDER_MISMATCH');
+  const [priorPaid]=await conn.execute<Array<RowDataPacket&{provider_payment_id:string}>>(
+    "SELECT provider_payment_id FROM lr_demo_payment_events WHERE order_id=? AND status='DONE' LIMIT 1",[event.orderId]);
+  const differentPayment=priorPaid.some(p=>p.provider_payment_id!==event.providerPaymentId);
   let next:OrderStatus='REVIEW_REQUIRED';
-  if(order.status==='PENDING_SIMULATION'){
+  if(differentPayment){next='REVIEW_REQUIRED';}
+  else if(order.status==='PENDING_SIMULATION'){
    if(event.status==='DONE'){
     const [hold]=await conn.execute<Array<RowDataPacket&{status:string;expired:number}>>(
-     "SELECT status,expires_at<=UTC_TIMESTAMP(3) AS expired FROM lr_inventory_holds WHERE id=?",
+     "SELECT status,expires_at<=UTC_TIMESTAMP(3) AS expired FROM lr_inventory_holds WHERE id=? FOR UPDATE",
      [order.hold_id]);
     next=hold[0]?.status==='ACTIVE'&&!Number(hold[0]?.expired)?'SIMULATED_PAID':'REVIEW_REQUIRED';
    }else next=event.status==='FAILED'?'FAILED':'CANCELED';

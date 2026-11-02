@@ -133,3 +133,24 @@ test('a real production-style app cannot expose any M5.2 sandbox endpoint',async
  }
  assert.equal((await request(prod).post('/api/v1/payments/mock-webhook').send({})).status,404);
 });
+
+test('same mock provider payment cannot be applied to two orders',async()=>{
+ const a=await held(),b=await held();
+ const oa=await createDemoPaymentOrder(db,{actorId:a.actorId,holdId:a.hold.holdId});
+ const ob=await createDemoPaymentOrder(db,{actorId:b.actorId,holdId:b.hold.holdId});
+ const paid=makeEvent(oa.orderId,'DONE');
+ await applyVerifiedMockEvent(db,paid,checked(paid));
+ const reused=makeEvent(ob.orderId,'DONE',randomUUID(),paid.providerPaymentId);
+ await assert.rejects(()=>applyVerifiedMockEvent(db,reused,checked(reused)),e=>error(e,'PROVIDER_MISMATCH'));
+ assert.equal(await orderState(ob.orderId),'PENDING_SIMULATION');
+ assert.equal(await eventCount(ob.orderId),0);
+});
+test('second distinct mock payment on same order cannot double-grant a simulated success',async()=>{
+ const a=await held();
+ const o=await createDemoPaymentOrder(db,{actorId:a.actorId,holdId:a.hold.holdId});
+ const first=makeEvent(o.orderId);
+ assert.equal((await applyVerifiedMockEvent(db,first,checked(first))).status,'SIMULATED_PAID');
+ const second=makeEvent(o.orderId);
+ assert.equal((await applyVerifiedMockEvent(db,second,checked(second))).status,'REVIEW_REQUIRED');
+ assert.equal(await auditCount(o.orderId),3);
+});
