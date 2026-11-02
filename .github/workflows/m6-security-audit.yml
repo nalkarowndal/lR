@@ -1,0 +1,49 @@
+name: M6 security advisory inventory
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'package-lock.json'
+      - 'package.json'
+      - 'apps/api/package.json'
+      - 'apps/mobile/package.json'
+      - 'scripts/security/**'
+      - '.github/workflows/m6-security-audit.yml'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+      - name: Install exact dependency tree
+        run: npm ci --include=dev --no-audit --no-fund
+      - name: Verify security report parser
+        run: node --test scripts/security/*.test.mjs
+      - name: Collect registry advisory reports without mutating dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p security-reports
+          # npm audit returns nonzero for *findings*, not only query errors.
+          # The parser below detects invalid/missing advisory responses and fails closed.
+          npm audit --json --omit=dev > security-reports/production.raw.json || true
+          npm audit --json > security-reports/all.raw.json || true
+          node scripts/security/audit-report.mjs security-reports/production.raw.json security-reports/all.raw.json security-reports/summary
+      - name: Publish audit evidence (no private keys or app runtime secrets)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m6-dependency-advisories-${{ github.run_id }}
+          path: security-reports/
+          retention-days: 14
+          if-no-files-found: warn
