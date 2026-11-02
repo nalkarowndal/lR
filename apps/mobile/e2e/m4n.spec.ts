@@ -94,6 +94,6 @@ test('server-disconnected demo login shows network error and denies any fake use
  await page.getByRole('textbox',{name:'테스트 이메일'}).fill('qa@example.invalid');
  await page.getByRole('textbox',{name:'테스트 비밀번호'}).fill('example-password-2026');
  await page.getByRole('button',{name:'테스트 계정 로그인'}).click();
- await expect(page.getByText(/인증 서버에 연결하지 못했습니다/)).toBeVisible();
+ await expect(page.getByRole('alert').filter({hasText:/인증 서버에 연결하지 못했습니다/})).toBeVisible();
  await expect(page.getByText(/테스트 계정: /)).toHaveCount(0);
 });
