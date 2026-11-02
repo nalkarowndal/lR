@@ -26,7 +26,7 @@ export default function StoreCheckout(){
    <Action label="스토어로 돌아가기" onPress={()=>router.replace('/(tabs)/store')}/></Panel>:null}
   {loaded.status==='ready'?selected.map(item=><Panel key={item.id}>
     <View style={{flexDirection:'row',gap:14,alignItems:'center'}}>
-     <View style={{width:105}}><ProductVisual background={item.art} small/></View>
+     <View style={{width:105}}><ProductVisual background={item.art} product={item} small/></View>
      <View style={{flex:1,gap:7}}>
       <Text style={{fontSize:12,color:colors.sub}}>{item.brand}</Text>
       <Text style={{color:colors.ink,fontWeight:'700',fontSize:15}}>{item.title}</Text>

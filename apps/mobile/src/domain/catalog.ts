@@ -1,9 +1,10 @@
 export type Channel='RENTAL'|'STORE';
 export type ProductArt='#FDF2F8'|'#EFF6FF'|'#F0FDF4'|'#F3F4F6';
+export interface ProductMedia{url:string;alt:string}
 export interface Product {
   id:string;brand:string;title:string;category:string;
   dayRateKrw:number;salePriceKrw:number;depositKrw:number;
-  condition:string;art:ProductArt;channels:Channel[];demo:boolean;
+  condition:string;art:ProductArt;channels:Channel[];demo:boolean;media?:ProductMedia[];
 }
 // Original M2 synthetic products, used ONLY when no EXPO_PUBLIC_API_URL is configured.
 // Real API failures must never silently fall back to these items.
