@@ -13,6 +13,12 @@
 - **기존 `lr_demo_orders.status`, `lr_inventory_units.physical_state`, `lr_inventory_holds.status`는 어떤 경우에도 UPDATE하지 않는다.** `MATCHED`를 `PAID`나 `CONFIRMED`로 해석하지 않는다.
 - 테스트에서 공급자 조회는 주입된 모의 콜백만 사용. **실제 PG 접근과 비밀키 관리·통합 QA는 [Issue #14](https://github.com/nalkarowndal/lR/issues/14) 미완료**.
 
+## 검증 (2026-11-02)
+- [PR #21 main 병합](https://github.com/nalkarowndal/lR/pull/21)
+- [Node/MySQL CI #41405957084](https://github.com/nalkarowndal/lR/actions/runs/41405957084): API/MySQL **83/83 PASS**, 실제 테스트 Node↔모바일 HTTP **5/5 PASS**.
+- [Expo UI #41405957061](https://github.com/nalkarowndal/lR/actions/runs/41405957061): **25/25 PASS** 및 웹 export PASS.
+- **CI는 모든 Toss 호출을 합성 PG 응답으로 모의**했고 실제 공급자 키를 발급/사용하지 않음.
+
 ## 한계와 후속
 - 상용 등급의 재처리 워커, 실패 백오프, 결제 부분취소/환불, 여러 이벤트 종류, 영속 이벤트 원문 보관/접근 권한/파기 정책, HTTP 수신과 재전송 확인(200 ACK), PG 실제 샌드박스 조회는 **구현하지 않았다**.
 - M5-2 전체 완료 아님. POL-01~05 영업/법률 승인과 실제 PG 시험 계정이 없으며 본 PR로 활성화하지 않음.
