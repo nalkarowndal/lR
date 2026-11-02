@@ -19,6 +19,11 @@ try{
  console.log(reports.map(r=>r.scope+': critical '+r.counts.critical+
   ', high '+r.counts.high+', moderate '+r.counts.moderate+
   ', low '+r.counts.low+'; '+r.releaseDecision).join('\n'));
+ // Print only validated npm package names and severities for triage; no raw advisory bodies.
+ for(const r of reports){
+  console.log(r.scope+' advisory packages: '+(r.packages.length?
+   r.packages.map(p=>p.name+' ('+p.severity+', fix:'+p.fixAvailable+')').join(', '):'none'));
+ }
  // The report job is *inventory only*. Release is BLOCKED until findings are explicitly triaged.
 }catch(error){
  console.error(error instanceof Error?error.message:'AUDIT_UNAVAILABLE');
