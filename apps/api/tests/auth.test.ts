@@ -78,3 +78,17 @@ test('production-style app mode blocks new self-service registrations',async()=>
  const result=await request(other).post('/api/v1/auth/register').send({email:email(),password});
  assert.equal(result.status,501);
 });
+
+test('demo bearer issuing and profile routes refuse HTTP caching',async()=>{
+ const e=email();
+ const registration=await register(e);
+ assert.equal(registration.status,201);
+ assert.equal(registration.headers['cache-control'],'no-store');
+ const logged=await login(e);
+ assert.equal(logged.status,200);
+ assert.equal(logged.headers['cache-control'],'no-store');
+ const me=await request(app).get('/api/v1/me')
+   .set('Authorization','Bearer '+logged.body.data.accessToken);
+ assert.equal(me.status,200);
+ assert.equal(me.headers['cache-control'],'no-store');
+});

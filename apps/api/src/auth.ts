@@ -78,6 +78,8 @@ export function getIdentity(res:Response):Identity{
 /** Does not trust a client-supplied user ID or role. */
 export function mountAuthRoutes(app:Express,db:Database,{demoMode}:{demoMode:boolean}){
  const auth=requireAuth(db);
+ // Prevent browser/proxy caching credentials and demo bearer token responses.
+ app.use('/api/v1/auth',(_req,_res,next)=>{_res.setHeader('Cache-Control','no-store');next();});
  const demoOnly=(req:Request,res:Response,next:NextFunction)=>{
   if(!demoMode){problem(req,res,501,'NOT_IMPLEMENTED','계정 서비스 운영 전입니다');return;}
   next();

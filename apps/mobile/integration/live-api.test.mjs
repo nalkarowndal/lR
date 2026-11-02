@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createApiClient,ApiError} from '../src/api/client.ts';
+import {createDemoAuthClient,AuthError} from '../src/auth/api.ts';
+import {randomUUID} from 'node:crypto';
 
 const client=createApiClient(process.env.TEST_API_URL||'http://127.0.0.1:4000');
 test('M4 client reads real MySQL-backed list and product details over HTTP',async()=>{
@@ -32,4 +34,25 @@ test('M4 client displays exact server quote amounts, never local calculated pric
 test('real backend 404 response stays an API error and never becomes demo result',async()=>{
  await assert.rejects(()=>client.product('not-found'),
   e=>e instanceof ApiError&&e.status===404&&e.code==='NOT_FOUND');
+});
+
+test('M5 demo user can register, log in, verify /me, rotate, and revoke via live Node/MySQL',async()=>{
+ const base=process.env.TEST_API_URL||'http://127.0.0.1:4000';
+ const auth=createDemoAuthClient(base);
+ const email='m5-'+randomUUID().slice(0,16)+'@example.invalid';
+ const password='isolated-demo-password-2026';
+ const registered=await auth.register(email,password);
+ assert.equal(registered.email,email);
+ const signed=await auth.login(email,password);
+ assert.equal(signed.demo,true);
+ assert.equal(signed.userId,registered.userId);
+ const me=await auth.me(signed.accessToken);
+ assert.deepEqual(me.roles,['CUSTOMER']);
+ const rotated=await auth.refresh(signed.accessToken);
+ assert.notEqual(rotated.accessToken,signed.accessToken);
+ await assert.rejects(()=>auth.me(signed.accessToken),e=>e instanceof AuthError&&e.status===401);
+ const me2=await auth.me(rotated.accessToken);
+ assert.equal(me2.userId,registered.userId);
+ await auth.logout(rotated.accessToken);
+ await assert.rejects(()=>auth.me(rotated.accessToken),e=>e instanceof AuthError&&e.status===401);
 });

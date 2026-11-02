@@ -76,3 +76,24 @@ test('unreachable Node API shows retry/error and never silently falls back to de
  await expect(page.getByText('연결 오류')).toBeVisible();
  await expect(page.getByText('The Sera Top Handle')).toHaveCount(0);
 });
+
+test('offline design mode never allows login or account creation',async({page})=>{
+ test.skip(!offline,'only when local preview has no backend');
+ await page.goto('/');
+ await tab(page,'마이').click();
+ await expect(page.getByText('방문을 환영합니다')).toBeVisible();
+ await expect(page.getByRole('button',{name:'테스트 계정 로그인'})).toBeDisabled();
+ await expect(page.getByText(/현재 오프라인 시연 모드이므로 로그인/)).toBeVisible();
+});
+test('server-disconnected demo login shows network error and denies any fake user profile',async({page})=>{
+ test.skip(mode!=='api-unreachable','requires intentionally unreachable API URL');
+ await page.goto('/');
+ await tab(page,'마이').click();
+ await page.getByRole('button',{name:'테스트 계정 로그인'}).click();
+ await expect(page.getByText('시연 로그인')).toBeVisible();
+ await page.getByRole('textbox',{name:'테스트 이메일'}).fill('qa@example.invalid');
+ await page.getByRole('textbox',{name:'테스트 비밀번호'}).fill('example-password-2026');
+ await page.getByRole('button',{name:'테스트 계정 로그인'}).click();
+ await expect(page.getByRole('alert').filter({hasText:/인증 서버에 연결하지 못했습니다/})).toBeVisible();
+ await expect(page.getByText(/테스트 계정: /)).toHaveCount(0);
+});
