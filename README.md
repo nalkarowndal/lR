@@ -16,7 +16,7 @@ Build a mobile-first premium experience that combines luxury goods **rental**, *
 | Product name | `luxuryRental` (preserve existing branding) |
 | Mobile | React Native + Expo + TypeScript (planned) |
 | Backend | **Node.js + TypeScript + Express** (selected baseline; not yet implemented) |
-| Database | PostgreSQL + Prisma proposed; verify integration with existing luxuryRental data first |
+| Database | Legacy website uses **MySQL**; decide MySQL retention vs PostgreSQL + Prisma migration **after schema/data audit** |
 | API | Versioned REST API, planned `/api/v1` |
 | Admin | Preserve and integrate with existing luxuryRental web/ERP/CMS where feasible |
 | Development phase | Requirements, UI/UX, architecture, and technical verification **before implementing app code** |
@@ -29,12 +29,15 @@ Build a mobile-first premium experience that combines luxury goods **rental**, *
 - Care: photo-based repair/restoration request, quotation, status tracking
 - Account: authentication, favorites, bookings, orders, returns, care requests
 - Admin integration: products, individual units, inventory statuses, rentals/orders, editorials and audits
-- Existing ancillary pages (e.g., sales application, recruiting) must be inventoried before final information architecture is approved
+- Existing ancillary modules (including consignment and store **staffing management**, not a public hiring page) must be mapped before final IA is approved
 
 ## Planning documents
 
 - [Architecture and Node.js API plan](docs/ARCHITECTURE.md)
 - [Development roadmap and acceptance gates](docs/ROADMAP.md)
+- [M0 source audit — pinned commits and verified architecture](docs/SOURCE_AUDIT.md)
+- [M0 feature matrix — UI/API/demo/missing](docs/FEATURE_MATRIX.md)
+- [M0 risk register — security, booking, payment and QA](docs/RISK_REGISTER.md)
 
 ## Source-of-truth and preservation policy
 
@@ -58,7 +61,10 @@ lR/
 │   └── api-client/             # Typed API client
 ├── docs/
 │   ├── ARCHITECTURE.md
-│   └── ROADMAP.md
+│   ├── ROADMAP.md
+│   ├── SOURCE_AUDIT.md
+│   ├── FEATURE_MATRIX.md
+│   └── RISK_REGISTER.md
 ├── analysis-artifacts/         # Phase-scoped reports; do not commit archives/secrets
 └── README.md
 ```
