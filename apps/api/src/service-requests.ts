@@ -3,7 +3,8 @@
  * Requests are demo workflow records, NOT actual goods intake, prices, shipping, or contracts.
  */
 import {createHash,randomUUID} from 'node:crypto';
-import type{RowDataPacket} from 'mysql2';
+import type{RowDataPacket,ResultSetHeader} from 'mysql2';
+import {appendDemoErpOutbox} from './erp-outbox.js';
 import type{Database} from './db.js';
 
 export type ServiceKind='REPAIR'|'CONSIGNMENT';
@@ -53,9 +54,13 @@ export async function createServiceRequest(db:Database,input:{
   if(row.input_hash!==inputHash)throw new ServiceError('IDEMPOTENCY_KEY_REUSED');
   const created=row.id===insertedId;
   if(created){
-   await connection.execute(
+   const [audit]=await connection.execute<ResultSetHeader>(
     'INSERT INTO lr_demo_service_audit(request_id,actor_id,from_status,to_status) VALUES(?,?,NULL,?)',
     [row.id,input.ownerId,'SUBMITTED']);
+   await appendDemoErpOutbox(connection,{
+    auditId:audit.insertId,requestId:row.id,actorId:input.ownerId,kind:row.kind,
+    fromStatus:null,toStatus:'SUBMITTED'
+   });
   }
   await connection.commit();
   return {record:toRecord(row),replayed:!created};
@@ -120,9 +125,13 @@ export async function changeServiceRequestStatus(db:Database,input:{
   if(!valid)throw new ServiceError('STATE_CONFLICT');
   await connection.execute('UPDATE lr_demo_service_requests SET status=? WHERE id=?',
    [input.target,input.id]);
-  await connection.execute(
+  const [audit]=await connection.execute<ResultSetHeader>(
    'INSERT INTO lr_demo_service_audit(request_id,actor_id,from_status,to_status) VALUES(?,?,?,?)',
    [input.id,input.actorId,current.status,input.target]);
+  await appendDemoErpOutbox(connection,{
+   auditId:audit.insertId,requestId:input.id,actorId:input.actorId,kind:current.kind,
+   fromStatus:current.status,toStatus:input.target
+  });
   const [updated]=await connection.execute<ServiceRow[]>(
    'SELECT '+fields+' FROM lr_demo_service_requests WHERE id=?',[input.id]);
   await connection.commit();
