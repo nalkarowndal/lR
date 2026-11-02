@@ -1,0 +1,24 @@
+name: Mobile UI checks
+on:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  mobile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: 'package.json'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: React Native TypeScript check
+        run: npm run typecheck:mobile
+      - name: Rental date policy tests
+        run: npm run test:mobile
+      - name: Expo web bundle smoke build
+        run: npm run build:mobile:web
