@@ -1,0 +1,50 @@
+# TEMPORARY one-shot bootstrap. Remove from the PR immediately after lockfile creation.
+# Only a same-repository PR from the exact migration branch can run this write job.
+name: M6 temporary workspace lockfile bootstrap
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/m6-temporary-lockfile.yml'
+      - 'package.json'
+      - 'apps/api/package.json'
+      - 'apps/mobile/package.json'
+      - 'package-lock.json'
+permissions:
+  contents: write
+jobs:
+  bootstrap:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'chore/m6-0-locked-installs' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          persist-credentials: true
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate root npm workspace lockfile with no install scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm --version
+          if [ ! -f package-lock.json ]; then
+            npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          fi
+          node -e "const l=require('./package-lock.json'); if(l.lockfileVersion!==3 || !l.packages['apps/api'] || !l.packages['apps/mobile']) process.exit(2); console.log('npm lockfile v3, both workspaces verified')"
+      - name: Commit generated lockfile to exact PR branch only
+        shell: bash
+        env:
+          TARGET_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          if [ "$TARGET_BRANCH" != 'chore/m6-0-locked-installs' ]; then exit 3; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- package-lock.json
+          if ! git diff --cached --quiet; then
+            git commit -m "build(m6): generate npm workspace lockfile on Node 22"
+            git push origin "HEAD:refs/heads/$TARGET_BRANCH"
+          fi
