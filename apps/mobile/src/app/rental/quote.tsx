@@ -6,6 +6,7 @@ import {colors,formatKrw} from '../../theme';
 import {Screen,Panel,Heading,Body,Action,DemoNotice,Badge} from '../../components/ui';
 import {DataSourceNotice,NetworkFeedback} from '../../components/NetworkFeedback';
 import {Back} from '../../components/Back';
+const koreanExpiry=(value:string)=>{const parsed=new Date(value);return Number.isFinite(parsed.valueOf())?new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',dateStyle:'medium',timeStyle:'short'}).format(parsed):'재확인 필요';};
 export default function Quote(){
  const router=useRouter();const {draft}=useAppState();
  const productResource=useProduct(draft?.productId||'');
@@ -31,7 +32,7 @@ export default function Quote(){
    <View style={{height:1,backgroundColor:colors.divider}}/>
    <Text style={{fontSize:15,color:colors.sub,fontWeight:'700'}}>예시 청구 합계</Text>
    <Text style={{fontSize:27,fontWeight:'900',color:colors.ink}}>{formatKrw(quote.payableNowKrw)}</Text>
-   <Body muted>{quote.disclaimer} · 견적 만료: {quote.quoteExpiresAt.slice(0,16)}</Body>
+   <Body muted>{quote.disclaimer} · 견적 만료(한국 시간): {koreanExpiry(quote.quoteExpiresAt)}</Body>
   </Panel>
   <Action label="렌탈 주문서 미리보기 (실제 결제 없음)" onPress={()=>router.push('/rental/checkout')}/></>:null}
  </Screen>;
