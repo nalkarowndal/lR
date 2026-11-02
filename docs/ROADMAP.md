@@ -1,7 +1,7 @@
 # luxuryRental — Implementation Roadmap and Acceptance Gates
 
 **Project:** [nalkarowndal/lR](https://github.com/nalkarowndal/lR)  
-**Status:** M0–M2 planning; application code not started  
+**Status:** M0 source audit and M1 design documentation completed; M2 visual prototyping pending. No application code implemented  
 **Updated:** 2026-11-02
 
 ## Guiding constraints
@@ -57,7 +57,7 @@
 ### Tasks
 1. Create `apps/api` with supported Node.js LTS + TypeScript + Express.
 2. Implement configuration validation, versioned routing, structured error handling, authentication, RBAC, request validation, and health check.
-3. Prepare PostgreSQL + Prisma migration only after a legacy schema comparison and explicit migration plan.
+3. Use the M1 **MySQL/InnoDB initial database baseline** with verified schema/backups; introduce Prisma only if selected version supports MySQL, after separate migration approval. Do not migrate real data before validation.
 4. Implement product catalog, unit inventory, quote and availability transactions.
 5. Generate OpenAPI and write contract/integration tests.
 
@@ -113,10 +113,15 @@
 | Designated repository and writing permission | Verified |
 | Node.js backend decision | Confirmed |
 | Architecture and phase definitions | Documented |
-| Latest original site source comparison | Pending |
-| Approved Figma wireframes | Pending |
+| Latest original site source comparison | GitHub static audit completed; live DB/ZIP parity pending |
+| M1 requirements, IA, data model and API design | Documents completed; business policies pending |
+| Approved Figma wireframes | Pending (M2) |
 | Node.js API source code | Not started |
 | React Native app source code | Not started |
 | Database migration / CI / QA | Not started |
 
-**Next planned activity:** M0 original luxuryRental source audit and feature matrix; avoid premature feature coding until source-of-truth screens and flows are confirmed.
+**Current next activity:** M2 Figma design system + clickable prototype based on M1 requirements and ERD. M3 API/DB implementation starts only after actual MySQL schema/data checks and outstanding operational policy decisions.
+
+**M1 committed deliverables (2026-11-02):** [DECISIONS](DECISIONS_M1.md), [REQUIREMENTS](REQUIREMENTS.md), [INFORMATION_ARCHITECTURE](INFORMATION_ARCHITECTURE.md), [USER_FLOWS](USER_FLOWS.md), [DATA_MODEL](DATA_MODEL.md), [API_CONTRACT](API_CONTRACT.md), [ACCEPTANCE_TESTS](ACCEPTANCE_TESTS.md). M1 design baseline is complete, but customer business policies POL-01~05, live DB inspection, payment-provider selection and QA execution are not completed.
+
+**Important:** `docs/ARCHITECTURE.md` began as an M0 conceptual sketch. M1 detailed documents supersede older examples on dates, state transitions, database choice and endpoint shapes.
