@@ -1,8 +1,13 @@
 # luxuryRental — Premium Rental & Luxury Boutique App
 
-> Status: **M3.3–M5.2B1 demo auth, API/UI, simulated payment ledger and internal Toss signature boundary merged with CI; real PG/native-device QA not complete** · Updated: 2026-11-02
+> Status: **M5.2B1 backend + UX-A/UX-BC mobile UI QA merged with CI; licensed product photography, real PG and native-device QA incomplete** · Updated: 2026-11-02
 > Repository: **nalkarowndal/lR**  
 > This repository is for the **new mobile app and its Node.js backend**. It is not a replacement for the original luxuryRental website.
+
+## Latest mobile UI and screenshot QA
+- [UX-A: wishlist/calendar fixes PR #17](https://github.com/nalkarowndal/lR/pull/17) — [Chromium 33/33 PASS](https://github.com/nalkarowndal/lR/actions/runs/41394900864).
+- [UX-BC: image-ready product cards, accessible detail, search and tablet layout PR #18](https://github.com/nalkarowndal/lR/pull/18) — [Chromium 40/40 PASS](https://github.com/nalkarowndal/lR/actions/runs/41396560622), [Expo UI CI PASS](https://github.com/nalkarowndal/lR/actions/runs/41396560623).
+- Approved **real product photography not uploaded**; illustrations remain explicitly demo-only. [Media/rights and native QA issue #19](https://github.com/nalkarowndal/lR/issues/19). Commercial PG still blocked.
 
 ## Vision
 

@@ -8,6 +8,13 @@
 - 상품 그리드: 모바일 2열, 640~959px 태블릿 3열, 960px 이상 4열. 다른 화면의 5탭과 safe-area 동작은 그대로 둔다.
 - 필터 입력은 저장·전송되지 않으며 인증/결제 API 변경 없음.
 
+## 검증 결과 (2026-11-02)
+- [PR #18 main 병합](https://github.com/nalkarowndal/lR/pull/18)
+- [Chromium CI #41396560622](https://github.com/nalkarowndal/lR/actions/runs/41396560622): offline **34/34 PASS**, API-unreachable **6/6 PASS**. [Offline screenshots and HTML artifact](https://github.com/nalkarowndal/lR/actions/runs/41396560622/artifacts/13119058694).
+- [Expo #41396560623](https://github.com/nalkarowndal/lR/actions/runs/41396560623): TypeScript, unit tests and web build PASS.
+- Expo Router가 보이지 않는 이전 페이지를 유지하기 때문에 search 정렬 테스트는 **화면에 표시되는 role 기반 상품 버튼**으로 확인하도록 개선. 최초 테스트 선택자 오류 수정 후 최종 전체 통과.
+- 실제 사진 사용권·이미지 CMS/API 공급·실기기 QA는 [Issue #19](https://github.com/nalkarowndal/lR/issues/19)에서 미완료로 추적.
+
 ## 자동 검증
 - DOM 이미지 소스 사용 시 HTTPS와 접근성 설명 검증을 단위 테스트에 추가.
 - 상품 카테고리/등급/가격 정렬의 순수 함수 테스트.
