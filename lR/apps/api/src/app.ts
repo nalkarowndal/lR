@@ -41,7 +41,7 @@ export function createApp(db:Database,{demoMode=false,corsOrigins=[]}:{demoMode?
    if(!origin||!corsOrigins.includes(origin)){next();return;}
    res.setHeader('Access-Control-Allow-Origin',origin);
    res.setHeader('Vary','Origin');
-   res.setHeader('Access-Control-Allow-Methods','GET,POST,PATCH,DELETE,OPTIONS');
+   res.setHeader('Access-Control-Allow-Methods','GET,POST,PUT,PATCH,DELETE,OPTIONS');
    res.setHeader('Access-Control-Allow-Headers','Accept,Content-Type,Authorization,Idempotency-Key');
    res.setHeader('Access-Control-Max-Age','600');
    if(req.method==='OPTIONS'){res.sendStatus(204);return;}
