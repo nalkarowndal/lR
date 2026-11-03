@@ -64,3 +64,14 @@
 - iOS와 Android의 원본 소스맵·생성 JS는 `lR/apps/mobile/dist/` 아래에서 생성되며 아티팩트에 포함하지 않는다. `lR/security-reports/`에 패키지 이름·모듈 수량만 별도로 기록한다.
 - SDK 58의 공식 수정이 npm으로 배포되지 않았으므로 `glob 13.0.6`·`minimatch 10.2.6` 잠금 유지; npm audit **moderate 11** 잔존. 확인 기준 [Expo #52735](https://github.com/expo/expo/issues/52735) 및 [Expo GitHub Releases](https://github.com/expo/expo/releases). 강제 메이저 올림·`npm audit fix --force` 금지.
 - **남은 단계:** SDK58 의존성 패치가 공식 릴리스되면 최소 업데이트/회귀 검증. 웹 번들·OTA·네이티브 바이너리/실기기·외부 입력 경로 검증, [Issue #10](https://github.com/nalkarowndal/lR/issues/10) 및 [Issue #14](https://github.com/nalkarowndal/lR/issues/14) 이행 전까지 출시 불가. 관리자 ERP·실 PG·운영 DB에 손대지 않음.
+
+## 7. M6-1B4 — Expo 웹 배포용 JS 보안 검사 (2026-11-03)
+
+- [PR #35](https://github.com/nalkarowndal/lR/pull/35): 기존 iOS·Android 검사기에 `web`을 추가하고 플랫폼별 판정·누락/손상 소스맵 실패·인덱스형 소스맵 취약 패키지 탐지를 검증한다. `ios`/`android`/`web` 외 플랫폼은 거부한다.
+- [보안 CI #41563342668](https://github.com/nalkarowndal/lR/actions/runs/41563342668) **PASS**: 보안 테스트 **19/19**, `npx expo install --check` 성공, 웹 배포 JS를 `expo export --platform web --source-maps --output-dir dist/security-web`로 생성했다.
+- **실측:** iOS **1개 map / 1,215 source entries**, Android **1개 / 1,209**, 웹 **22개 / 858**를 검사했다. 추적하는 `glob`, `minimatch`, Expo 빌드 도구의 `node_modules` 패키지 경로는 각 플랫폼 **0건**이었다.
+- [모바일 CI #41563342730](https://github.com/nalkarowndal/lR/actions/runs/41563342730) **PASS**: TypeScript·모바일 테스트·웹 번들 빌드. 이번 PR에서 API/MySQL 및 Chromium 브라우저 QA를 신규 실행한 결과는 아니다.
+- 소스맵 원본과 JS 번들은 아티팩트에 올리지 않는다. `lR/security-reports/native-bundle-surface-{ios,android,web}.{json,md}`로 요약 수치·패키지명만 저장한다. `releaseApproved:false`는 유지한다.
+- **검증 한계:** 생성한 프로덕션 웹/iOS/Android JS 출력물의 *source-map에 표기된 모듈 목록*만 검사한다. 실제 런타임 실행·외부 입력 경로·OTA·네이티브 바이너리·기기 취약성·서버 API 보안까지 입증하지 않는다.
+- 공식 Expo 릴리스의 [`expo@58.0.22`](https://github.com/expo/expo/releases/tag/expo%4058.0.22)는 2026-10-31 게시되었고, [upstream #52735](https://github.com/expo/expo/issues/52735)는 2026-11-03 확인 기준 **열림** 상태였다. 본 프로젝트의 lockfile은 바꾸지 않았으며 npm audit production/all **moderate 11**개 영향 패키지가 남아 있다. 강제 overrides/major 업그레이드를 하지 않는다.
+- **다음 우선순위:** Expo SDK58 패치 발행 시 실제 설치 버전과 `npm audit` 영향 검증, 최소 의존성 변경, 전체 API/MySQL·Chromium·Expo/보안 CI 재검증. 실제 Android/iOS 기기 QA([Issue #10](https://github.com/nalkarowndal/lR/issues/10))·사업 정책/PG 승인([Issue #14](https://github.com/nalkarowndal/lR/issues/14)) 전까지 출시 불가.

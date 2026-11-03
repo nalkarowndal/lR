@@ -8,6 +8,8 @@ on:
       - 'lR/apps/api/package.json'
       - 'lR/apps/mobile/package.json'
       - 'lR/scripts/security/**'
+      - 'lR/docs/M6_1B_ADVISORY_TRIAGE.md'
+      - 'lR/docs/PROJECT_STATUS.md'
       - '.github/workflows/m6-security-audit.yml'
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -51,7 +53,7 @@ jobs:
           set -euo pipefail
           (cd apps/mobile && npx expo install --check)
           git diff --exit-code -- package-lock.json package.json apps/mobile/package.json
-      - name: Export iOS and Android production JS and inspect source maps
+      - name: Export iOS, Android and Web production JS and inspect source maps
         env:
           CI: '1'
           EXPO_NO_TELEMETRY: '1'
@@ -61,6 +63,8 @@ jobs:
           node scripts/security/native-bundle-surface.mjs apps/mobile/dist/security-ios security-reports/native-bundle-surface-ios ios
           (cd apps/mobile && npx expo export --platform android --source-maps --no-bytecode --output-dir dist/security-android)
           node scripts/security/native-bundle-surface.mjs apps/mobile/dist/security-android security-reports/native-bundle-surface-android android
+          (cd apps/mobile && npx expo export --platform web --source-maps --output-dir dist/security-web)
+          node scripts/security/native-bundle-surface.mjs apps/mobile/dist/security-web security-reports/native-bundle-surface-web web
       - name: Publish audit evidence (no private keys or app runtime secrets)
         if: always()
         uses: actions/upload-artifact@v4

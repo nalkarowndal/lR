@@ -52,6 +52,15 @@
 - 위험: npm audit moderate 11개 유지; 앱 번들 외 네이티브·실기기·외부 입력 검증 미완료, 실결제/운영 기능 차단
 - 다음: 공식 Expo58 호환 패치 확인·검증, 필요 시 최소 의존성 업데이트/전체 CI 재실행 후 Issue #10 실기기 QA 및 Issue #14 사업 정책 승인
 
+## M6-1B4 — Web JS 소스맵 보안 검증 (2026-11-03)
+
+- 목표: `main/lR/` 프로젝트에서 기존 Android·iOS JS 소스맵 감사에 웹 배포 JS 검증 추가
+- 변경: `native-bundle-surface.mjs`/단위 테스트·`.github/workflows/m6-security-audit.yml`·[M6 보안 문서](M6_1B_ADVISORY_TRIAGE.md)
+- PR/CI: [PR #35](https://github.com/nalkarowndal/lR/pull/35), [보안 CI #41563342668](https://github.com/nalkarowndal/lR/actions/runs/41563342668), [모바일 CI #41563342730](https://github.com/nalkarowndal/lR/actions/runs/41563342730)
+- QA: 보안 **19/19**, Expo SDK 의존성 호환성 통과, iOS 1,215·Android 1,209·Web 858 source entries 검증, 추적 패키지 모듈 모두 0개
+- 위험: 실제 npm audit `moderate 11` 잔존; 소스맵 밖 네이티브·OTA·실기기·외부 입력 노출 미확인, PG/ERP 출시 차단
+- 다음: Expo SDK58 공식 안전 패치 시 최소 업데이트 및 전체 회귀 검증 → 실제 기기 Issue #10 → 승인 정책 Issue #14
+
 ## 다음 연속 작업 패키지
 
 **M6-1A 의존성 보안 감사·릴리스 API 차단 회귀 병합 완료, 다음 M6-1B 취약점 11개 패키지 분류:** API/MySQL 106/106, HTTP 5/5, 모바일 25/25 PASS. 직전 Chromium 40/40 PASS(이번 PR 미실행). 실제 PG 테스트 키·운영 정책 승인은 여전히 미완료. 실제 Android/iOS 기기·접근성, 운영 계정·PG·보증금/취소/물류 정책 미승인으로 **상용 출시 Gate는 미통과**.
