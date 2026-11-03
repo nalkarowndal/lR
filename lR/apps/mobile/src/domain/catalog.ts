@@ -1,4 +1,4 @@
-import {getGeneratedDemoMedia} from './generated-media';
+import {getGeneratedDemoMedia} from './generated-media.ts';
 export type Channel='RENTAL'|'STORE';
 export type ProductArt='#FDF2F8'|'#EFF6FF'|'#F0FDF4'|'#F3F4F6';
 export interface ProductMedia{url:string;alt:string}
