@@ -63,6 +63,8 @@ export function createApp(db:Database,{demoMode=false,corsOrigins=[]}:{demoMode?
    try{await db.query('SELECT 1');res.json({status:'ready'});}
    catch{problem(req,res,503,'DATABASE_UNAVAILABLE','Database is not ready');}
  });
+ // Rights revocation must not be masked by browser/proxy-cached product images or metadata.
+ app.use('/api/v1/products',(_req,res,next)=>{res.setHeader('Cache-Control','no-store');next();});
  app.get('/api/v1/products',async(req,res)=>{
    const q=listSchema.parse(req.query);
    const result=await listProducts(db,q);
