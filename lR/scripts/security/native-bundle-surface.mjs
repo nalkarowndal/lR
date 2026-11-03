@@ -42,7 +42,7 @@ function sourcesFromMap(map, depth = 0) {
 }
 
 export function inspectSourceMaps(maps, platform = 'ios') {
-  if (platform !== 'ios' && platform !== 'android') throw new Error('INVALID_PLATFORM');
+  if (platform !== 'ios' && platform !== 'android' && platform !== 'web' && platform !== 'web') throw new Error('INVALID_PLATFORM');
   if (!Array.isArray(maps) || maps.length === 0) throw new Error('NO_NATIVE_SOURCE_MAPS');
   const counts = new Map();
   let sourceCount = 0;
@@ -105,7 +105,7 @@ export function inspectExportDirectory(directory, platform = 'ios') {
 
 export function renderNativeEvidence(report) {
   const status=report.requiresReview?'REVIEW_REQUIRED':'NO_RISK_PACKAGES_IN_INSPECTED_MAPS';
-  const platform=report.target === 'android-production-js-export' ? 'Android' : 'iOS';
+  const platform=report.target === 'android-production-js-export' ? 'Android' : report.target === 'web-production-js-export' ? 'Web' : 'iOS';
   return '# M6 native '+platform+' JavaScript bundle source-map evidence\n\n'
     + '- Status: '+status+'\n'
     + '- Source maps inspected: '+report.mapsInspected+'\n'
