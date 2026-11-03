@@ -7,7 +7,7 @@ import {colors} from '../../theme';
 import {Screen,Panel,DemoNotice,Heading,Body,RowLink,Action,Badge} from '../../components/ui';
 export default function My(){
  const router=useRouter();
- const {favorites,cart}=useAppState();
+ const {favorites,cart,savedSyncStatus,savedSyncError,retrySavedSync}=useAppState();
  const session=useDemoSession();
  const loggedIn=session.status==='signed-in'&&!!session.identity;
  return <Screen title="마이" subtitle="내 취향과 이용 내역">
@@ -28,8 +28,10 @@ export default function My(){
    {session.error?<Text accessibilityRole="alert" style={{color:colors.error}}>{session.error}</Text>:null}
   </Panel>
   <Panel>
-   <RowLink title="찜한 상품" subtitle={favorites.length+'개 · 이 기기의 임시 목록'} onPress={()=>router.push('/my/wishlist')}/>
-   <RowLink title="장바구니" subtitle={cart.length+'개 · 임시 시연'} onPress={()=>router.push('/store/checkout')}/>
+   {loggedIn&&savedSyncStatus==='loading'?<Body muted>테스트 계정의 찜·장바구니를 불러오는 중입니다.</Body>:null}
+   {savedSyncError?<><Body muted>{savedSyncError}</Body><Action label="저장 목록 다시 불러오기" secondary onPress={retrySavedSync}/></>:null}
+   <RowLink title="찜한 상품" subtitle={favorites.length+'개 · '+(loggedIn?'테스트 계정 저장':'이 기기의 임시 목록')} onPress={()=>router.push('/my/wishlist')}/>
+   <RowLink title="장바구니" subtitle={cart.length+'개 · '+(loggedIn?'테스트 계정 저장':'임시 시연')} onPress={()=>router.push('/store/checkout')}/>
    <RowLink title="명품 위탁 판매" subtitle="3단계 신청 화면 미리보기" onPress={()=>router.push('/my/consignment')}/>
    {apiEnabled()?
     <RowLink title="내 주문 내역" subtitle="서버에 접수된 렌탈 주문 확인" onPress={()=>router.push('/my/experience-orders')}/>:null}
