@@ -29,6 +29,11 @@ npm run build:mobile:web
 - iOS/Android **JS 배포 번들** export 및 source-map 검사는 별도 [M6 security workflow](https://github.com/nalkarowndal/lR/actions/workflows/m6-security-audit.yml)에서 실행한다. `source-map` 검사는 native binary E2E와 다르다.
 - 앱 구성 오류는 CI에서 실패해야 한다. 경고를 무시하거나 결과를 성공으로 가장하지 않는다.
 
+### 최초 CI 근거 (2026-11-03)
+
+- [Mobile UI checks #41566382082](https://github.com/nalkarowndal/lR/actions/runs/41566382082) — `expo-doctor` **20/20 PASS**, `npx expo install --check` PASS, TypeScript·도메인 테스트 **25/25** 및 Expo 웹 export 성공. 이것은 native preflight만 증명한다.
+- 첫 실행에서 app config 불일치 2종(`android.edgeToEdgeEnabled`, `newArchEnabled`)을 순차로 발견해 Expo SDK 58 공식 스키마에 맞게 제거했다. 실제 앱 동작/기기 보안 검증은 여전히 별개다.
+
 ## 3. 실제 기기 준비
 
 1. `main`의 정확한 커밋 SHA, 앱 버전 `0.1.0`, Expo 버전, 테스트 날짜를 기록한다. 가능하면 Android 실기기(또는 에뮬레이터) **1개 + iPhone 실기기(또는 macOS iOS Simulator) 1개** 이상 준비한다.

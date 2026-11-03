@@ -61,6 +61,15 @@
 - 위험: 실제 npm audit `moderate 11` 잔존; 소스맵 밖 네이티브·OTA·실기기·외부 입력 노출 미확인, PG/ERP 출시 차단
 - 다음: Expo SDK58 공식 안전 패치 시 최소 업데이트 및 전체 회귀 검증 → 실제 기기 Issue #10 → 승인 정책 Issue #14
 
+## M6-1B5 — Expo Doctor SDK 58 사전검증·Android/iOS 기기 QA 실행 준비 (2026-11-03)
+
+- 목표: [M6-1B4](M6_1B_ADVISORY_TRIAGE.md) 다음 순서대로 Expo 공식 패치 재확인 → native 설정·의존성 사전검증 → 기기 QA 실행 준비
+- 변경: `.github/workflows/mobile-ui.yml`에 read-only `expo-doctor` + `expo install --check` 추가, `apps/mobile/app.json`의 SDK 58에서 폐기된 `android.edgeToEdgeEnabled`와 `newArchEnabled` 제거, [실기기 QA 실행표](M6_1B5_DEVICE_QA_RUNBOOK.md) 신설
+- PR/CI: [PR #36](https://github.com/nalkarowndal/lR/pull/36), [모바일 CI #41566382082](https://github.com/nalkarowndal/lR/actions/runs/41566382082)에서 Expo Doctor **20/20**, `expo install --check` **PASS**, TypeScript·모바일 **25/25**·Expo Web export **PASS**
+- 보안 패치: 2026-11-03 Expo 공개 SDK 58 릴리스 `expo@58.0.22`(현재 버전)과 upstream [#52735](https://github.com/expo/expo/issues/52735) OPEN 확인. 잠금파일/Expo 의존성 변화 없음, [M6-1B4 보안 CI #41563727969](https://github.com/nalkarowndal/lR/actions/runs/41563727969) 기준 npm audit moderate **11**은 여전히 미해결
+- 위험: CI가 확인한 것은 Expo 앱 구성과 JS 테스트·번들 빌드다. **실제 Android/iOS 기기 실행·시각·VoiceOver/TalkBack·네이티브 SecureStore 동작을 증명하지 않는다**. [Issue #10](https://github.com/nalkarowndal/lR/issues/10) OPEN, `releaseApproved=false` 유지
+- 다음: 실제 Android/iOS 장치별 테스트 ID NAT-01~12 및 증거 확보, 오류 수정/재검증 → [Issue #14](https://github.com/nalkarowndal/lR/issues/14) 사업 정책·PG 샌드박스 및 운영 승인 검토. 승인되지 않은 실거래 API/ERP/DB 변경 금지
+
 ## 다음 연속 작업 패키지
 
 **M6-1A 의존성 보안 감사·릴리스 API 차단 회귀 병합 완료, 다음 M6-1B 취약점 11개 패키지 분류:** API/MySQL 106/106, HTTP 5/5, 모바일 25/25 PASS. 직전 Chromium 40/40 PASS(이번 PR 미실행). 실제 PG 테스트 키·운영 정책 승인은 여전히 미완료. 실제 Android/iOS 기기·접근성, 운영 계정·PG·보증금/취소/물류 정책 미승인으로 **상용 출시 Gate는 미통과**.
