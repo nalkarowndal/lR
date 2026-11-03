@@ -5,6 +5,7 @@ import type{Database} from './db.js';
 import {getIdentity,requireAuth,requireRole} from './auth.js';
 import {problem} from './problem.js';
 import {readEditorial,changeEditorial,editorialCopySchema,EditorialConflict} from './editorial.js';
+import {listMediaRights} from './media-rights.js';
 const draftBody=z.object({expectedRevision:z.number().int().min(1),copy:editorialCopySchema}).strict();
 const publishBody=z.object({expectedRevision:z.number().int().min(1)}).strict();
 export function mountEditorialRoutes(app:Express,db:Database,{demoMode}:{demoMode:boolean}){
@@ -16,7 +17,7 @@ export function mountEditorialRoutes(app:Express,db:Database,{demoMode}:{demoMod
  };
  const admin=requireRole('ADMIN'),auth=requireAuth(db);
  const path='/api/v1/admin/editorial/home';
- app.use(['/api/v1/editorial/home',path],(_req,res,next)=>{
+ app.use(['/api/v1/editorial/home',path,'/api/v1/admin/media-rights'],(_req,res,next)=>{
   res.setHeader('Cache-Control','no-store');next();
  });
  app.get('/api/v1/editorial/home',gate,async(_req,res)=>{
@@ -24,6 +25,9 @@ export function mountEditorialRoutes(app:Express,db:Database,{demoMode}:{demoMod
   // Public callers see a published-only snapshot and no draft or admin actor.
   res.json({data:{slot:current.slot,copy:current.published,revision:current.publishedRevision,demo:true},
    meta:{requestId:res.locals.requestId}});
+ });
+ app.get('/api/v1/admin/media-rights',gate,auth,admin,async(_req,res)=>{
+  res.json({data:await listMediaRights(db),meta:{requestId:res.locals.requestId,demo:true}});
  });
  app.get(path,gate,auth,admin,async(_req,res)=>{
   res.json({data:await readEditorial(db),meta:{requestId:res.locals.requestId}});
