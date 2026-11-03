@@ -45,3 +45,9 @@
 - [PR #39](https://github.com/nalkarowndal/lR/pull/39): 서버 테스트 원장 `lr_demo_orders`에 저장된 **내부 모의 주문**과 `lr_demo_payment_audit` / `lr_demo_payment_events`를 ADMIN 역할로만 조회한다. [구체 명세](M5_2C2_ADMIN_LEDGER_READ.md).
 - **C1 브라우저 세션 가짜 결제 결과는 관리자 원장에 합쳐지지 않는다**. `APP_MODE=demo`·`NODE_ENV=test`·`DB_NAME=lr_test`가 동시에 일치해야 조회 경로가 열리며, 실회원/PG/운영 MySQL은 연결되지 않는다.
 - [API/MySQL #41574021033](https://github.com/nalkarowndal/lR/actions/runs/41574021033) 111/111+HTTP 5/5, [모바일 #41574021034](https://github.com/nalkarowndal/lR/actions/runs/41574021034) 33/33·Expo Web export PASS. [브라우저 #41574021124](https://github.com/nalkarowndal/lR/actions/runs/41574021124)에서 관리자 비로그인 접근 차단·기존 사용자 흐름을 검증. 실제 관리자 세션을 통한 브라우저/DB 연동 E2E는 아직 실시하지 않았다.
+
+## 7. M5-2C3 서버 저장형 주문 경험
+
+- [PR #40](https://github.com/nalkarowndal/lR/pull/40): 포트폴리오 **체험 주문을 서버가 실제 접수·저장**한다. 테스트 계정·안전한 주문 옵션·서버 금액·상태·접수번호는 유지되지만 **결제·예약/재고 확정·배송은 실행하지 않는다**.
+- [Node API #41577706132](https://github.com/nalkarowndal/lR/actions/runs/41577706132) 116/116 + 실 HTTP 6/6, [Mobile #41577706051](https://github.com/nalkarowndal/lR/actions/runs/41577706051) 37/37·Web export, [실 API 연결 Chromium #41577706025](https://github.com/nalkarowndal/lR/actions/runs/41577706025) 3/3(360/390/768) PASS. 브라우저 고객/서버가 실제 연결된 흐름을 검증했다. 관리자 브라우저 실권한 전 구간은 API 역할 테스트와 구분.
+- 고객용 `/my/experience-orders`는 실제 `lr_test` 체험 주문을 표시한다. 기존 `/my/demo-orders` 오프라인 메모리 시뮬레이션은 별개. [상세 명세](M5_2C3_PORTFOLIO_ORDER_INTAKE.md).
