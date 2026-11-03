@@ -61,7 +61,7 @@ export function inspectSourceMaps(maps, platform = 'ios') {
     target:platform+'-production-js-export', mapsInspected:maps.length, sourceEntriesInspected:sourceCount,
     blockedPackageHits:packages, requiresReview:packages.length !== 0,
     releaseApproved:false,
-    limitations:'Only the inspected iOS JS source maps are covered; no native binary, OTA, web, input reachability, or actual device security claim.'
+    limitations:'Only the inspected '+platform+' JS source maps are covered; no native binary, OTA, web, input reachability, or actual device security claim.'
   };
 }
 

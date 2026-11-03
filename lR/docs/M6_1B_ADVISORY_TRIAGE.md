@@ -54,3 +54,13 @@
 - `lR/security-reports/native-bundle-surface.json` 및 `.md`에는 수량/패키지만 저장하고 **소스맵 원본은 아티팩트로 업로드하지 않는다**. 결과는 `releaseApproved:false`로 유지한다.
 - **판정 한계:** iOS JS 소스맵에 나타나지 않았다고 해서 안드로이드·웹·네이티브 바이너리·업데이트 번들·외부 입력 공격 표면 전체가 안전하다고 증명되는 것은 아니다.
 - [Expo 공식 번들 분석 문서](https://docs.expo.dev/guides/analyzing-bundles/)에 근거. Expo 유지관리자는 [upstream 이슈](https://github.com/expo/expo/issues/52735)에서 빌드 도구 쪽 권고라고 설명했으나 본 프로젝트의 iOS 증거와 분리해서 기록한다.
+
+## 6. M6-1B3 — Android 배포 JavaScript 보안 범위·Expo SDK 호환성 (2026-11-03)
+
+- [PR #34](https://github.com/nalkarowndal/lR/pull/34)에서 기존 iOS 검사기에 Android 플랫폼 인식·형식 오류·대상 구분 회귀 테스트를 추가했다. 검사기는 `platform='ios'|'android'`만 허용하며 다른 대상은 `INVALID_PLATFORM`으로 종료한다.
+- [보안 CI #41559865818](https://github.com/nalkarowndal/lR/actions/runs/41559865818): Node 보안 파서+소스맵 **16/16 PASS**, `npx expo install --check` 통과 및 원본 manifest/lockfile 변경 없음. 실제 Expo SDK58 iOS/Android 배포 JS를 각각 `--source-maps --no-bytecode`로 생성하여 검사한다.
+- 동일 CI의 **iOS 1개 소스맵/1,215 sources**, **Android 1개 소스맵/1,209 sources**에서 추적 중인 `glob`·`minimatch`·Expo 빌드 전용 패키지 모듈 **각 0건**. 이는 검사한 소스맵의 모듈 이름 검사 결과로, 네이티브 바이너리·실기기 보안 검증이 아니다.
+- [모바일 CI #41559865778](https://github.com/nalkarowndal/lR/actions/runs/41559865778): 타입 검사·도메인 25/25·Expo 웹 번들 통과. 이전의 MySQL/API 106/106·실HTTP 5/5·Chromium 40/40은 이번 PR 재실행 결과가 아님.
+- iOS와 Android의 원본 소스맵·생성 JS는 `lR/apps/mobile/dist/` 아래에서 생성되며 아티팩트에 포함하지 않는다. `lR/security-reports/`에 패키지 이름·모듈 수량만 별도로 기록한다.
+- SDK 58의 공식 수정이 npm으로 배포되지 않았으므로 `glob 13.0.6`·`minimatch 10.2.6` 잠금 유지; npm audit **moderate 11** 잔존. 확인 기준 [Expo #52735](https://github.com/expo/expo/issues/52735) 및 [Expo GitHub Releases](https://github.com/expo/expo/releases). 강제 메이저 올림·`npm audit fix --force` 금지.
+- **남은 단계:** SDK58 의존성 패치가 공식 릴리스되면 최소 업데이트/회귀 검증. 웹 번들·OTA·네이티브 바이너리/실기기·외부 입력 경로 검증, [Issue #10](https://github.com/nalkarowndal/lR/issues/10) 및 [Issue #14](https://github.com/nalkarowndal/lR/issues/14) 이행 전까지 출시 불가. 관리자 ERP·실 PG·운영 DB에 손대지 않음.

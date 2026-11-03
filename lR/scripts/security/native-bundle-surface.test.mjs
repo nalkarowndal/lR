@@ -74,6 +74,8 @@ test('separately identifies Android production JavaScript export instead of sile
  const map={sources:['/repo/node_modules/react/index.js','/repo/src/app/index.tsx']};
  const result=inspectSourceMaps([map],'android');
  assert.equal(result.target,'android-production-js-export');
+ assert.match(result.limitations,/inspected android JS source maps/);
+ assert.doesNotMatch(result.limitations,/inspected iOS JS/);
  assert.match(renderNativeEvidence(result),/Android JavaScript bundle/);
  assert.equal(result.releaseApproved,false);
 });
