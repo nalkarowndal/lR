@@ -13,7 +13,7 @@ test('repair and consignment forms persist receipts; customer can cancel and rel
  await expect(page.getByText(/시연 계정을 생성했습니다/)).toBeVisible();
  await page.getByRole('textbox',{name:'테스트 비밀번호'}).fill(password);
  await page.getByRole('button',{name:'테스트 계정 로그인'}).click();
- await expect(page.getByText('테스트 계정: '+email)).toBeVisible();
+ await expect(page.getByText('테스트 계정: '+email).filter({visible:true})).toBeVisible();
 
  await page.getByRole('button',{name:'수선 서비스'}).click();
  await page.getByRole('button',{name:'수선 신청서 작성하기'}).click();
@@ -34,7 +34,7 @@ test('repair and consignment forms persist receipts; customer can cancel and rel
  expect((await canceled).status()).toBe(200);
  await expect(page.getByText('진행 상태: 신청 취소')).toBeVisible();
  await page.getByRole('button',{name:'마이페이지로 돌아가기'}).click();
- await expect(page.getByText('테스트 계정: '+email)).toBeVisible();
+ await expect(page.getByText('테스트 계정: '+email).filter({visible:true})).toBeVisible();
 
  await page.getByRole('button',{name:/명품 위탁 판매/}).click();
  await page.getByRole('textbox',{name:'위탁 판매 브랜드'}).fill('DEMO');
@@ -57,7 +57,7 @@ test('repair and consignment forms persist receipts; customer can cancel and rel
  await page.getByRole('textbox',{name:'테스트 이메일'}).fill(email);
  await page.getByRole('textbox',{name:'테스트 비밀번호'}).fill(password);
  await page.getByRole('button',{name:'테스트 계정 로그인'}).click();
- await expect(page.getByText('테스트 계정: '+email)).toBeVisible();
+ await expect(page.getByText('테스트 계정: '+email).filter({visible:true})).toBeVisible();
  await page.getByRole('button',{name:'내 수선·위탁 신청 내역'}).click();
  await expect(page.getByRole('button',{name:/위탁 · DEMO 시연용 숄더백/})).toBeVisible();
  await expect(page.getByRole('button',{name:/수선 · 시연용 가죽가방/})).toBeVisible();
