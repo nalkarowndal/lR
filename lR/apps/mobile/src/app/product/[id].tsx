@@ -1,5 +1,5 @@
 import {useEffect,useState} from 'react';
-import {View,Text,Pressable,useWindowDimensions} from 'react-native';
+import {View,Text,Pressable,Modal,useWindowDimensions} from 'react-native';
 import {useLocalSearchParams,useRouter} from 'expo-router';
 import {useProduct} from '../../api/hooks';
 import {formatKrw,colors} from '../../theme';
@@ -13,7 +13,8 @@ export default function ProductDetail(){
  const router=useRouter();const {width}=useWindowDimensions();
  const resource=useProduct(id||'');const product=resource.data;
  const [mediaIndex,setMediaIndex]=useState(0);
- useEffect(()=>setMediaIndex(0),[id]);
+ const [expanded,setExpanded]=useState(false);
+ useEffect(()=>{setMediaIndex(0);setExpanded(false)},[id]);
  const {addToCart,toggleFavorite,favorites}=useAppState();
  const storeFirst=channel==='STORE';
  const rental=()=>product&&router.push({pathname:'/rental/availability/[id]',params:{id:product.id}});
@@ -32,10 +33,19 @@ export default function ProductDetail(){
        accessibilityLabel={'상품 이미지 '+(i+1)+': '+m.alt}
        accessibilityState={{selected:i===mediaIndex}}
        onPress={()=>setMediaIndex(i)}
-       style={{minHeight:44,paddingHorizontal:12,paddingVertical:9,borderWidth:1,borderColor:i===mediaIndex?colors.ink:colors.divider,borderRadius:10,backgroundColor:colors.surface}}>
-       <Text style={{fontSize:12,fontWeight:'700',color:colors.ink}}>이미지 {i+1}</Text>
+       style={{width:90,minHeight:92,padding:5,borderWidth:i===mediaIndex?2:1,
+        borderColor:i===mediaIndex?colors.ink:colors.divider,borderRadius:10,backgroundColor:colors.surface}}>
+       <ProductVisual background={product.art} product={product} mediaIndex={i} heightOverride={65}/>
+       <Text style={{fontSize:10,fontWeight:'700',color:colors.ink,textAlign:'center'}}>이미지 {i+1}</Text>
       </Pressable>)}
      </View>:null}
+    {product.media?.length?<Pressable accessibilityRole="button" accessibilityLabel="사진 크게 보기"
+      onPress={()=>setExpanded(true)}
+      style={{minHeight:44,alignSelf:'flex-start',paddingHorizontal:16,
+       borderWidth:1,borderColor:colors.divider,borderRadius:10,
+       backgroundColor:colors.surface,justifyContent:'center'}}>
+      <Text style={{fontSize:12,color:colors.ink,fontWeight:'800'}}>이미지 크게 보기</Text>
+     </Pressable>:null}
     <Body muted>{product.demo&&product.media?.some(m=>m.alt.includes('AI 생성'))?
      'AI로 만든 가상 상품 이미지입니다. 실제 브랜드·제품·정품 사진이 아니며 상품 상태도 시연 데이터입니다.':
      product.media?.length?'제공된 이미지 · 실제 상품 상태는 별도 검수로 확인해야 합니다.':
@@ -64,5 +74,25 @@ export default function ProductDetail(){
     </Panel>
    </View>
   </View>:null}
+  <Modal transparent visible={expanded&&!!product?.media?.length}
+    animationType="fade" onRequestClose={()=>setExpanded(false)}>
+   <View testID="product-gallery-expanded"
+    style={{flex:1,backgroundColor:'rgba(13,18,29,0.96)',justifyContent:'center',
+     alignItems:'center',padding:16,gap:15}}>
+    <View style={{width:'100%',maxWidth:740,gap:12}}>
+     <Pressable accessibilityRole="button" accessibilityLabel="확대 이미지 닫기"
+      onPress={()=>setExpanded(false)}
+      style={{minHeight:48,alignSelf:'flex-end',paddingHorizontal:20,borderRadius:10,
+       justifyContent:'center',backgroundColor:colors.surface}}>
+      <Text style={{color:colors.ink,fontWeight:'800'}}>닫기 ×</Text>
+     </Pressable>
+     {product?<ProductVisual background={product.art} product={product} mediaIndex={mediaIndex}
+       heightOverride={Math.min(width-32,620)}/>:null}
+     <Text style={{color:colors.surface,textAlign:'center',fontSize:13}}>
+      {product?.media?.[mediaIndex]?.alt||'상품 이미지'} 
+     </Text>
+    </View>
+   </View>
+  </Modal>
  </Screen>;
 }
