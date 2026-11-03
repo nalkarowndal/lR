@@ -31,7 +31,7 @@ export default function My(){
    <RowLink title="찜한 상품" subtitle={favorites.length+'개 · 이 기기의 임시 목록'} onPress={()=>router.push('/my/wishlist')}/>
    <RowLink title="장바구니" subtitle={cart.length+'개 · 임시 시연'} onPress={()=>router.push('/store/checkout')}/>
    <RowLink title="명품 위탁 판매" subtitle="3단계 신청 화면 미리보기" onPress={()=>router.push('/my/consignment')}/>
-   <RowLink title="내 대여 · 구매 내역" subtitle="정식 서버 기능 준비 중" onPress={()=>{}}/>
+   <RowLink title="모의 렌탈 이용 내역" subtitle="현재 세션의 결제 시뮬레이션 기록" onPress={()=>router.push('/my/demo-orders')}/>
    <RowLink title="수선 서비스" onPress={()=>router.push('/(tabs)/care')}/>
   </Panel>
  </Screen>;
