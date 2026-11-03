@@ -23,15 +23,32 @@ function packageFromSource(source) {
   return null;
 }
 
+function sourcesFromMap(map, depth = 0) {
+  if (!map || typeof map !== 'object' || depth > 30)
+    throw new Error('INVALID_NATIVE_SOURCE_MAP');
+  if (Array.isArray(map.sources)) {
+    if (map.sources.some(source => typeof source !== 'string'))
+      throw new Error('INVALID_NATIVE_SOURCE_MAP');
+    return map.sources;
+  }
+  // Metro SDK 58 produces indexed source maps with embedded sections.
+  if (!Array.isArray(map.sections) || map.sections.length === 0)
+    throw new Error('INVALID_NATIVE_SOURCE_MAP');
+  return map.sections.flatMap(section => {
+    if (!section || typeof section !== 'object' || !section.map || section.url)
+      throw new Error('INVALID_NATIVE_SOURCE_MAP');
+    return sourcesFromMap(section.map, depth + 1);
+  });
+}
+
 export function inspectSourceMaps(maps) {
   if (!Array.isArray(maps) || maps.length === 0) throw new Error('NO_NATIVE_SOURCE_MAPS');
   const counts = new Map();
   let sourceCount = 0;
   for (const map of maps) {
-    if (!map || !Array.isArray(map.sources)) throw new Error('INVALID_NATIVE_SOURCE_MAP');
-    if (map.sources.some(source => typeof source !== 'string')) throw new Error('INVALID_NATIVE_SOURCE_MAP');
-    sourceCount += map.sources.length;
-    for (const source of map.sources) {
+    const sources=sourcesFromMap(map);
+    sourceCount += sources.length;
+    for (const source of sources) {
       const name = packageFromSource(source);
       if (name) counts.set(name, (counts.get(name) || 0) + 1);
     }
@@ -71,11 +88,11 @@ export function inspectExportDirectory(directory) {
       }));
       throw new Error('INVALID_NATIVE_SOURCE_MAP');
     }
-    if (!Array.isArray(map.sources) || map.sources.some(s=>typeof s!=='string')) {
+    try { sourcesFromMap(map); }
+    catch {
       console.error('SOURCEMAP_STRUCTURE',JSON.stringify({
         file:basename(path), keys:Object.keys(map).slice(0,20),
-        sourcesType:typeof map.sources, sourcesCount:map.sources?.length,
-        malformedEntries:Array.isArray(map.sources)?map.sources.filter(s=>typeof s!=='string').length:null
+        sectionsCount:Array.isArray(map.sections)?map.sections.length:null
       }));
       throw new Error('INVALID_NATIVE_SOURCE_MAP');
     }
