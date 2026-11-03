@@ -81,6 +81,15 @@
 - **보안·운영 게이트:** npm audit moderate 11권고 및 공식 Expo 패치 모니터링은 지속. POL-01~05 실제 영업 승인/PG·배송·운영 ERP 및 실사용자 데이터 처리는 미승인/비활성 유지. 사용자에게 실제 결제가 발생하는 것처럼 오인시키지 않음
 - **다음 개발:** [Issue #14](https://github.com/nalkarowndal/lR/issues/14)에서 **렌탈·보증금·취소·반납의 데모 정책 명시 → 모의 결제/주문 사용자 흐름과 서버 상태·중복 요청/실패 복구 QA → 실제 PG 정책 승인은 별도 보류**. [Issue #19](https://github.com/nalkarowndal/lR/issues/19) UX-D는 기능 안정화 이후
 
+## M5-2C1 — 웹 브라우저 모의 렌탈 결제·세션 내역 (2026-11-03)
+
+- **목표:** [Issue #14](https://github.com/nalkarowndal/lR/issues/14)의 첫 사용자 접점 — 렌탈 주문서에서 모의 결제 성공·실패·취소를 체험하고 마이페이지 내역을 확인하는 UI. [설계/검증](M5_2C1_BROWSER_DEMO_CHECKOUT.md)
+- **변경:** `apps/mobile/src/domain/demo-rental.ts`, `state/AppState.tsx`, `app/rental/checkout.tsx`, `app/demo-result.tsx`, `app/my/demo-orders.tsx`, `app/(tabs)/my.tsx`, 도메인/Playwright 테스트 및 모바일 tsconfig. 백엔드·MySQL·PG·lockfile 수정 없음
+- **PR/검증:** [PR #38](https://github.com/nalkarowndal/lR/pull/38), [모바일 #41571483087](https://github.com/nalkarowndal/lR/actions/runs/41571483087) Expo Doctor 20/20·TypeScript·모바일 29/29·Web export, [브라우저 #41571483053](https://github.com/nalkarowndal/lR/actions/runs/41571483053) Chromium 오프라인 **43/43** + API 연결 실패 **6/6**, 새 결제 시나리오 **9/9**
+- **정책/안전:** `demo=true`, 허용된 샘플 정책 버전·금액·기간·만료시간만 처리, 주문 번호 `DEMO-...`로 표시, 세션 내역은 새로고침/로그아웃 후 소멸. 실제 주문·결제 승인 API 미호출, 예약/재고/DB 기록 없음, 실제 개인정보 입력 금지
+- **남은 범위:** 주문/결제 영속 처리·관리자 확인·취소/환불 정산·실 PG/사업 정책 **미구현·미승인**. Android/iOS 실기기 QA는 사용자 결정으로 **SKIPPED(PASS 아님)**, Moderate 11건은 [#30](https://github.com/nalkarowndal/lR/issues/30)에서 별도 추적
+- **다음:** [Issue #14](https://github.com/nalkarowndal/lR/issues/14) 격리된 `lr_test` 기반 내부 모의 주문 이벤트/상태 조회 경계와 관리자 읽기 화면을 작은 TDD PR로 확장; 실제 `/api/v1/orders` 및 `/api/v1/payments/confirm`은 501 출시 차단 유지, UX-D [#19](https://github.com/nalkarowndal/lR/issues/19) 후순위
+
 ## 다음 연속 작업 패키지
 
 **M6-1A 의존성 보안 감사·릴리스 API 차단 회귀 병합 완료, 다음 M6-1B 취약점 11개 패키지 분류:** API/MySQL 106/106, HTTP 5/5, 모바일 25/25 PASS. 직전 Chromium 40/40 PASS(이번 PR 미실행). 실제 PG 테스트 키·운영 정책 승인은 여전히 미완료. 실제 Android/iOS 기기·접근성, 운영 계정·PG·보증금/취소/물류 정책 미승인으로 **상용 출시 Gate는 미통과**.

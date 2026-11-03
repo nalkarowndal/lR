@@ -33,3 +33,9 @@
 5. 운영 계약·실PG 키·실사업 정책 승인/개인정보 수집·외부 배송연동은 별개 추후 작업이며 승인했다고 보고하지 않는다.
 
 참고: [프로젝트 진행 현황](PROJECT_STATUS.md), [정책표](M5_1_POLICY_GATE.md), [Issue #14](https://github.com/nalkarowndal/lR/issues/14), [Expo Web 문서](https://docs.expo.dev/workflow/web/).
+
+## 5. M5-2C1 브라우저 결제 시뮬레이션 구현
+
+- [PR #38](https://github.com/nalkarowndal/lR/pull/38): 기존 견적→주문서 미리보기 다음에 세 가지 **브라우저 세션 내** 모의 결과(성공·실패·취소)와 마이페이지 모의 렌탈 내역을 추가. 브라우저 새로고침/로그아웃 시 삭제.
+- [모바일 CI #41571483087](https://github.com/nalkarowndal/lR/actions/runs/41571483087): 모델 입력/만료/금액/정책 가드 포함 29/29, Expo Doctor·TypeScript·Web export 통과. [Chromium #41571483053](https://github.com/nalkarowndal/lR/actions/runs/41571483053): 기존+추가 브라우저 offline 43/43, API-disconnected 6/6 통과.
+- **제한:** 모의 주문은 앱 메모리에만 저장. Node API `POST /api/v1/orders`와 `POST /api/v1/payments/confirm`의 501 차단을 해제하지 않으며, 결제 제공업체/운영 DB/관리자 시스템과 연결되지 않았다. [구체 명세](M5_2C1_BROWSER_DEMO_CHECKOUT.md) 참조.
