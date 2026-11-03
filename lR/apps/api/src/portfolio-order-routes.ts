@@ -44,7 +44,9 @@ export function mountPortfolioOrderRoutes(app:Express,db:Database,{demoMode}:{de
     requestId:res.locals.requestId,replayed,demo:true,disclaimer:note}});
   }catch(e){
    if(e instanceof PortfolioOrderError){
-    problem(req,res,409,e.code,e.code==='INVENTORY_CONFLICT'?'선택한 기간에 사용 가능한 상품이 없습니다':
+    const conflict=e.code==='INVENTORY_CONFLICT'||e.code==='IDEMPOTENCY_KEY_REUSED';
+    problem(req,res,conflict?409:422,conflict?e.code:'VALIDATION_ERROR',
+      e.code==='INVENTORY_CONFLICT'?'선택한 기간에 사용 가능한 상품이 없습니다':
       e.code==='IDEMPOTENCY_KEY_REUSED'?'다른 주문에는 새 요청번호를 사용해 주세요':
       '주문 내용이나 날짜를 확인해 주세요');return;
    }
