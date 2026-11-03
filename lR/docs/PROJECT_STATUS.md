@@ -1,6 +1,6 @@
 # luxuryRental — 실시간 프로젝트 상태 기준표
 
-**작성 기준:** 2026-11-02 · **원칙:** GitHub 커밋/PR/실행 로그로만 구현·QA 성공 판정. 이 문서는 최신 커밋에 맞춰 각 완료된 *개발 패키지*에서만 갱신하며, 나머지 상세 문서(M0~M2)는 필요할 때만 열람한다.
+**작성 기준:** 2026-11-03 · **작업 기준 경로:** `main/lR/` (CI 워크플로만 루트 `.github/workflows/`) · **원칙:** GitHub 커밋/PR/실행 로그로만 구현·QA 성공 판정. 이 문서는 최신 커밋에 맞춰 각 완료된 *개발 패키지*에서만 갱신하며, 나머지 상세 문서(M0~M2)는 필요할 때만 열람한다.
 
 | 영역 | 현재 근거 | 판정 |
 |---|---|---|
@@ -24,7 +24,7 @@
 | M5-3B 테스트 ERP Outbox·임대 재처리 | [PR #25](https://github.com/nalkarowndal/lR/pull/25), [Node CI](https://github.com/nalkarowndal/lR/actions/runs/41409390813), [Expo CI](https://github.com/nalkarowndal/lR/actions/runs/41409390982), [명세](M5_3B_ERP_OUTBOX.md) | **main 병합**, MySQL/API **102/102 PASS**, HTTP **5/5**, 모바일 **25/25 PASS**. 원자 이벤트·감사·임대/재시도/DEAD, 모의 ERP 전용. 운영 ERP 미연결 |
 | M6-0 의존성 잠금·CI 설치 재현성 | [PR #27](https://github.com/nalkarowndal/lR/pull/27), [API CI](https://github.com/nalkarowndal/lR/actions/runs/41411032537), [모바일 CI](https://github.com/nalkarowndal/lR/actions/runs/41411032534), [Chromium CI](https://github.com/nalkarowndal/lR/actions/runs/41411032533), [문서](M6_0_REPRODUCIBLE_CI.md) | **main 병합** · root package-lock v3, 세 CI `npm ci` + lockfile 캐시. API **102/102**, HTTP **5/5**, 모바일 **25/25**, Chromium **40/40 PASS**. 임시 lock 생성 워크플로 삭제 |
 | M6-1A npm 취약점 인벤토리·API 보안 회귀 | [PR #29](https://github.com/nalkarowndal/lR/pull/29), [감사 CI](https://github.com/nalkarowndal/lR/actions/runs/41412864760), [API CI](https://github.com/nalkarowndal/lR/actions/runs/41412864705), [모바일 CI](https://github.com/nalkarowndal/lR/actions/runs/41412864825), [문서](M6_1A_SECURITY_AUDIT.md) | **main 병합**, API/MySQL **106/106**, HTTP **5/5**, 모바일 **25/25 PASS**. npm audit critical 0/high 0/**moderate 11**(운영·전체 동일). 인벤토리/실제 출시 차단 회귀 완료. **취약점 미해결 및 상용 출시 차단** |
-| M6-1B 취약점 분류·SDK 58 호환성 조치 | [Issue #30](https://github.com/nalkarowndal/lR/issues/30) | **다음 개발**, Expo/CLI/glob/minimatch 계열 보통 11 영향 패키지 분석·안전한 수정·CI 검증. 네이티브 QA/운영승인 별도 |
+| M6-1B1 보안 권고 원인·설치 경로 자동 분류 | [PR #31](https://github.com/nalkarowndal/lR/pull/31), [감사 CI](https://github.com/nalkarowndal/lR/actions/runs/41553019695), [문서](M6_1B_ADVISORY_TRIAGE.md) | **main/lR 병합 완료** · 보안 파서 8/8, Expo 25/25 PASS, 실제 감사 moderate 11 유지. SDK58 강제 업데이트/출시 승인 없음 |\n| M6-1B2 iOS 배포 JS 소스맵 범위 검증 | [PR #33](https://github.com/nalkarowndal/lR/pull/33), [iOS CI](https://github.com/nalkarowndal/lR/actions/runs/41554033948) | iOS 배포 JS 소스맵 1개, 1,215 source entries 검사 · 추적 빌드 도구 패키지 0건 검출 · 보안 단위 13/13 통과. **iOS JS 출력물에 한정** · 앱 출시 불가 |
 | M6 실기기·시각·성능·보안 | 없음 | 완료 주장 불가 |
 
 ## 변경하지 않는 안전 제한
@@ -42,7 +42,7 @@
 
 기존 [UX-A PR #17](https://github.com/nalkarowndal/lR/pull/17)와 [UX-BC PR #18](https://github.com/nalkarowndal/lR/pull/18)의 병합 결과는 그대로 유지. 기능 불량·접근성·보안상 필수 QA는 기존 단계 중에도 수행한다. 외부 사업 정책 승인이나 테스트/실기기 증거가 없으면 완료·출시 가능이라고 표기하지 않는다.
 
-## 다음 연속 작업 패키지
+## 2026-11-03 경로·보안 작업 이어받기\n\n- 목표: 프로젝트 루트는 GitHub `main/lR/`이며 `npm ci`·개발 명령은 `cd lR`부터 실행. 원본 사이트 `567890`과 운영 DB는 변경 금지.\n- M6-1B1: PR #31을 새 경로에 이식 후 main 병합, 감사 CI 8/8·모바일 25/25 통과.\n- M6-1B2: PR #33 iOS **JS 소스맵** 자동 검사, [CI](https://github.com/nalkarowndal/lR/actions/runs/41554033948) 보안 테스트 13/13·소스 1,215개 중 추적 패키지 0건. 실기기·Android·웹·원격 입력 노출은 증명하지 않음.\n- 위험: npm audit moderate 11 미수정. Expo [upstream #52735](https://github.com/expo/expo/issues/52735) 패치/유지관리 의견을 모니터링하고 실제 업데이트 가능 버전에서 CI 재검증. 임의 `overrides`·`--force` 금지.\n- 다음: SDK58 호환 패치 재평가 → Issue #10 실제 Android/iOS QA → Issue #14 실PG·사업 정책 게이트 → UX-D Issue #19 후순위. 출시는 계속 차단.\n\n## 다음 연속 작업 패키지
 
 **M6-1A 의존성 보안 감사·릴리스 API 차단 회귀 병합 완료, 다음 M6-1B 취약점 11개 패키지 분류:** API/MySQL 106/106, HTTP 5/5, 모바일 25/25 PASS. 직전 Chromium 40/40 PASS(이번 PR 미실행). 실제 PG 테스트 키·운영 정책 승인은 여전히 미완료. 실제 Android/iOS 기기·접근성, 운영 계정·PG·보증금/취소/물류 정책 미승인으로 **상용 출시 Gate는 미통과**.
 

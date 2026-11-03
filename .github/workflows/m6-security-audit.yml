@@ -20,7 +20,7 @@ jobs:
       run:
         working-directory: lR
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -43,6 +43,14 @@ jobs:
           npm audit --json > security-reports/all.raw.json || true
           node scripts/security/audit-report.mjs security-reports/production.raw.json security-reports/all.raw.json security-reports/summary
           node scripts/security/audit-triage.mjs package-lock.json security-reports/production.raw.json security-reports/all.raw.json security-reports/triage
+      - name: Export production iOS JS and source maps without shipping native binaries
+        env:
+          CI: '1'
+          EXPO_NO_TELEMETRY: '1'
+        run: |
+          set -euo pipefail
+          (cd apps/mobile && npx expo export --platform ios --source-maps --no-bytecode --output-dir dist)
+          node scripts/security/native-bundle-surface.mjs apps/mobile/dist security-reports/native-bundle-surface
       - name: Publish audit evidence (no private keys or app runtime secrets)
         if: always()
         uses: actions/upload-artifact@v4

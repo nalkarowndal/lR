@@ -44,3 +44,13 @@
 5. Android/iOS 실기기 검수 Issue #10, POL-01~05 및 실제 PG 승인 Issue #14, 마지막 UI 개선 Issue #19는 별도 게이트. 운영 MySQL·실 PG·실 ERP·원본 luxuryRental 웹 567890을 변경하지 않는다.
 
 **이 PR 범위:** 증거 자동화 및 문서화. 위험한 메이저 강제 업그레이드나 운영 기능 활성화는 포함하지 않는다.
+
+## 5. M6-1B2 — iOS 배포 JS 소스맵 기반 범위 확인 (2026-11-03)
+
+- Expo SDK 58 공식 `expo export --platform ios --source-maps --no-bytecode`로 iOS **배포용 JS**를 CI에서 별도 export한다. **네이티브 앱 빌드/실기기 QA는 아님.**
+- `lR/scripts/security/native-bundle-surface.mjs`가 생성된 `.map`의 `sources` 경로에 포함된 `glob`, `minimatch` 및 관련 Expo CLI/config 빌드 도구를 검사한다. 중첩 node_modules 및 Windows 경로도 지원하고 원본 코드와 전체 경로는 저장하지 않는다.
+- `@expo/cli/build/metro-require/require.js`는 Expo 런타임 로더로 구분한다. 다른 CLI 모듈은 검토 대상으로 남긴다.
+- 소스맵 누락·손상·빈 sources는 **검사 실패**; 관련 패키지 경로 발견도 **검토가 필요한 실패**로 처리한다.
+- `lR/security-reports/native-bundle-surface.json` 및 `.md`에는 수량/패키지만 저장하고 **소스맵 원본은 아티팩트로 업로드하지 않는다**. 결과는 `releaseApproved:false`로 유지한다.
+- **판정 한계:** iOS JS 소스맵에 나타나지 않았다고 해서 안드로이드·웹·네이티브 바이너리·업데이트 번들·외부 입력 공격 표면 전체가 안전하다고 증명되는 것은 아니다.
+- [Expo 공식 번들 분석 문서](https://docs.expo.dev/guides/analyzing-bundles/)에 근거. Expo 유지관리자는 [upstream 이슈](https://github.com/expo/expo/issues/52735)에서 빌드 도구 쪽 권고라고 설명했으나 본 프로젝트의 iOS 증거와 분리해서 기록한다.
