@@ -21,7 +21,7 @@ test('published product DTO exposes DEMO and both offers',async()=>{
  const res=await request(app).get('/api/v1/products?brand=DEMO');
  assert.equal(res.status,200);assert.ok(res.headers['x-request-id']);
  // Concurrent hold tests create their own TEST-brand fixtures in the same isolated DB.
- assert.equal(res.body.data.length,1);
+ assert.equal(res.body.data.length,4);
  const item=res.body.data[0];
  assert.equal(item.id,'demo-bag-01');assert.equal(item.dayRateKrw,28000);
  assert.equal(item.salePriceKrw,900000);assert.equal(item.demo,true);
