@@ -39,7 +39,8 @@ test('signed-in wishlist/cart survives a fresh browser session after re-login',a
  await expect(page.getByText('1개 · 테스트 계정 저장')).toHaveCount(2);
  await page.getByText('찜한 상품').click();
  await expect(page.getByRole('button',{name:'The Sera Top Handle 상세 보기'})).toBeVisible();
- await page.getByText('마이',{exact:true}).last().click();
+ await page.getByRole('button',{name:'이전 화면으로 돌아가기'}).click();
+ await expect(page.getByText('장바구니',{exact:true})).toBeVisible();
  await page.getByText('장바구니',{exact:true}).click();
  await expect(page.getByText('The Sera Top Handle',{exact:true})).toBeVisible();
 });
