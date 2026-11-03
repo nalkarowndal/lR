@@ -6,6 +6,7 @@ import {createDemoAuthClient,AuthError,sessionIsCurrent,type Identity,type Token
 import {readNativeSession,writeNativeSession,clearNativeSession} from './token-storage';
 import {createSavedCollectionsClient,type SavedList} from './saved-collections';
 import {createStoreOrdersClient,type StoreOrder,type StoreOrderInput} from './store-orders';
+import {createServiceRequestsClient,type ServiceInput,type ServiceRecord,type ServiceKind,type AdminServiceStatus} from './service-requests';
 
 type Status='restoring'|'guest'|'signed-in';
 interface Context{
@@ -27,6 +28,12 @@ interface Context{
  listStoreOrders:()=>Promise<StoreOrder[]>;
  getStoreOrder:(id:string)=>Promise<StoreOrder>;
  listAdminStoreOrders:()=>Promise<StoreOrder[]>;
+ createServiceRequest:(input:ServiceInput,key:string)=>Promise<ServiceRecord>;
+ listServiceRequests:()=>Promise<ServiceRecord[]>;
+ getServiceRequest:(id:string)=>Promise<ServiceRecord>;
+ cancelServiceRequest:(id:string)=>Promise<ServiceRecord>;
+ listAdminServiceRequests:(kind?:ServiceKind)=>Promise<ServiceRecord[]>;
+ updateAdminServiceStatus:(id:string,status:AdminServiceStatus)=>Promise<ServiceRecord>;
 }
 const Ctx=createContext<Context|null>(null);
 const client=()=>{
@@ -162,11 +169,27 @@ export function SessionProvider({children}:{children:React.ReactNode}){
  const listStoreOrders=useCallback(async()=>storeClient().list(experienceToken()),[experienceToken]);
  const getStoreOrder=useCallback(async(id:string)=>storeClient().detail(experienceToken(),id),[experienceToken]);
  const listAdminStoreOrders=useCallback(async()=>storeClient().adminList(adminToken()),[adminToken]);
+ const serviceClient=()=>{
+  const base=apiBaseUrl();
+  if(!base)throw new AuthError('테스트 수선·위탁 API가 설정되지 않았습니다');
+  return createServiceRequestsClient(base);
+ };
+ const createServiceRequest=useCallback(async(input:ServiceInput,key:string)=>
+  serviceClient().create(experienceToken(),key,input),[experienceToken]);
+ const listServiceRequests=useCallback(async()=>serviceClient().list(experienceToken()),[experienceToken]);
+ const getServiceRequest=useCallback(async(id:string)=>serviceClient().detail(experienceToken(),id),[experienceToken]);
+ const cancelServiceRequest=useCallback(async(id:string)=>serviceClient().cancel(experienceToken(),id),[experienceToken]);
+ const listAdminServiceRequests=useCallback(async(kind?:ServiceKind)=>
+  serviceClient().adminList(adminToken(),kind),[adminToken]);
+ const updateAdminServiceStatus=useCallback(async(id:string,status:AdminServiceStatus)=>
+  serviceClient().adminStatus(adminToken(),id,status),[adminToken]);
  const value=useMemo<Context>(()=>({status,busy,identity,error,login,register,logout,refresh,
   listAdminDemoOrders,getAdminDemoOrder,createExperienceOrder,listExperienceOrders,getExperienceOrder,listAdminExperienceOrders,
-  listSaved,addSaved,removeSaved,createStoreOrder,listStoreOrders,getStoreOrder,listAdminStoreOrders}),
+  listSaved,addSaved,removeSaved,createStoreOrder,listStoreOrders,getStoreOrder,listAdminStoreOrders,
+  createServiceRequest,listServiceRequests,getServiceRequest,cancelServiceRequest,listAdminServiceRequests,updateAdminServiceStatus}),
   [status,busy,identity,error,login,register,logout,refresh,listAdminDemoOrders,getAdminDemoOrder,
-   createExperienceOrder,listExperienceOrders,getExperienceOrder,listAdminExperienceOrders,listSaved,addSaved,removeSaved,createStoreOrder,listStoreOrders,getStoreOrder,listAdminStoreOrders]);
+   createExperienceOrder,listExperienceOrders,getExperienceOrder,listAdminExperienceOrders,listSaved,addSaved,removeSaved,createStoreOrder,listStoreOrders,getStoreOrder,listAdminStoreOrders,
+   createServiceRequest,listServiceRequests,getServiceRequest,cancelServiceRequest,listAdminServiceRequests,updateAdminServiceStatus]);
  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 export function useDemoSession(){const c=useContext(Ctx);if(!c)throw new Error('SessionProvider missing');return c;}
