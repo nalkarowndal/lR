@@ -1,6 +1,8 @@
 # M6-1B — Expo SDK 58 전이 의존성 권고 분류 및 수정 게이트
 
-작성 기준: 2026-11-02, GitHub main 5fc62d9, Issue #30. **릴리스 보안 승인 아님.**
+작성 기준: 2026-11-03, `main/lR/` 프로젝트 기준, Issue #30. **릴리스 보안 승인 아님.**
+
+경로 규칙: GitHub 저장소 루트는 CI 워크플로 경로용이며, 코드·패키지·문서는 `lR/` 아래에 존재한다. `npm ci`, `npm audit`, `npx expo` 명령은 `cd lR` 후 실행한다. `.github/workflows/`는 저장소 루트에 남고 `working-directory: lR`를 설정한다.
 
 ## 1. 확인된 범위와 실제 잠금 파일
 
@@ -17,7 +19,7 @@
 | glob | [GHSA-3g3m-2fjr-6pw4](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4), 취소 이후 파일 탐색 | 14.0.2 이상 | 13.0.6 |
 | minimatch | [GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249), globparts 패턴 증폭/DoS | 11.0.1 이상 | 10.2.6 |
 
-[Expo 상위 프로젝트 이슈 #52735](https://github.com/expo/expo/issues/52735)는 Expo SDK 58의 glob ^13 및 minimatch ^10 버전 제약을 보고한다. 이 문서 작성 시 해당 이슈는 열려 있으며 공식적으로 수정된 SDK 58 패치 및 본 프로젝트의 호환성 테스트 결과는 확인되지 않았다. 위 표는 **공개 권고 기준**이며 실제 npm audit 원시 JSON에서 발견한 모든 권고 ID의 최종 목록으로 간주하지 않는다.
+[Expo 상위 프로젝트 이슈 #52735](https://github.com/expo/expo/issues/52735)는 Expo SDK 58의 glob ^13 및 minimatch ^10 버전 제약을 보고한다. 2026-11-03 확인 시 해당 이슈는 열려 있으며 공식적으로 SDK 58 패치 배포와 본 프로젝트의 호환성 테스트 결과는 확인되지 않았다. Expo 유지관리자 댓글(2026-11-02)은 이 라이브러리들이 개발 시 도구에서 실행되고 사용자 앱 번들로 들어가지 않으며, 이 문제를 낮은 우선순위로 판단한다고 설명했다. 이는 *상위 프로젝트의 의견*이고, 본 프로젝트 자체의 번들·입력 노출 검증 증거는 아니다. [원본 이슈 및 유지관리자 댓글](https://github.com/expo/expo/issues/52735) 위 표는 **공개 권고 기준**이며 실제 npm audit 원시 JSON에서 발견한 모든 권고 ID의 최종 목록으로 간주하지 않는다.
 
 - 현 상태에서 같은 major 범위 내 npm update만으로 두 권고를 제거할 수 있다는 근거가 없다.
 - glob 14, minimatch 11은 의존 범위를 넘어가는 major 변경이다. 빌드 도구 및 glob 매칭 동작, Expo 호환성을 확인하지 않고 npm overrides 또는 npm audit fix --force를 적용하지 않는다.
@@ -26,9 +28,9 @@
 
 ## 3. 추가한 검증 기능
 
-- scripts/security/audit-triage-lib.mjs — npm audit 성공/오류를 엄격히 구분하여 lockfile의 영향받는 패키지별 설치 경로·정확한 버전, 상위 선언 버전 범위, npm via 패키지, GHSA ID를 추출한다. npm 데이터가 없는 경우에도 증거 부족을 표시한다.
-- scripts/security/audit-triage.mjs — production 및 all의 별도 JSON/Markdown 출력; GitHub CI 요약에 반영.
-- scripts/security/audit-triage-lib.test.mjs — 정상 버전/권고 분류, 레지스트리 오류 fail-closed, 잘못된 패키지명/범위 입력, lockfile 누락 경로 검사.
+- `lR/scripts/security/audit-triage-lib.mjs` — npm audit 성공/오류를 엄격히 구분하여 lockfile의 영향받는 패키지별 설치 경로·정확한 버전, 상위 선언 버전 범위, npm via 패키지, GHSA ID를 추출한다. npm 데이터가 없는 경우에도 증거 부족을 표시한다.
+- `lR/scripts/security/audit-triage.mjs` — production 및 all의 별도 JSON/Markdown 출력; GitHub CI 요약에 반영.
+- `lR/scripts/security/audit-triage-lib.test.mjs` — 정상 버전/권고 분류, 레지스트리 오류 fail-closed, 잘못된 패키지명/범위 입력, lockfile 누락 경로 검사.
 - .github/workflows/m6-security-audit.yml — 매 PR 보안 인벤토리에 triage 증거 파일 생성 추가. 기존 npm audit 원본 JSON과 보고서가 같이 업로드된다.
 
 **주의:** lockfile에 존재하거나 npm audit --omit=dev에 포함되어도 모바일 실제 JS 번들 또는 외부 사용자 입력에 노출되었다는 증거는 아니다. 따라서 triage 출력은 runtimeExposure=NOT_ESTABLISHED 및 releaseApproved=false를 유지한다. 도구 실행 경로에서 외부 업로드/악성 glob 패턴 노출 여부, 실제 번들 포함 여부는 별도 검수한다.

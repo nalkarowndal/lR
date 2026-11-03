@@ -9,6 +9,9 @@ permissions:
   contents: read
 jobs:
   mobile:
+    defaults:
+      run:
+        working-directory: lR
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -17,7 +20,7 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
+          cache-dependency-path: 'lR/package-lock.json'
       - name: Install dependencies
         run: npm ci --include=dev --no-audit --no-fund
       - name: React Native TypeScript check

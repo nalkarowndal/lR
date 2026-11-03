@@ -8,11 +8,14 @@ coverage/
 !.env.example
 *.log
 .DS_Store
-apps/api/uploads/
-apps/api/data/
+lR/apps/api/uploads/
+lR/apps/api/data/
 *.db
 *.sqlite
 
 # CI browser screenshot/trace artifacts
 playwright-report/
 test-results/
+
+# Generated audit evidence (never commit runtime reports)
+security-reports/

@@ -3,9 +3,9 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
-      - 'apps/api/**'
-      - 'package.json'
-      - 'package-lock.json'
+      - 'lR/apps/api/**'
+      - 'lR/package.json'
+      - 'lR/package-lock.json'
       - '.github/workflows/api-ci.yml'
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -14,6 +14,9 @@ permissions:
   contents: read
 jobs:
   api:
+    defaults:
+      run:
+        working-directory: lR
     runs-on: ubuntu-latest
     timeout-minutes: 20
     services:
@@ -43,7 +46,7 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
+          cache-dependency-path: 'lR/package-lock.json'
       - name: Install workspaces
         run: npm ci --include=dev --no-audit --no-fund
       - name: Compile Node API TypeScript
