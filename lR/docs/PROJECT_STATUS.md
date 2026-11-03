@@ -2,6 +2,8 @@
 
 **작성 기준:** 2026-11-03 · **작업 기준 경로:** `main/lR/` (CI 워크플로만 루트 `.github/workflows/`) · **원칙:** GitHub 커밋/PR/실행 로그로만 구현·QA 성공 판정. 이 문서는 최신 커밋에 맞춰 각 완료된 *개발 패키지*에서만 갱신하며, 나머지 상세 문서(M0~M2)는 필요할 때만 열람한다.
 
+> **QA 범위 변경 · 2026-11-03 사용자 결정:** 본 프로젝트의 포트폴리오 완료 기준은 **Expo 웹 빌드의 브라우저 기능·시각 QA + 서버/API/테스트 DB의 격리 회귀 검증**이다. Android/iOS 실기기·시뮬레이터·EAS 배포·VoiceOver/TalkBack·네이티브 SecureStore 검증은 **사용자 요청으로 단계 제외(SKIPPED), 통과(PASS) 아님**. 웹 체험 가능 수준과 Android/iOS 네이티브 출시 준비 여부를 구분한다. [범위 변경 기록](WEB_PORTFOLIO_QA_SCOPE.md) · 관련 [Issue #10](https://github.com/nalkarowndal/lR/issues/10) · 다음 [Issue #14](https://github.com/nalkarowndal/lR/issues/14).
+
 | 영역 | 현재 근거 | 판정 |
 |---|---|---|
 | M0 소스 실사 | [SOURCE_AUDIT.md](SOURCE_AUDIT.md) | 코드 정적 실사 완료; 운영 DB 실데이터 미검증 |
@@ -69,6 +71,15 @@
 - 보안 패치: 2026-11-03 Expo 공개 SDK 58 릴리스 `expo@58.0.22`(현재 버전)과 upstream [#52735](https://github.com/expo/expo/issues/52735) OPEN 확인. 잠금파일/Expo 의존성 변화 없음, [M6-1B4 보안 CI #41563727969](https://github.com/nalkarowndal/lR/actions/runs/41563727969) 기준 npm audit moderate **11**은 여전히 미해결
 - 위험: CI가 확인한 것은 Expo 앱 구성과 JS 테스트·번들 빌드다. **실제 Android/iOS 기기 실행·시각·VoiceOver/TalkBack·네이티브 SecureStore 동작을 증명하지 않는다**. [Issue #10](https://github.com/nalkarowndal/lR/issues/10) OPEN, `releaseApproved=false` 유지
 - 다음: 실제 Android/iOS 장치별 테스트 ID NAT-01~12 및 증거 확보, 오류 수정/재검증 → [Issue #14](https://github.com/nalkarowndal/lR/issues/14) 사업 정책·PG 샌드박스 및 운영 승인 검토. 승인되지 않은 실거래 API/ERP/DB 변경 금지
+
+## M6-1B6 — 포트폴리오 웹 QA 범위 확정 및 실기기 QA 단계 제외 (2026-11-03)
+
+- **목표:** [사용자 요청](WEB_PORTFOLIO_QA_SCOPE.md)에 따라 웹 브라우저를 최종 QA 플랫폼으로 확정하고 Android/iOS 기기 검수 단계는 일정에서 제거; 네이티브 테스트 성공이나 상용 출시 승인으로 표기하지 않음
+- **변경 범위:** [PROJECT_STATUS.md](PROJECT_STATUS.md), [M6_1B5_DEVICE_QA_RUNBOOK.md](M6_1B5_DEVICE_QA_RUNBOOK.md), [M5_1_POLICY_GATE.md](M5_1_POLICY_GATE.md), [WEB_PORTFOLIO_QA_SCOPE.md](WEB_PORTFOLIO_QA_SCOPE.md) 문서만; 앱·API 코드/lockfile/운영 DB/실결제 무변경
+- **기존 검증 근거:** [Chromium #41566763178](https://github.com/nalkarowndal/lR/actions/runs/41566763178) 오프라인 34/34·API 장애 6/6, [모바일 #41566763218](https://github.com/nalkarowndal/lR/actions/runs/41566763218) 25/25 + TypeScript·Expo web export, [API/MySQL #41551925928](https://github.com/nalkarowndal/lR/actions/runs/41551925928) 106/106 + HTTP 5/5. 위 결과들은 각각의 검증 범위에 한정하며 이 PR에서 새로 실행한 브라우저·DB 검증이 아님
+- **품질 한계:** 브라우저 QA가 Native API 저장소·기기 Safe Area·터치·시스템 접근성·iOS/Android 서명 및 배포 품질을 증명하지 않음; `expo-doctor` PASS 역시 기기 검증 아님
+- **보안·운영 게이트:** npm audit moderate 11권고 및 공식 Expo 패치 모니터링은 지속. POL-01~05 실제 영업 승인/PG·배송·운영 ERP 및 실사용자 데이터 처리는 미승인/비활성 유지. 사용자에게 실제 결제가 발생하는 것처럼 오인시키지 않음
+- **다음 개발:** [Issue #14](https://github.com/nalkarowndal/lR/issues/14)에서 **렌탈·보증금·취소·반납의 데모 정책 명시 → 모의 결제/주문 사용자 흐름과 서버 상태·중복 요청/실패 복구 QA → 실제 PG 정책 승인은 별도 보류**. [Issue #19](https://github.com/nalkarowndal/lR/issues/19) UX-D는 기능 안정화 이후
 
 ## 다음 연속 작업 패키지
 
