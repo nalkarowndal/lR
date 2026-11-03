@@ -1,3 +1,4 @@
+import {useEffect,useState} from 'react';
 import {Pressable,Text,View} from 'react-native';
 import {useRouter} from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -6,9 +7,29 @@ import {DataSourceNotice,NetworkFeedback,LoadMore} from '../../components/Networ
 import {colors} from '../../theme';
 import {Screen,Panel,Action,Heading,Body,DemoNotice} from '../../components/ui';
 import {ProductGrid} from '../../components/ProductGrid';
+import {apiBaseUrl,apiEnabled} from '../../api/client';
+import {createEditorialClient,defaultHomeEditorial,type EditorialCopy,type EditorialTarget} from '../../auth/editorial';
 export default function Home(){
  const router=useRouter();
  const catalog=useProductList({channel:'RENTAL'});
+ const [hero,setHero]=useState<EditorialCopy>(defaultHomeEditorial);
+ const [editorialError,setEditorialError]=useState(false);
+ useEffect(()=>{
+  if(!apiEnabled()){setHero(defaultHomeEditorial);setEditorialError(false);return;}
+  let live=true;
+  void createEditorialClient(apiBaseUrl()!).published().then(result=>{
+   if(live){setHero(result.copy);setEditorialError(false);}
+  }).catch(()=>{if(live){setHero(defaultHomeEditorial);setEditorialError(true);}});
+  return()=>{live=false};
+ },[]);
+ const heroTarget=(target:EditorialTarget)=>{
+  switch(target){
+   case 'RENTAL':return '/(tabs)/rental';
+   case 'STORE':return '/(tabs)/store';
+   case 'CARE':return '/(tabs)/care';
+   case 'CONSIGNMENT':return '/my/consignment';
+  }
+ };
  const categories=[
   {label:'명품 렌탈',hint:'필요한 순간에 유연하게',bg:colors.rental,icon:'calendar-outline' as const,to:'/(tabs)/rental' as const},
   {label:'프리미엄 스토어',hint:'오래 간직할 선택',bg:colors.store,icon:'bag-handle-outline' as const,to:'/(tabs)/store' as const},
@@ -18,10 +39,17 @@ export default function Home(){
  return <Screen title="LUXURYRENTAL" subtitle="Premium Rental & Boutique" right={<Pressable accessibilityRole="button" accessibilityLabel="상품 검색" onPress={()=>router.push('/search')} style={{height:48,width:48,alignItems:'center',justifyContent:'center'}}><Ionicons name="search-outline" size={23} color={colors.ink}/></Pressable>}>
    <DemoNotice/><DataSourceNotice/>
    <View style={{backgroundColor:colors.ink,borderRadius:22,padding:25,gap:13,minHeight:190,justifyContent:'center'}}>
-     <Text style={{color:'#D1D5DB',fontSize:11,fontWeight:'700',letterSpacing:3}}>CURATED FOR YOU</Text>
-     <Text style={{color:colors.surface,fontSize:27,fontWeight:'800',lineHeight:38}}>오늘의 스타일,{'\n'}소유보다 자유롭게.</Text>
-     <Text style={{color:'#E5E7EB',fontSize:13,lineHeight:21}}>다양한 명품을 둘러보고 나에게 맞는 이용 방식을 찾아보세요.</Text>
+     <Text style={{color:'#D1D5DB',fontSize:11,fontWeight:'700',letterSpacing:3}}>{hero.eyebrow}</Text>
+     <Text testID="home-editorial-headline" style={{color:colors.surface,fontSize:27,fontWeight:'800',lineHeight:38}}>{hero.headline}</Text>
+     <Text style={{color:'#E5E7EB',fontSize:13,lineHeight:21}}>{hero.description}</Text>
+     <Pressable accessibilityRole="button" accessibilityLabel={hero.ctaLabel}
+      onPress={()=>router.push(heroTarget(hero.ctaTarget))}
+      style={{alignSelf:'flex-start',backgroundColor:colors.surface,borderRadius:10,minHeight:44,
+       paddingHorizontal:18,paddingVertical:12,justifyContent:'center'}}>
+      <Text style={{color:colors.ink,fontWeight:'800',fontSize:13}}>{hero.ctaLabel}</Text>
+     </Pressable>
    </View>
+   {editorialError?<Text accessibilityRole="alert" style={{color:colors.sub,fontSize:12}}>에디토리얼 서버에 연결할 수 없어 기본 시연 문구를 표시합니다.</Text>:null}
    <Heading>어떤 서비스를 찾으세요?</Heading>
    <View style={{flexDirection:'row',flexWrap:'wrap',justifyContent:'space-between',rowGap:12}}>
      {categories.map(item=><Pressable key={item.label} accessibilityRole="button" onPress={()=>router.push(item.to)} style={({pressed})=>({backgroundColor:item.bg,width:'48%',minHeight:143,borderRadius:16,padding:16,gap:8,opacity:pressed ? 0.8 : 1})}>
