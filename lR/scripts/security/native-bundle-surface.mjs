@@ -106,7 +106,7 @@ export function inspectExportDirectory(directory, platform = 'ios') {
 export function renderNativeEvidence(report) {
   const status=report.requiresReview?'REVIEW_REQUIRED':'NO_RISK_PACKAGES_IN_INSPECTED_MAPS';
   const platform=report.target === 'android-production-js-export' ? 'Android' : report.target === 'web-production-js-export' ? 'Web' : 'iOS';
-  return '# M6 native '+platform+' JavaScript bundle source-map evidence\n\n'
+  return '# M6 '+platform+' JavaScript bundle source-map evidence\n\n'
     + '- Status: '+status+'\n'
     + '- Source maps inspected: '+report.mapsInspected+'\n'
     + '- Source entries: '+report.sourceEntriesInspected+'\n'
@@ -125,7 +125,7 @@ if (process.argv[1] && import.meta.url === new URL('file://' + process.argv[1]).
     writeFileSync(outputPrefix+'.json',JSON.stringify(evidence,null,2)+'\n');
     writeFileSync(outputPrefix+'.md',markdown);
     if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY,markdown+'\n');
-    console.log('M6 native '+platform+' source-map scan: '+evidence.mapsInspected+' maps, '+
+    console.log('M6 '+platform+' source-map scan: '+evidence.mapsInspected+' maps, '+
       evidence.sourceEntriesInspected+' source entries, '+evidence.blockedPackageHits.length+' risk package names');
     if(evidence.requiresReview) process.exitCode=2;
   } catch (error) {

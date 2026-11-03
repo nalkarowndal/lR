@@ -8,6 +8,8 @@ on:
       - 'lR/apps/api/package.json'
       - 'lR/apps/mobile/package.json'
       - 'lR/scripts/security/**'
+      - 'lR/docs/M6_1B_ADVISORY_TRIAGE.md'
+      - 'lR/docs/PROJECT_STATUS.md'
       - '.github/workflows/m6-security-audit.yml'
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
