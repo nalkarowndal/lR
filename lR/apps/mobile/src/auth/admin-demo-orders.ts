@@ -46,9 +46,11 @@ const meta=(raw:unknown)=>{
 };
 export function parseAdminDemoList(raw:unknown):DemoAdminOrder[]{
  const container=meta(raw);
- if(!Array.isArray(container.data)||container.data.length>50||!obj(container.meta.page))
+ const responseMeta=container.meta;
+ if(!Array.isArray(container.data)||container.data.length>50||
+   !obj(responseMeta)||!obj(responseMeta.page))
   throw new AuthError('테스트 원장 목록 응답이 올바르지 않습니다');
- const page=container.meta.page;
+ const page=responseMeta.page;
  if(!Number.isInteger(page.limit)||!Number.isInteger(page.offset)||
    (page.limit as number)<1||(page.limit as number)>50||
    (page.offset as number)<0)
