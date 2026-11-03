@@ -36,8 +36,9 @@ export function parseProductMedia(value:unknown):ProductMedia[]{
   if(!isObject(item)||typeof item.url!=='string'||typeof item.alt!=='string'||!item.alt.trim()||item.alt.length>160)
    throw new ApiError('CONTRACT','상품 이미지 설명이 올바르지 않습니다');
   let url:URL;try{url=new URL(item.url);}catch{throw new ApiError('CONTRACT','상품 이미지 주소가 잘못되었습니다');}
-  const origins=new Set((process.env.EXPO_PUBLIC_MEDIA_HOSTS||'').split(',')
-   .map(host=>host.trim().toLowerCase()).filter(Boolean));
+  const approvedHosts: string=typeof process.env.EXPO_PUBLIC_MEDIA_HOSTS==='string'?process.env.EXPO_PUBLIC_MEDIA_HOSTS:'';
+  const origins=new Set(approvedHosts.split(',')
+   .map((host:string)=>host.trim().toLowerCase()).filter(Boolean));
   if(url.protocol!=='https:'||!origins.has(url.hostname.toLowerCase())||url.username||url.password||
    url.port||url.search||url.hash||item.url.length>2048||
    !/\.(?:webp|avif|png|jpe?g)$/i.test(url.pathname)||
