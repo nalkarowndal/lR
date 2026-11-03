@@ -1,5 +1,6 @@
 import React,{createContext,useCallback,useContext,useEffect,useMemo,useRef,useState} from 'react';
 import {apiBaseUrl} from '../api/client';
+import {createAdminDemoOrdersClient,type DemoAdminOrder,type DemoAdminDetail} from './admin-demo-orders';
 import {createDemoAuthClient,AuthError,sessionIsCurrent,type Identity,type TokenSession} from './api';
 import {readNativeSession,writeNativeSession,clearNativeSession} from './token-storage';
 import {useAppState} from '../state/AppState';
@@ -11,6 +12,8 @@ interface Context{
  register:(email:string,password:string)=>Promise<void>;
  logout:()=>Promise<void>;
  refresh:()=>Promise<void>;
+ listAdminDemoOrders:()=>Promise<DemoAdminOrder[]>;
+ getAdminDemoOrder:(id:string)=>Promise<DemoAdminDetail>;
 }
 const Ctx=createContext<Context|null>(null);
 const client=()=>{
@@ -94,8 +97,24 @@ export function SessionProvider({children}:{children:React.ReactNode}){
    saved.current=rotated;setIdentity(who);setStatus('signed-in');
   }catch(e){await drop();throw e;}
  }),[withAction,drop,identity?.userId]);
- const value=useMemo<Context>(()=>({status,busy,identity,error,login,register,logout,refresh}),
-  [status,busy,identity,error,login,register,logout,refresh]);
+ const adminToken=useCallback(()=>{
+  const current=saved.current;
+  if(status!=='signed-in'||!identity?.roles.includes('ADMIN')||!sessionIsCurrent(current))
+   throw new AuthError('관리자 테스트 세션이 필요합니다',403,'FORBIDDEN');
+  return current!.accessToken;
+ },[status,identity]);
+ const listAdminDemoOrders=useCallback(async()=>{
+  const token=adminToken(),base=apiBaseUrl();
+  if(!base)throw new AuthError('테스트 API 주소가 설정되지 않았습니다');
+  return createAdminDemoOrdersClient(base).list(token);
+ },[adminToken]);
+ const getAdminDemoOrder=useCallback(async(id:string)=>{
+  const token=adminToken(),base=apiBaseUrl();
+  if(!base)throw new AuthError('테스트 API 주소가 설정되지 않았습니다');
+  return createAdminDemoOrdersClient(base).detail(token,id);
+ },[adminToken]);
+ const value=useMemo<Context>(()=>({status,busy,identity,error,login,register,logout,refresh,listAdminDemoOrders,getAdminDemoOrder}),
+  [status,busy,identity,error,login,register,logout,refresh,listAdminDemoOrders,getAdminDemoOrder]);
  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 export function useDemoSession(){const c=useContext(Ctx);if(!c)throw new Error('SessionProvider missing');return c;}

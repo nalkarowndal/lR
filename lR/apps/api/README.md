@@ -70,3 +70,16 @@ See `.github/workflows/api-ci.yml`: MySQL 8.4 Docker service, schema/fixture, TS
 - Strict Zod schemas, Argon2id hashed demo passwords, token revocation and rotation, admin role checks and 404 ownership boundaries are tested.
 - **Not production-ready:** no email verification/forgot-password/MFA, in-memory rather than distributed login throttling, no Expo secure native token store, no legal approval or TLS deployment evidence. All registration/hold write routes are gated by `APP_MODE=demo`.
 - [M3.3 protocol and limitations](../../docs/M3_3_AUTH_HOLD_API.md).
+
+## M5-2C2 admin ledger read-only endpoints
+
+```
+GET /api/v1/admin/demo-orders?orderId=<UUID>&status=SIMULATED_PAID&limit=20&offset=0
+GET /api/v1/admin/demo-orders/:id
+```
+
+These endpoints are **read-only, TEST ONLY**. They require `APP_MODE=demo`, `NODE_ENV=test`, `DB_NAME=lr_test`, a valid bearer session and a role from the DB equal to `ADMIN`; otherwise the response is 501/401/403 respectively. No customer emails, authentication secrets, provider payment keys or real purchase records are returned. List is limited to 1–50 entries; per-order audit and event summaries to 100 each. `POST /orders` and `POST /payments/confirm` remain blocked with 501.
+
+A user with ADMIN in **isolated test** `lr_user_roles` can navigate My → 테스트 결제 원장 검수 in the Expo browser app after signing in over localhost or HTTPS. Synthetic fixture seeding does **not** create sample payment orders automatically; local internal integration tests or another explicitly isolated fixture must generate entries. Browser-session mock receipts from M5-2C1 **are not persisted** and therefore will not be listed.
+
+[Detailed contract, QA, and limitations](../../docs/M5_2C2_ADMIN_LEDGER_READ.md).
