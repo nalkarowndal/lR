@@ -3,7 +3,7 @@
  * accepts arbitrary server-supplied URL paths for local require().
  */
 import type{ImageSourcePropType} from 'react-native';
-import {getGeneratedDemoMedia} from '../domain/generated-media';
+import {getGeneratedDemoMedia} from '../domain/generated-media.ts';
 
 const paths:Readonly<Record<string,readonly [ImageSourcePropType,ImageSourcePropType]>>={
  'demo-bag-01':[
