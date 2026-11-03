@@ -42,6 +42,7 @@ jobs:
           npm audit --json --omit=dev > security-reports/production.raw.json || true
           npm audit --json > security-reports/all.raw.json || true
           node scripts/security/audit-report.mjs security-reports/production.raw.json security-reports/all.raw.json security-reports/summary
+          node scripts/security/audit-triage.mjs package-lock.json security-reports/production.raw.json security-reports/all.raw.json security-reports/triage
       - name: Publish audit evidence (no private keys or app runtime secrets)
         if: always()
         uses: actions/upload-artifact@v4
