@@ -89,3 +89,17 @@ export function createServiceRequestsClient(base:string,fetcher:HttpFetch=fetch)
   }
  };
 }
+
+/** Labels and transitions for UI affordances; the test API remains the only state authority. */
+export const serviceKindLabel:Record<ServiceKind,string>={REPAIR:'수선',CONSIGNMENT:'위탁'};
+export const serviceStatusLabel:Record<ServiceStatus,string>={
+ SUBMITTED:'접수 완료',UNDER_REVIEW:'시연 검토 중',INFO_REQUESTED:'추가 정보 요청',
+ DEMO_CLOSED:'시연 종료',CANCELED:'신청 취소'
+};
+export const canCancelService=(status:ServiceStatus)=>
+ status==='SUBMITTED'||status==='INFO_REQUESTED';
+export const nextAdminServiceStatuses=(status:ServiceStatus):AdminServiceStatus[]=>{
+ if(status==='SUBMITTED'||status==='INFO_REQUESTED')return ['UNDER_REVIEW'];
+ if(status==='UNDER_REVIEW')return ['INFO_REQUESTED','DEMO_CLOSED'];
+ return [];
+};
