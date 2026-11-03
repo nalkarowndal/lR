@@ -39,3 +39,9 @@
 - [PR #38](https://github.com/nalkarowndal/lR/pull/38): 기존 견적→주문서 미리보기 다음에 세 가지 **브라우저 세션 내** 모의 결과(성공·실패·취소)와 마이페이지 모의 렌탈 내역을 추가. 브라우저 새로고침/로그아웃 시 삭제.
 - [모바일 CI #41571483087](https://github.com/nalkarowndal/lR/actions/runs/41571483087): 모델 입력/만료/금액/정책 가드 포함 29/29, Expo Doctor·TypeScript·Web export 통과. [Chromium #41571483053](https://github.com/nalkarowndal/lR/actions/runs/41571483053): 기존+추가 브라우저 offline 43/43, API-disconnected 6/6 통과.
 - **제한:** 모의 주문은 앱 메모리에만 저장. Node API `POST /api/v1/orders`와 `POST /api/v1/payments/confirm`의 501 차단을 해제하지 않으며, 결제 제공업체/운영 DB/관리자 시스템과 연결되지 않았다. [구체 명세](M5_2C1_BROWSER_DEMO_CHECKOUT.md) 참조.
+
+## 6. M5-2C2 서버 `lr_test` 원장 관리자 조회 분리
+
+- [PR #39](https://github.com/nalkarowndal/lR/pull/39): 서버 테스트 원장 `lr_demo_orders`에 저장된 **내부 모의 주문**과 `lr_demo_payment_audit` / `lr_demo_payment_events`를 ADMIN 역할로만 조회한다. [구체 명세](M5_2C2_ADMIN_LEDGER_READ.md).
+- **C1 브라우저 세션 가짜 결제 결과는 관리자 원장에 합쳐지지 않는다**. `APP_MODE=demo`·`NODE_ENV=test`·`DB_NAME=lr_test`가 동시에 일치해야 조회 경로가 열리며, 실회원/PG/운영 MySQL은 연결되지 않는다.
+- [API/MySQL #41574021033](https://github.com/nalkarowndal/lR/actions/runs/41574021033) 111/111+HTTP 5/5, [모바일 #41574021034](https://github.com/nalkarowndal/lR/actions/runs/41574021034) 33/33·Expo Web export PASS. [브라우저 #41574021124](https://github.com/nalkarowndal/lR/actions/runs/41574021124)에서 관리자 비로그인 접근 차단·기존 사용자 흐름을 검증. 실제 관리자 세션을 통한 브라우저/DB 연동 E2E는 아직 실시하지 않았다.

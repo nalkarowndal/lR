@@ -90,7 +90,18 @@
 - **남은 범위:** 주문/결제 영속 처리·관리자 확인·취소/환불 정산·실 PG/사업 정책 **미구현·미승인**. Android/iOS 실기기 QA는 사용자 결정으로 **SKIPPED(PASS 아님)**, Moderate 11건은 [#30](https://github.com/nalkarowndal/lR/issues/30)에서 별도 추적
 - **다음:** [Issue #14](https://github.com/nalkarowndal/lR/issues/14) 격리된 `lr_test` 기반 내부 모의 주문 이벤트/상태 조회 경계와 관리자 읽기 화면을 작은 TDD PR로 확장; 실제 `/api/v1/orders` 및 `/api/v1/payments/confirm`은 501 출시 차단 유지, UX-D [#19](https://github.com/nalkarowndal/lR/issues/19) 후순위
 
+## M5-2C2 — 격리 모의 원장 관리자 조회 API + 웹 읽기 화면 (2026-11-03)
+
+- **목표:** [Issue #14](https://github.com/nalkarowndal/lR/issues/14)의 모의 결제 원장 관리자 **상태 확인·감사 이력 조회**, [명세](M5_2C2_ADMIN_LEDGER_READ.md). 고객의 브라우저 메모리 주문과 서버 테스트 원장은 *서로 다른 데이터*로 취급
+- **변경:** `apps/api/src/demo-order-admin.ts`·`demo-order-admin-routes.ts` 및 `app.ts`, 테스트; 모바일 `src/auth/admin-demo-orders.ts`·`SessionProvider`·관리자 마이 화면·메뉴와 도메인/Chromium 테스트. 주문·결제 쓰기 API와 SQL 스키마/lockfile은 그대로
+- **PR/검증:** [PR #39](https://github.com/nalkarowndal/lR/pull/39), [API/MySQL #41574021033](https://github.com/nalkarowndal/lR/actions/runs/41574021033) **111/111 + HTTP 5/5** PASS; [모바일 #41574021034](https://github.com/nalkarowndal/lR/actions/runs/41574021034) Expo Doctor 20/20·TypeScript·도메인 **33/33**·Expo Web export PASS. [Chromium #41574021124](https://github.com/nalkarowndal/lR/actions/runs/41574021124) 결과는 링크에서 확인(새 비로그인 관리자 화면 QA 포함)
+- **안전:** 오직 `APP_MODE=demo` + `NODE_ENV=test` + `DB_NAME=lr_test`에서 두 가지 GET 경로만 노출; 서버 DB ADMIN 역할이 없는 로그인·무인증 접근 차단. 주문 목록은 최대 50건 단위, 세부 이벤트와 감사 이력은 각 최대 100건까지. 응답에 고객 이메일/비밀번호/토큰/PG 제공업체 결제키 미포함
+- **범위 한계:** 상태 조회 **읽기 전용**(검수/변경 API 없음). 고객용 M5-2C1의 React 세션 영수는 백엔드에 저장되지 않으므로 관리자 화면에 표시되지 않는다. 운영 주문/결제 `POST /api/v1/orders`, `/api/v1/payments/confirm`은 501; 실제 PG·배송·예약/환불·ERP·민감정보 취급 승인 전 계속 금지
+- **다음:** M5-2C3 — 포트폴리오 브라우저용 **격리된 테스트 데이터 시드·관리자 E2E 연계 검증**을 설계하고, 승인·정책 없는 운영 거래와의 혼동을 피할 것. [Issue #19](https://github.com/nalkarowndal/lR/issues/19) 최종 UI/이미지 고도화는 기능 완료 후
+
 ## 다음 연속 작업 패키지
+
+> **이하 M4~M6 항목은 이전 작업 패키지의 이력 기록입니다.** 2026-11-03 이후 우선순위와 네이티브 기기 QA 제외 결정은 위 M5-2C2 및 [웹 QA 범위](WEB_PORTFOLIO_QA_SCOPE.md)가 우선합니다.
 
 **M6-1A 의존성 보안 감사·릴리스 API 차단 회귀 병합 완료, 다음 M6-1B 취약점 11개 패키지 분류:** API/MySQL 106/106, HTTP 5/5, 모바일 25/25 PASS. 직전 Chromium 40/40 PASS(이번 PR 미실행). 실제 PG 테스트 키·운영 정책 승인은 여전히 미완료. 실제 Android/iOS 기기·접근성, 운영 계정·PG·보증금/취소/물류 정책 미승인으로 **상용 출시 Gate는 미통과**.
 
