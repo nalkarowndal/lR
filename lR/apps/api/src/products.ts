@@ -1,6 +1,7 @@
 import type{RowDataPacket} from 'mysql2';
 import type{Database} from './db.js';
 import {approvedProductMedia,type PublishedMedia} from './media-rights.js';
+import {generatedDemoMedia} from './generated-demo-media.js';
 export type Channel='RENTAL'|'STORE';
 export interface ProductDto{
  id:string;title:string;brand:string;category:string;condition:string;
@@ -43,7 +44,7 @@ export async function getProducts(db:Database,ids:string[]):Promise<ProductDto[]
   }
  }
  const approved=await approvedProductMedia(db,ids);
- for(const [id,product] of products)product.media=approved.get(id)||[];
+ for(const [id,product] of products)product.media=[...generatedDemoMedia(id,product.demo),...(approved.get(id)||[])].slice(0,8);
  return ids.flatMap(id=>products.has(id)?[products.get(id)!]:[]);
 }
 export async function listProducts(db:Database,opts:{

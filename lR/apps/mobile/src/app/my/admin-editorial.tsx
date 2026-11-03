@@ -96,8 +96,8 @@ export default function AdminEditorial(){
    <Body muted>읽기 전용 검토 현황입니다. 승인되지 않은 상품·브랜드 실사 사진은 공개되지 않으며, 원본 업로드와 무단 URL 등록 기능도 없습니다.</Body>
    {rights.length===0?<Body muted>점검할 상품 정보가 없거나 아직 미디어 등록이 없습니다.</Body>:null}
    {rights.map(r=><View key={r.productId} style={{gap:4,paddingVertical:8,borderBottomWidth:1,borderColor:colors.divider}}>
-    <Body>{r.title} · {r.displayReady?'승인 이미지 사용 가능':'사용권 검토 대기'}</Body>
-    <Body muted>등록 {r.registeredCount}장 · 권리 승인 {r.rightsApprovedCount}장</Body>
+    <Body>{r.title} · {r.generatedCount>0?'AI 시연 이미지 표시':r.displayReady?'실사 사용권 승인 이미지 표시':'실사 사용권 검토 대기'}</Body>
+    <Body muted>AI 생성 {r.generatedCount}장 · 실사 등록 {r.registeredCount}장 · 권리 승인 {r.rightsApprovedCount}장</Body>
     <Body muted>{r.reason}</Body>
    </View>)}
    <Body muted>권리 증빙, 이미지 출처 및 CDN 승인 없이 사진을 등록할 수 없습니다. 지금은 합성 일러스트를 유지합니다.</Body>

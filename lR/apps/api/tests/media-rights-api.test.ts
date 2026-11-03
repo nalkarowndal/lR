@@ -23,13 +23,14 @@ async function admin(){
  const l=await request(app).post('/api/v1/auth/login').send({email,password:pass});
  return {token:l.body.data.accessToken,userId:r.body.data.userId};
 }
-test('product JSON explicitly has empty media by default and no public upload endpoint',async()=>{
+test('product JSON returns provenance-labeled generated demo views, no public upload endpoint',async()=>{
  const list=await request(app).get('/api/v1/products?brand=DEMO');
  assert.equal(list.status,200);
  assert.match(String(list.headers['cache-control']),/no-store/);
- assert.deepEqual(list.body.data[0].media,[]);
+ assert.equal(list.body.data[0].media.length,2);
+ assert.match(list.body.data[0].media[0].alt,/AI 생성/);
  const detail=await request(app).get('/api/v1/products/demo-bag-01');
- assert.deepEqual(detail.body.data.media,[]);
+ assert.equal(detail.body.data.media.length,2);
  assert.equal((await request(app).post('/api/v1/admin/media-rights').send({url:'https://unlicensed.invalid/photo.jpg'})).status,404);
 });
 test('unapproved or nonallowlisted URLs never leave the API; sorted approved media requires evidence and reviewer',async()=>{
@@ -47,17 +48,19 @@ test('unapproved or nonallowlisted URLs never leave the API; sorted approved med
  await add(ids[2],'https://unlicensed.invalid/photo/brand.webp','APPROVED',212,true);
  // Even an APPROVED status is insufficient unless an explicit approved origin exists.
  delete process.env.APPROVED_MEDIA_HOSTS;
- assert.deepEqual((await request(app).get('/api/v1/products/demo-bag-01')).body.data.media,[]);
+ assert.equal((await request(app).get('/api/v1/products/demo-bag-01')).body.data.media.length,2);
  process.env.APPROVED_MEDIA_HOSTS='cdn.example.invalid';
  const product=await request(app).get('/api/v1/products/demo-bag-01');
  assert.equal(product.status,200);
- assert.deepEqual(product.body.data.media,[{
+ assert.equal(product.body.data.media.length,3);
+ assert.deepEqual(product.body.data.media[2],{
   url:'https://cdn.example.invalid/demo/faux-bag.webp',alt:'허가된 시연용 가방 정면'
- }]);
+ });
  const report=await request(app).get('/api/v1/admin/media-rights').set('Authorization','Bearer '+reviewer.token);
  assert.equal(report.status,200);
  const row=report.body.data.find((x:{productId:string})=>x.productId==='demo-bag-01');
  assert.equal(row.registeredCount,3);assert.equal(row.rightsApprovedCount,2);
+ assert.equal(row.generatedCount,2);
  assert.equal(row.displayReady,true);
  assert.equal((await request(app).get('/api/v1/admin/media-rights')).status,401);
  assert.equal((await request(disabled).get('/api/v1/admin/media-rights')).status,501);

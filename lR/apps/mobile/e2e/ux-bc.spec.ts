@@ -18,10 +18,10 @@ test('UX-BC: search filter category and grade without falsely ranking unloaded p
   .toHaveAttribute('aria-label','The Atelier Bucket 상세 보기');
  await info.attach('search-filtered',{body:await page.screenshot({fullPage:true,animations:'disabled'}),contentType:'image/png'});
 });
-test('UX-BC: detail shows honest illustration and route-aware primary action',async({page},info)=>{
+test('UX-BC: detail identifies original AI demo visuals and route-aware primary action',async({page},info)=>{
  test.skip(!offline,'offline demo product only');
  await page.goto('/product/demo-bag-01?channel=STORE');
- await expect(page.getByText(/시연용 일러스트로 표시됩니다/)).toBeVisible();
+ await expect(page.getByText(/AI로 만든 가상 상품 이미지입니다/)).toBeVisible();
  const buttons=page.getByRole('button');
  const shop=page.getByRole('button',{name:'스토어 시연 장바구니에 담기'});
  const rental=page.getByRole('button',{name:'렌탈 기간 선택'});

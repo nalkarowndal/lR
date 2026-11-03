@@ -1,4 +1,5 @@
 import type{Channel,Product,ProductArt,ProductMedia} from '../domain/catalog';
+import {getGeneratedDemoMedia,isGeneratedDemoMediaUrl} from '../domain/generated-media.ts';
 
 export type ApiErrorKind='HTTP'|'NETWORK'|'TIMEOUT'|'CONFIG'|'CONTRACT';
 export class ApiError extends Error {
@@ -39,7 +40,7 @@ export function parseProductMedia(value:unknown):ProductMedia[]{
   const approvedHosts: string=typeof process.env.EXPO_PUBLIC_MEDIA_HOSTS==='string'?process.env.EXPO_PUBLIC_MEDIA_HOSTS:'';
   const origins=new Set(approvedHosts.split(',')
    .map((host:string)=>host.trim().toLowerCase()).filter(Boolean));
-  if(url.protocol!=='https:'||!origins.has(url.hostname.toLowerCase())||url.username||url.password||
+  if(url.protocol!=='https:'||(!origins.has(url.hostname.toLowerCase())&&!isGeneratedDemoMediaUrl(item.url))||url.username||url.password||
    url.port||url.search||url.hash||item.url.length>2048||
    !/\.(?:webp|avif|png|jpe?g)$/i.test(url.pathname)||
    /[<>\u0000-\u001f\u007f]/.test(item.alt)||item.alt.trim().length<2)
@@ -53,11 +54,16 @@ export function parseProduct(value:unknown):Product{
  if(!isObject(value))throw new ApiError('CONTRACT','상품 응답 형식이 올바르지 않습니다');
  if(!Array.isArray(value.channels)||!value.channels.every(x=>x==='RENTAL'||x==='STORE'))throw new ApiError('CONTRACT','판매 채널이 올바르지 않습니다');
  if(typeof value.demo!=='boolean')throw new ApiError('CONTRACT','상품 표시 정보가 올바르지 않습니다');
+ const media=parseProductMedia(value.media);
+ if(media.some(item=>isGeneratedDemoMediaUrl(item.url)&&
+  (value.demo!==true||!getGeneratedDemoMedia(value.id as string)
+   .some(known=>known.url===item.url&&known.alt===item.alt))))
+  throw new ApiError('CONTRACT','AI 시연 이미지가 다른 상품에 연결됐습니다');
  return {id:str(value.id,'id'),brand:str(value.brand,'brand'),title:str(value.title,'title'),
   category:str(value.category,'category'),condition:str(value.condition,'condition'),
   channels:value.channels,dayRateKrw:nullable(value.dayRateKrw,'dayRateKrw'),
   salePriceKrw:nullable(value.salePriceKrw,'salePriceKrw'),
-  depositKrw:amount(value.depositKrw,'depositKrw'),demo:value.demo,art:stableArt(value.id as string),media:parseProductMedia(value.media)};
+  depositKrw:amount(value.depositKrw,'depositKrw'),demo:value.demo,art:stableArt(value.id as string),media};
 }
 export function parsePage(value:unknown):PageResult{
  if(!isObject(value)||!Array.isArray(value.data)||!isObject(value.meta)||!isObject(value.meta.page))

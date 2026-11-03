@@ -24,7 +24,7 @@ test('ADMIN edits a copy-only draft, public stays unchanged until publish, right
   await expect(page.getByText('테스트 계정: '+email).filter({visible:true})).toBeVisible();
   await page.getByRole('button',{name:'에디토리얼 관리'}).click();
   await expect(page.getByText('상품 이미지 사용권 점검',{exact:true})).toBeVisible();
-  await expect(page.getByText(/사용권 검토 대기/).first()).toBeVisible();
+  await expect(page.getByText(/AI 생성 2장/).first()).toBeVisible();
   const changed='시연 에디토리얼 '+randomUUID().slice(0,8);
   await page.getByRole('textbox',{name:'에디토리얼 헤드라인'}).fill(changed);
   await page.getByRole('textbox',{name:'에디토리얼 버튼 문구'}).fill('스토어 컬렉션 보기');
