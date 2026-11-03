@@ -1,5 +1,5 @@
 import type{QuoteResult} from '../api/client';
-import {rentalDays} from './date';
+import {rentalDays} from './date.ts';
 
 export type DemoOutcome='SUCCESS'|'FAILURE'|'CANCEL';
 export type DemoRentalStatus='SIMULATED_PAID'|'SIMULATED_FAILED'|'SIMULATED_CANCELED';
