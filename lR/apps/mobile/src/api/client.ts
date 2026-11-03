@@ -40,8 +40,8 @@ export function parseProductMedia(value:unknown):ProductMedia[]{
    .map(host=>host.trim().toLowerCase()).filter(Boolean));
   if(url.protocol!=='https:'||!origins.has(url.hostname.toLowerCase())||url.username||url.password||
    url.port||url.search||url.hash||item.url.length>2048||
-   !/\\.(?:webp|avif|png|jpe?g)$/i.test(url.pathname)||
-   /[<>\\u0000-\\u001f\\u007f]/.test(item.alt)||item.alt.trim().length<2)
+   !/\.(?:webp|avif|png|jpe?g)$/i.test(url.pathname)||
+   /[<>\u0000-\u001f\u007f]/.test(item.alt)||item.alt.trim().length<2)
    throw new ApiError('CONTRACT','상품 이미지는 사용권을 확인한 HTTPS 출처에서만 제공합니다');
   return {url:item.url,alt:item.alt.trim()};
  });
