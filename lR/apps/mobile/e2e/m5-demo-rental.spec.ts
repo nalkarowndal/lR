@@ -10,7 +10,7 @@ const setupCheckout=async(page:Page)=>{
  await page.getByRole('button',{name:/3일 렌탈 견적 보기/}).click();
  await expect(page.getByText('예시 청구 합계')).toBeVisible();
  await page.getByRole('button',{name:'렌탈 주문서 미리보기 (실제 결제 없음)'}).click();
- await expect(page.getByText('렌탈 주문서 미리보기')).toBeVisible();
+ await expect(page.getByRole('heading',{name:'렌탈 주문서 미리보기',exact:true})).toBeVisible();
  await page.getByRole('button',{name:'시연 조건 확인'}).click();
 };
 
@@ -30,7 +30,7 @@ for(const scenario of cases){
   await page.getByRole('button',{name:'마이페이지에서 모의 내역 보기'}).click();
   await expect(page.getByText('모의 렌탈 이용 내역',{exact:true})).toBeVisible();
   await expect(page.getByText(scenario.result,{exact:true})).toBeVisible();
-  await expect(page.getByText(/The Sera Top Handle/)).toBeVisible();
+  await expect(page.getByText('렌탈 내역',{exact:true}).locator('..').getByText('The Sera Top Handle',{exact:true})).toBeVisible();
   expect(await page.getByText(/모의 주문 번호:/).count()).toBe(1);
   await info.attach('demo-checkout-'+scenario.outcome,{body:await page.screenshot({fullPage:true}),contentType:'image/png'});
   await page.reload();
