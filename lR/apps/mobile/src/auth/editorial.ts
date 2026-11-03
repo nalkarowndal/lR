@@ -25,6 +25,7 @@ const safeString=(x:unknown,min:number,max:number):x is string=>
 const target=(x:unknown):x is EditorialTarget=>
  x==='RENTAL'||x==='STORE'||x==='CARE'||x==='CONSIGNMENT';
 const integer=(x:unknown):x is number=>Number.isSafeInteger(x)&&typeof x==='number'&&x>=1;
+const nonNegativeInteger=(x:unknown):x is number=>typeof x==='number'&&Number.isSafeInteger(x)&&x>=0;
 function copyFrom(x:unknown):EditorialCopy{
  if(!obj(x)||!safeString(x.eyebrow,2,60)||!safeString(x.headline,2,80)||
   !safeString(x.description,2,180)||!safeString(x.ctaLabel,2,32)||!target(x.ctaTarget)||
@@ -54,7 +55,7 @@ export function parseRightsReport(raw:unknown):MediaRightsRow[]{
   throw new AuthError('미디어 권리 보고서 응답이 올바르지 않습니다');
  return d.map((r:unknown)=>{
   if(!obj(r)||typeof r.productId!=='string'||!r.productId.length||r.productId.length>40||
-   !safeString(r.title,2,255)||!integer(r.registeredCount+1)||!integer(r.rightsApprovedCount+1)||
+   !safeString(r.title,2,255)||!nonNegativeInteger(r.registeredCount)||!nonNegativeInteger(r.rightsApprovedCount)||
    r.rightsApprovedCount>r.registeredCount||typeof r.displayReady!=='boolean'||
    !safeString(r.reason,2,255))
    throw new AuthError('미디어 권리 보고서 항목이 올바르지 않습니다');
