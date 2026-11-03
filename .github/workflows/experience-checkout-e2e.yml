@@ -74,7 +74,7 @@ jobs:
       - name: Run signed-in checkout and saved order history in live Chromium
         env:
           NODE_ENV: development
-        run: npm run qa:web --workspace @luxuryrental/mobile -- e2e/m5-experience-live.spec.ts
+        run: npm run qa:web --workspace @luxuryrental/mobile -- e2e/m5-experience-live.spec.ts e2e/m5-saved-collections-live.spec.ts
       - name: Upload screenshots and traces
         if: always()
         uses: actions/upload-artifact@v4

@@ -1,0 +1,46 @@
+import {test,expect} from '@playwright/test';
+import {randomUUID} from 'node:crypto';
+/** Chromium to real isolated MySQL, account-separated list persistence, no financial endpoints. */
+test('signed-in wishlist/cart survives a fresh browser session after re-login',async({page})=>{
+ test.skip(process.env.M4N_MODE!=='experience-live','needs real isolated test API');
+ const email='saved-'+randomUUID().slice(0,13)+'@example.invalid';
+ const password='only-local-example-account-secret';
+ await page.goto('/my/login');
+ await page.getByRole('button',{name:'테스트 계정 새로 만들기'}).click();
+ await page.getByRole('textbox',{name:'테스트 이메일'}).fill(email);
+ await page.getByRole('textbox',{name:'테스트 비밀번호'}).fill(password);
+ await page.getByRole('button',{name:'테스트 계정 생성하기'}).click();
+ await expect(page.getByText(/시연 계정을 생성했습니다/)).toBeVisible();
+ await page.getByRole('textbox',{name:'테스트 비밀번호'}).fill(password);
+ await page.getByRole('button',{name:'테스트 계정 로그인'}).click();
+ await expect(page.getByText('테스트 계정: '+email)).toBeVisible();
+ await expect(page.getByText('테스트 계정의 찜·장바구니를 불러오는 중입니다.')).toHaveCount(0);
+ await page.getByText('렌탈',{exact:true}).last().click();
+ await expect(page.getByText('렌탈 컬렉션')).toBeVisible();
+ const saved=page.waitForResponse(r=>r.url().includes('/api/v1/me/wishlist')&&r.request().method()==='POST');
+ await page.getByRole('button',{name:'찜 추가'}).first().click();
+ expect((await saved).status()).toBe(201);
+ await page.getByText('스토어',{exact:true}).last().click();
+ await expect(page.getByText('스토어 상품',{exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'The Sera Top Handle 상세 보기'}).click();
+ const added=page.waitForResponse(r=>r.url().includes('/api/v1/me/cart')&&r.request().method()==='POST');
+ await page.getByRole('button',{name:'스토어 시연 장바구니에 담기'}).click();
+ expect((await added).status()).toBe(201);
+ await expect(page.getByText('구매 주문서',{exact:true})).toBeVisible();
+ // Web bearer stays memory-only by design. Persisted list data survives login again.
+ await page.reload();
+ await page.goto('/my/login');
+ await page.getByRole('textbox',{name:'테스트 이메일'}).fill(email);
+ await page.getByRole('textbox',{name:'테스트 비밀번호'}).fill(password);
+ await page.getByRole('button',{name:'테스트 계정 로그인'}).click();
+ await expect(page.getByText('테스트 계정: '+email)).toBeVisible();
+ await expect(page.getByText('테스트 계정의 찜·장바구니를 불러오는 중입니다.')).toHaveCount(0);
+ await expect(page.getByText('찜한 상품')).toBeVisible();
+ await expect(page.getByText('1개 · 테스트 계정 저장')).toHaveCount(2);
+ await page.getByText('찜한 상품').click();
+ await expect(page.getByRole('button',{name:'The Sera Top Handle 상세 보기'})).toBeVisible();
+ await page.getByRole('button',{name:'이전 화면으로 돌아가기'}).click();
+ await expect(page.getByText('장바구니',{exact:true})).toBeVisible();
+ await page.getByText('장바구니',{exact:true}).click();
+ await expect(page.getByText('The Sera Top Handle',{exact:true})).toBeVisible();
+});

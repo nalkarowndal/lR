@@ -4,7 +4,7 @@ import {createAdminDemoOrdersClient,type DemoAdminOrder,type DemoAdminDetail} fr
 import {createExperienceOrdersClient,type ExperienceOrder,type ExperienceOrderInput} from './experience-orders';
 import {createDemoAuthClient,AuthError,sessionIsCurrent,type Identity,type TokenSession} from './api';
 import {readNativeSession,writeNativeSession,clearNativeSession} from './token-storage';
-import {useAppState} from '../state/AppState';
+import {createSavedCollectionsClient,type SavedList} from './saved-collections';
 
 type Status='restoring'|'guest'|'signed-in';
 interface Context{
@@ -19,6 +19,9 @@ interface Context{
  listExperienceOrders:()=>Promise<ExperienceOrder[]>;
  getExperienceOrder:(id:string)=>Promise<ExperienceOrder>;
  listAdminExperienceOrders:()=>Promise<ExperienceOrder[]>;
+ listSaved:(kind:SavedList)=>Promise<string[]>;
+ addSaved:(kind:SavedList,id:string)=>Promise<string[]>;
+ removeSaved:(kind:SavedList,id:string)=>Promise<void>;
 }
 const Ctx=createContext<Context|null>(null);
 const client=()=>{
@@ -32,11 +35,10 @@ export function SessionProvider({children}:{children:React.ReactNode}){
  const [identity,setIdentity]=useState<Identity|null>(null);
  const [error,setError]=useState<string|null>(null);
  const saved=useRef<TokenSession|null>(null);
- const {resetPrivateState}=useAppState();
  const drop=useCallback(async()=>{
-  saved.current=null;setIdentity(null);setStatus('guest');resetPrivateState();
+  saved.current=null;setIdentity(null);setStatus('guest');
   await clearNativeSession();
- },[resetPrivateState]);
+ },[]);
  useEffect(()=>{
   let live=true;
   const restore=async()=>{
@@ -76,8 +78,8 @@ export function SessionProvider({children}:{children:React.ReactNode}){
   // Only native SecureStore persists. Web stores token in this provider's memory.
   await writeNativeSession(token);
   saved.current=token;
-  resetPrivateState();setIdentity(verified);setStatus('signed-in');
- }),[withAction,resetPrivateState]);
+  setIdentity(verified);setStatus('signed-in');
+ }),[withAction]);
  const register=useCallback(async(email:string,password:string)=>withAction(async()=>{
   await client().register(email,password);
   // Creating a test account does not grant authentication.
@@ -135,10 +137,21 @@ export function SessionProvider({children}:{children:React.ReactNode}){
  const getExperienceOrder=useCallback(async(id:string)=>
   experienceClient().detail(experienceToken(),id),[experienceToken]);
  const listAdminExperienceOrders=useCallback(async()=>experienceClient().adminList(adminToken()),[adminToken]);
+ const savedClient=()=>{
+  const base=apiBaseUrl();
+  if(!base)throw new AuthError('저장 목록 테스트 API가 설정되지 않았습니다');
+  return createSavedCollectionsClient(base);
+ };
+ const listSaved=useCallback(async(kind:SavedList)=>savedClient().list(experienceToken(),kind),[experienceToken]);
+ const addSaved=useCallback(async(kind:SavedList,id:string)=>savedClient().add(experienceToken(),kind,id),[experienceToken]);
+ const removeSaved=useCallback(async(kind:SavedList,id:string)=>{
+  await savedClient().remove(experienceToken(),kind,id);
+ },[experienceToken]);
  const value=useMemo<Context>(()=>({status,busy,identity,error,login,register,logout,refresh,
-  listAdminDemoOrders,getAdminDemoOrder,createExperienceOrder,listExperienceOrders,getExperienceOrder,listAdminExperienceOrders}),
+  listAdminDemoOrders,getAdminDemoOrder,createExperienceOrder,listExperienceOrders,getExperienceOrder,listAdminExperienceOrders,
+  listSaved,addSaved,removeSaved}),
   [status,busy,identity,error,login,register,logout,refresh,listAdminDemoOrders,getAdminDemoOrder,
-   createExperienceOrder,listExperienceOrders,getExperienceOrder,listAdminExperienceOrders]);
+   createExperienceOrder,listExperienceOrders,getExperienceOrder,listAdminExperienceOrders,listSaved,addSaved,removeSaved]);
  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 export function useDemoSession(){const c=useContext(Ctx);if(!c)throw new Error('SessionProvider missing');return c;}

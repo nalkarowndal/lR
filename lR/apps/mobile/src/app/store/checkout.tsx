@@ -9,12 +9,14 @@ import {Screen,Panel,Heading,Body,Action,DemoNotice} from '../../components/ui';
 import {NetworkFeedback,DataSourceNotice} from '../../components/NetworkFeedback';
 import {Back} from '../../components/Back';
 export default function StoreCheckout(){
- const router=useRouter();const{cart,removeCart}=useAppState();
+ const router=useRouter();const{cart,removeCart,savedSyncStatus,savedSyncError,retrySavedSync}=useAppState();
  const loaded=useProductIds(cart);
  const selected=(loaded.data||[]).filter(x=>x.channels.includes('STORE'));
  const total=selected.reduce((sum,item)=>sum+item.salePriceKrw,0);
  return <Screen title="구매 주문서" subtitle="명품 스토어 · 장바구니 시연" right={<Back/>}>
   <DemoNotice/><DataSourceNotice/>
+  {savedSyncStatus==='loading'?<Body muted>저장된 장바구니를 확인하는 중입니다.</Body>:null}
+  {savedSyncError?<Panel><Body muted>{savedSyncError}</Body><Action label="장바구니 다시 불러오기" onPress={retrySavedSync}/></Panel>:null}
   <NetworkFeedback status={loaded.status} error={loaded.error} retry={loaded.retry}/>
   {loaded.status==='ready'&&!cart.length?<Panel>
    <Ionicons name="bag-handle-outline" size={44} color={colors.sub}/>
