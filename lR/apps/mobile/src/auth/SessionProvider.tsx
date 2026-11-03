@@ -7,6 +7,7 @@ import {readNativeSession,writeNativeSession,clearNativeSession} from './token-s
 import {createSavedCollectionsClient,type SavedList} from './saved-collections';
 import {createStoreOrdersClient,type StoreOrder,type StoreOrderInput} from './store-orders';
 import {createServiceRequestsClient,type ServiceInput,type ServiceRecord,type ServiceKind,type AdminServiceStatus} from './service-requests';
+import {createEditorialClient,type AdminEditorial,type EditorialCopy,type MediaRightsRow} from './editorial';
 
 type Status='restoring'|'guest'|'signed-in';
 interface Context{
@@ -34,6 +35,10 @@ interface Context{
  cancelServiceRequest:(id:string)=>Promise<ServiceRecord>;
  listAdminServiceRequests:(kind?:ServiceKind)=>Promise<ServiceRecord[]>;
  updateAdminServiceStatus:(id:string,status:AdminServiceStatus)=>Promise<ServiceRecord>;
+ readAdminEditorial:()=>Promise<AdminEditorial>;
+ saveAdminEditorial:(revision:number,copy:EditorialCopy)=>Promise<AdminEditorial>;
+ publishAdminEditorial:(revision:number)=>Promise<AdminEditorial>;
+ listAdminMediaRights:()=>Promise<MediaRightsRow[]>;
 }
 const Ctx=createContext<Context|null>(null);
 const client=()=>{
@@ -183,13 +188,26 @@ export function SessionProvider({children}:{children:React.ReactNode}){
   serviceClient().adminList(adminToken(),kind),[adminToken]);
  const updateAdminServiceStatus=useCallback(async(id:string,status:AdminServiceStatus)=>
   serviceClient().adminStatus(adminToken(),id,status),[adminToken]);
+ const editorialClient=()=>{
+  const base=apiBaseUrl();
+  if(!base)throw new AuthError('테스트 에디토리얼 API가 설정되지 않았습니다');
+  return createEditorialClient(base);
+ };
+ const readAdminEditorial=useCallback(async()=>editorialClient().adminRead(adminToken()),[adminToken]);
+ const saveAdminEditorial=useCallback(async(revision:number,copy:EditorialCopy)=>
+  editorialClient().adminDraft(adminToken(),revision,copy),[adminToken]);
+ const publishAdminEditorial=useCallback(async(revision:number)=>
+  editorialClient().adminPublish(adminToken(),revision),[adminToken]);
+ const listAdminMediaRights=useCallback(async()=>editorialClient().mediaRights(adminToken()),[adminToken]);
  const value=useMemo<Context>(()=>({status,busy,identity,error,login,register,logout,refresh,
   listAdminDemoOrders,getAdminDemoOrder,createExperienceOrder,listExperienceOrders,getExperienceOrder,listAdminExperienceOrders,
   listSaved,addSaved,removeSaved,createStoreOrder,listStoreOrders,getStoreOrder,listAdminStoreOrders,
-  createServiceRequest,listServiceRequests,getServiceRequest,cancelServiceRequest,listAdminServiceRequests,updateAdminServiceStatus}),
+  createServiceRequest,listServiceRequests,getServiceRequest,cancelServiceRequest,listAdminServiceRequests,updateAdminServiceStatus,
+  readAdminEditorial,saveAdminEditorial,publishAdminEditorial,listAdminMediaRights}),
   [status,busy,identity,error,login,register,logout,refresh,listAdminDemoOrders,getAdminDemoOrder,
    createExperienceOrder,listExperienceOrders,getExperienceOrder,listAdminExperienceOrders,listSaved,addSaved,removeSaved,createStoreOrder,listStoreOrders,getStoreOrder,listAdminStoreOrders,
-   createServiceRequest,listServiceRequests,getServiceRequest,cancelServiceRequest,listAdminServiceRequests,updateAdminServiceStatus]);
+   createServiceRequest,listServiceRequests,getServiceRequest,cancelServiceRequest,listAdminServiceRequests,updateAdminServiceStatus,
+   readAdminEditorial,saveAdminEditorial,publishAdminEditorial,listAdminMediaRights]);
  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 export function useDemoSession(){const c=useContext(Ctx);if(!c)throw new Error('SessionProvider missing');return c;}
