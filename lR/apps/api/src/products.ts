@@ -1,9 +1,10 @@
 import type{RowDataPacket} from 'mysql2';
 import type{Database} from './db.js';
+import {approvedProductMedia,type PublishedMedia} from './media-rights.js';
 export type Channel='RENTAL'|'STORE';
 export interface ProductDto{
  id:string;title:string;brand:string;category:string;condition:string;
- channels:Channel[];dayRateKrw:number|null;salePriceKrw:number|null;depositKrw:number;demo:boolean;
+ channels:Channel[];dayRateKrw:number|null;salePriceKrw:number|null;depositKrw:number;demo:boolean;media:PublishedMedia[];
  offers:Array<{channel:Channel;dayRateKrw:number|null;salePriceKrw:number|null;depositKrw:number}>;
 }
 interface IdRow extends RowDataPacket{id:string}
@@ -29,7 +30,7 @@ export async function getProducts(db:Database,ids:string[]):Promise<ProductDto[]
   let dto=products.get(row.id);
   if(!dto){
    dto={id:row.id,title:row.title,brand:row.brand,category:row.category,condition:row.condition_grade,
-    channels:[],dayRateKrw:null,salePriceKrw:null,depositKrw:0,demo:!!row.is_demo,offers:[]};
+    channels:[],dayRateKrw:null,salePriceKrw:null,depositKrw:0,demo:!!row.is_demo,media:[],offers:[]};
    products.set(row.id,dto);
   }
   if(row.channel){
@@ -41,6 +42,8 @@ export async function getProducts(db:Database,ids:string[]):Promise<ProductDto[]
    if(row.channel==='STORE')dto.salePriceKrw=salePriceKrw;
   }
  }
+ const approved=await approvedProductMedia(db,ids);
+ for(const [id,product] of products)product.media=approved.get(id)||[];
  return ids.flatMap(id=>products.has(id)?[products.get(id)!]:[]);
 }
 export async function listProducts(db:Database,opts:{
