@@ -1,5 +1,5 @@
 import {readdirSync, readFileSync, writeFileSync, appendFileSync} from 'node:fs';
-import {join} from 'node:path';
+import {join, basename} from 'node:path';
 
 const RISK_PACKAGES = new Set([
   'glob', 'minimatch', '@expo/cli', '@expo/config', '@expo/config-plugins',
@@ -61,8 +61,25 @@ export function inspectExportDirectory(directory) {
   const paths=findSourceMaps(directory);
   if (paths.length===0) throw new Error('NO_NATIVE_SOURCE_MAPS');
   return inspectSourceMaps(paths.map(path=>{
-    try { return JSON.parse(readFileSync(path,'utf8')); }
-    catch { throw new Error('INVALID_NATIVE_SOURCE_MAP'); }
+    const raw=readFileSync(path,'utf8');
+    let map;
+    try { map=JSON.parse(raw); }
+    catch {
+      console.error('SOURCEMAP_FORMAT',JSON.stringify({
+        file:basename(path), bytes:Buffer.byteLength(raw),
+        firstBytesHex:Buffer.from(raw.slice(0,24)).toString('hex')
+      }));
+      throw new Error('INVALID_NATIVE_SOURCE_MAP');
+    }
+    if (!Array.isArray(map.sources) || map.sources.some(s=>typeof s!=='string')) {
+      console.error('SOURCEMAP_STRUCTURE',JSON.stringify({
+        file:basename(path), keys:Object.keys(map).slice(0,20),
+        sourcesType:typeof map.sources, sourcesCount:map.sources?.length,
+        malformedEntries:Array.isArray(map.sources)?map.sources.filter(s=>typeof s!=='string').length:null
+      }));
+      throw new Error('INVALID_NATIVE_SOURCE_MAP');
+    }
+    return map;
   }));
 }
 
