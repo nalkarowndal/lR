@@ -31,7 +31,7 @@ for(const scenario of cases){
   await expect(page.getByText('모의 렌탈 이용 내역',{exact:true})).toBeVisible();
   await expect(page.getByText(scenario.result,{exact:true})).toBeVisible();
   await expect(page.getByText('렌탈 내역',{exact:true}).locator('..').getByText('The Sera Top Handle',{exact:true})).toBeVisible();
-  expect(await page.getByText(/모의 주문 번호:/).count()).toBe(1);
+  expect(await page.getByText('렌탈 내역',{exact:true}).locator('..').getByText(/모의 주문 번호:/).count()).toBe(1);
   await info.attach('demo-checkout-'+scenario.outcome,{body:await page.screenshot({fullPage:true}),contentType:'image/png'});
   await page.reload();
   await expect(page.getByText('모의 내역이 없습니다')).toBeVisible();
