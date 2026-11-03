@@ -1,0 +1,46 @@
+import {test,expect} from '@playwright/test';
+import {randomUUID} from 'node:crypto';
+
+/** Real Chromium → Expo web → Express API → isolated lr_test; no payment occurs. */
+test('customer registers, submits unpaid order, opens persisted receipt and history',async({page},info)=>{
+ test.skip(process.env.M4N_MODE!=='experience-live','requires isolated lr_test and Node API');
+ const email='checkout-'+randomUUID().slice(0,13)+'@example.invalid';
+ const password='ephemeral-sample-password-2026';
+ await page.goto('/my/login');
+ await page.getByRole('button',{name:'테스트 계정 새로 만들기'}).click();
+ await page.getByRole('textbox',{name:'테스트 이메일'}).fill(email);
+ await page.getByRole('textbox',{name:'테스트 비밀번호'}).fill(password);
+ await page.getByRole('button',{name:'테스트 계정 생성하기'}).click();
+ await expect(page.getByText(/시연 계정을 생성했습니다/)).toBeVisible();
+ await page.getByRole('textbox',{name:'테스트 비밀번호'}).fill(password);
+ await page.getByRole('button',{name:'테스트 계정 로그인'}).click();
+ await expect(page.getByText('테스트 계정: '+email)).toBeVisible();
+ await page.getByText('렌탈',{exact:true}).last().click();
+ await expect(page.getByText('렌탈 컬렉션')).toBeVisible();
+ await page.getByRole('button',{name:'The Sera Top Handle 상세 보기'}).click();
+ await page.getByRole('button',{name:'렌탈 기간 선택'}).click();
+ const start=new Date(Date.now()+10*86400_000).toISOString().slice(0,10);
+ const end=new Date(Date.now()+13*86400_000).toISOString().slice(0,10);
+ await page.getByRole('textbox',{name:'대여 시작일 YYYY-MM-DD'}).fill(start);
+ await page.getByRole('textbox',{name:'반납 예정일 YYYY-MM-DD'}).fill(end);
+ await page.getByRole('button',{name:'입력한 날짜 적용'}).click();
+ await page.getByRole('button',{name:/3일 렌탈 견적 보기/}).click();
+ await expect(page.getByText('예시 청구 합계')).toBeVisible();
+ await page.getByRole('button',{name:'주문서 작성하기'}).click();
+ await expect(page.getByText('결제 방법',{exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'간편결제'}).click();
+ await page.getByRole('button',{name:'매장 방문 수령'}).click();
+ await page.getByRole('button',{name:'주문 조건 확인'}).click();
+ await page.getByRole('button',{name:'주문 접수'}).click();
+ await expect(page.getByText('주문이 접수되었습니다',{exact:true})).toBeVisible();
+ await expect(page.getByText(/접수 상태: 접수 완료 · 결제 상태: 미결제/)).toBeVisible();
+ const orderLabel=await page.getByText(/^주문번호: /).textContent();
+ const orderId=orderLabel?.replace('주문번호: ','').trim();
+ expect(orderId).toMatch(/^[0-9a-f-]{36}$/);
+ await info.attach('received-order',{body:await page.screenshot({fullPage:true}),contentType:'image/png'});
+ await page.getByRole('button',{name:'내 주문 내역 보기'}).click();
+ await expect(page.getByText('접수된 주문',{exact:true})).toBeVisible();
+ await expect(page.getByRole('button',{name:/The Sera Top Handle/})).toBeVisible();
+ await page.getByRole('button',{name:/The Sera Top Handle/}).click();
+ await expect(page.getByText('주문번호: '+orderId,{exact:true})).toBeVisible();
+});
