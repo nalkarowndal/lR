@@ -105,3 +105,15 @@ test('role revocation is applied on every administrator mutation and public neve
  const pub=await request(app).get('/api/v1/editorial/home');
  assert.equal(pub.status,200);assert.equal(pub.body.data.ownerId,undefined);
 });
+
+test('editorial PUT preflight allows only configured Expo origin, never wildcard',async()=>{
+ const cors=createApp(db,{demoMode:true,corsOrigins:['http://127.0.0.1:8081']});
+ const approved=await request(cors).options('/api/v1/admin/editorial/home/draft')
+  .set('Origin','http://127.0.0.1:8081').set('Access-Control-Request-Method','PUT');
+ assert.equal(approved.status,204);
+ assert.equal(approved.headers['access-control-allow-origin'],'http://127.0.0.1:8081');
+ assert.match(approved.headers['access-control-allow-methods'],/PUT/);
+ const denied=await request(cors).options('/api/v1/admin/editorial/home/draft')
+  .set('Origin','https://untrusted.invalid').set('Access-Control-Request-Method','PUT');
+ assert.equal(denied.headers['access-control-allow-origin'],undefined);
+});
