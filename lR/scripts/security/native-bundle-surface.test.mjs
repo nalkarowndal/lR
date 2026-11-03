@@ -94,3 +94,41 @@ test('directory scanner retains explicit platform context for android source-map
   assert.deepEqual(result.blockedPackageHits.map(x=>x.name),['glob']);
  }finally{rmSync(dir,{recursive:true,force:true});}
 });
+
+
+test('web production source-map report identifies platform and does not imply native security clearance',()=>{
+  const report=inspectSourceMaps([{version:3,sources:[
+    '../../node_modules/react/index.js',
+    '../../node_modules/@expo/cli/build/metro-require/require.js',
+    'src/app/index.tsx'
+  ]}],'web');
+  assert.equal(report.target,'web-production-js-export');
+  assert.equal(report.mapsInspected,1);
+  assert.equal(report.sourceEntriesInspected,3);
+  assert.deepEqual(report.blockedPackageHits,[]);
+  assert.equal(report.releaseApproved,false);
+  assert.match(report.limitations,/web JS source maps/);
+  assert.match(renderNativeEvidence(report),/Web JavaScript bundle/);
+});
+
+test('web scan flags Expo build-only modules in indexed Metro source-map sections',()=>{
+  const indexed={version:3,sections:[
+    {offset:{line:0,column:0},map:{version:3,sources:['../../node_modules/@expo/config/build/getConfig.js']}},
+    {offset:{line:9,column:0},map:{version:3,sources:['../../node_modules/minimatch/dist/index.js']}}
+  ]};
+  const report=inspectSourceMaps([indexed],'web');
+  assert.equal(report.requiresReview,true);
+  assert.deepEqual(report.blockedPackageHits.map(x=>x.name),['@expo/config','minimatch']);
+});
+
+test('web scan fails closed for missing export, empty source maps, and invalid platform',()=>{
+  const dir=mkdtempSync(join(tmpdir(),'lr-web-exposure-'));
+  try {
+    assert.throws(()=>inspectExportDirectory(dir,'web'),/NO_NATIVE_SOURCE_MAPS/);
+    writeFileSync(join(dir,'web.js.map'),JSON.stringify({version:3,sources:[]}));
+    assert.throws(()=>inspectExportDirectory(dir,'web'),/EMPTY_NATIVE_SOURCE_MAPS/);
+    assert.throws(()=>inspectSourceMaps([{sources:['index.js']}],'desktop'),/INVALID_PLATFORM/);
+  } finally {
+    rmSync(dir,{recursive:true,force:true});
+  }
+});
