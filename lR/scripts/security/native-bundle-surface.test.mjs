@@ -69,3 +69,26 @@ test('handles Metro indexed source maps with embedded sections and refuses unres
  assert.throws(()=>inspectSourceMaps([{sections:[{url:'https://example.com/missing.map'}]}]),
    /INVALID_NATIVE_SOURCE_MAP/);
 });
+
+test('separately identifies Android production JavaScript export instead of silently reporting iOS',()=>{
+ const map={sources:['/repo/node_modules/react/index.js','/repo/src/app/index.tsx']};
+ const result=inspectSourceMaps([map],'android');
+ assert.equal(result.target,'android-production-js-export');
+ assert.match(renderNativeEvidence(result),/Android JavaScript bundle/);
+ assert.equal(result.releaseApproved,false);
+});
+
+test('rejects unrecognized platform rather than manufacturing a clean report',()=>{
+ assert.throws(()=>inspectSourceMaps([{sources:['src/app.tsx']}],'windows'),/INVALID_PLATFORM/);
+ assert.throws(()=>inspectSourceMaps([{sources:['src/app.tsx']}],null),/INVALID_PLATFORM/);
+});
+
+test('directory scanner retains explicit platform context for android source-map output',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'lr-android-audit-'));
+ try {
+  writeFileSync(join(dir,'android.entry.js.map'),JSON.stringify({version:3,sources:['node_modules/glob/index.js']}));
+  const result=inspectExportDirectory(dir,'android');
+  assert.equal(result.target,'android-production-js-export');
+  assert.deepEqual(result.blockedPackageHits.map(x=>x.name),['glob']);
+ }finally{rmSync(dir,{recursive:true,force:true});}
+});
