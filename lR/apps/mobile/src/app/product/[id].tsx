@@ -36,7 +36,9 @@ export default function ProductDetail(){
        <Text style={{fontSize:12,fontWeight:'700',color:colors.ink}}>이미지 {i+1}</Text>
       </Pressable>)}
      </View>:null}
-    <Body muted>{product.media?.length?'제공된 이미지 · 실제 상품 상태는 별도 검수로 확인해야 합니다.':
+    <Body muted>{product.demo&&product.media?.some(m=>m.alt.includes('AI 생성'))?
+     'AI로 만든 가상 상품 이미지입니다. 실제 브랜드·제품·정품 사진이 아니며 상품 상태도 시연 데이터입니다.':
+     product.media?.length?'제공된 이미지 · 실제 상품 상태는 별도 검수로 확인해야 합니다.':
      '현재 상품은 시연용 일러스트로 표시됩니다. 실제 상품 사진을 제공하지 않습니다.'}</Body>
    </View>
    <View style={{flex:1,gap:13}}>
