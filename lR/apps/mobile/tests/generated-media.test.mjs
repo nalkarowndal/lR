@@ -45,7 +45,7 @@ test('every committed generated gallery asset is a real small JPEG with nonempty
  for(let n=1;n<=4;n++)urls.push(...getGeneratedDemoMedia('demo-bag-0'+n).map(x=>x.url));
  for(const url of urls){
   const filename=url.split('/').at(-1);
-  assert.match(filename,/^demo-bag-0[1-4]-(front|detail)\\.jpg$/);
+  assert.match(filename,/^demo-bag-0[1-4]-(front|detail)\.jpg$/);
   const file=fileURLToPath(new URL('../assets/catalog/'+filename,import.meta.url));
   const bytes=await readFile(file);
   assert.ok(bytes.length>10000 && bytes.length<300000,filename+' byte count '+bytes.length);
