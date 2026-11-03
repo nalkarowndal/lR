@@ -8,7 +8,7 @@ if(config.DB_NAME!=='lr_test'||config.NODE_ENV==='production'){
 }
 const pool=openPool(config);
 try{
- const filenames=['001_test_schema.sql','002_test_hold_requests.sql','003_test_auth.sql','004_test_demo_payment.sql','005_test_toss_reconciliation.sql','006_test_service_requests.sql','007_test_erp_outbox.sql','008_portfolio_experience_orders.sql','009_saved_collections.sql','010_portfolio_store_orders.sql'];
+ const filenames=['001_test_schema.sql','002_test_hold_requests.sql','003_test_auth.sql','004_test_demo_payment.sql','005_test_toss_reconciliation.sql','006_test_service_requests.sql','007_test_erp_outbox.sql','008_portfolio_experience_orders.sql','009_saved_collections.sql','010_portfolio_store_orders.sql','011_editorial_media_rights.sql'];
  let installed=0;
  for(const filename of filenames){
    const sql=await readFile(fileURLToPath(new URL('../sql/'+filename,import.meta.url)),'utf8');

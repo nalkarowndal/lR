@@ -92,6 +92,9 @@ test('unconfigured URL cannot produce a mock HTTP request',()=>{
 });
 
 test('product media contract rejects insecure and deceptive external origins',()=>{
+ const previous=process.env.EXPO_PUBLIC_MEDIA_HOSTS;
+ process.env.EXPO_PUBLIC_MEDIA_HOSTS='cdn.example.invalid';
+ try{
  const parsed=parseProduct({...sample,media:[
   {url:'https://cdn.example.invalid/catalog/bag.webp',alt:'제품 앞면 예시 사진'}
  ]});
@@ -104,4 +107,18 @@ test('product media contract rejects insecure and deceptive external origins',()
  assert.throws(()=>parseProduct({...sample,media:[{url:'https://cdn.example.invalid/x.webp',alt:''}]}),ApiError);
  assert.throws(()=>parseProduct({...sample,media:Array(9).fill({url:'https://cdn.example.invalid/x.webp',alt:'테스트'})}),ApiError);
  assert.deepEqual(parseProduct(sample).media,[]);
+ for(const url of ['https://unlicensed.invalid/x.webp','https://cdn.example.invalid/a.svg',
+  'https://cdn.example.invalid/a.webp?tracking=1']){
+  assert.throws(()=>parseProduct({...sample,media:[{url,alt:'시연 상품'}]}),ApiError);
+ }
+ }finally{if(previous===undefined)delete process.env.EXPO_PUBLIC_MEDIA_HOSTS;
+  else process.env.EXPO_PUBLIC_MEDIA_HOSTS=previous;}
+});
+test('media is suppressed unless the client approved-origin configuration is supplied',()=>{
+ const saved=process.env.EXPO_PUBLIC_MEDIA_HOSTS;
+ delete process.env.EXPO_PUBLIC_MEDIA_HOSTS;
+ try{assert.throws(()=>parseProduct({...sample,media:[{
+  url:'https://cdn.example.invalid/catalog/bag.webp',alt:'시연용 가방 정면'
+ }]}),ApiError);}
+ finally{if(saved!==undefined)process.env.EXPO_PUBLIC_MEDIA_HOSTS=saved;}
 });

@@ -16,14 +16,21 @@ export function ProductVisual({background,small=false,product,mediaIndex=0}:{
  background:Product['art'];small?:boolean;product?:Product;mediaIndex?:number
 }){
  const media=product?.media?.[mediaIndex];
- const [broken,setBroken]=useState(false);
- useEffect(()=>setBroken(false),[media?.url]);
+ const [broken,setBroken]=useState(false),[loaded,setLoaded]=useState(false);
+ useEffect(()=>{setBroken(false);setLoaded(false)},[media?.url]);
  const height=small?146:280;
  if(media&&!broken)return <View style={{backgroundColor:background,height,borderRadius:14,overflow:'hidden'}}>
-  <Image source={{uri:media.url}} onError={()=>setBroken(true)}
-   accessibilityLabel={media.alt} resizeMode="contain" style={{width:'100%',height:'100%'}}/>
+  {!loaded?<View style={{position:'absolute',left:0,right:0,top:0,bottom:0,
+   alignItems:'center',justifyContent:'center'}}>
+   <Ionicons name="image-outline" size={32} color={colors.sub}/>
+   <Text style={{color:colors.sub,fontSize:12,marginTop:8}}>승인된 이미지 불러오는 중…</Text>
+  </View>:null}
+  <Image source={{uri:media.url}} onLoad={()=>setLoaded(true)} onError={()=>setBroken(true)}
+   accessible accessibilityRole="image" accessibilityLabel={media.alt}
+   resizeMode="contain" style={{width:'100%',height:'100%'}}/>
  </View>;
- return <View accessibilityLabel={product?'시연용 일러스트, '+product.title:'상품 이미지 준비 중'}
+ return <View accessible accessibilityRole="image"
+  accessibilityLabel={product?'시연용 일러스트, '+product.title:'상품 이미지 준비 중'}
   style={{backgroundColor:background,height,borderRadius:14,overflow:'hidden',
    alignItems:'center',justifyContent:'center',gap:7}}>
   <View style={{position:'absolute',width:small?112:210,height:small?112:210,borderRadius:120,

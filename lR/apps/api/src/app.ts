@@ -13,6 +13,7 @@ import {mountAdminDemoOrderRoutes} from './demo-order-admin-routes.js';
 import {mountPortfolioOrderRoutes} from './portfolio-order-routes.js';
 import {mountSavedCollectionRoutes} from './saved-collection-routes.js';
 import {mountStoreIntakeRoutes} from './store-intake-routes.js';
+import {mountEditorialRoutes} from './editorial-routes.js';
 
 const listSchema=z.object({
  q:z.string().trim().max(100).optional(),brand:z.string().trim().max(120).optional(),
@@ -40,7 +41,7 @@ export function createApp(db:Database,{demoMode=false,corsOrigins=[]}:{demoMode?
    if(!origin||!corsOrigins.includes(origin)){next();return;}
    res.setHeader('Access-Control-Allow-Origin',origin);
    res.setHeader('Vary','Origin');
-   res.setHeader('Access-Control-Allow-Methods','GET,POST,PATCH,DELETE,OPTIONS');
+   res.setHeader('Access-Control-Allow-Methods','GET,POST,PUT,PATCH,DELETE,OPTIONS');
    res.setHeader('Access-Control-Allow-Headers','Accept,Content-Type,Authorization,Idempotency-Key');
    res.setHeader('Access-Control-Max-Age','600');
    if(req.method==='OPTIONS'){res.sendStatus(204);return;}
@@ -56,11 +57,14 @@ export function createApp(db:Database,{demoMode=false,corsOrigins=[]}:{demoMode?
  mountPortfolioOrderRoutes(app,db,{demoMode});
  mountSavedCollectionRoutes(app,db,{demoMode});
  mountStoreIntakeRoutes(app,db,{demoMode});
+ mountEditorialRoutes(app,db,{demoMode});
  app.get('/health',(_req,res)=>{res.json({status:'ok'});});
  app.get('/ready',async(req,res)=>{
    try{await db.query('SELECT 1');res.json({status:'ready'});}
    catch{problem(req,res,503,'DATABASE_UNAVAILABLE','Database is not ready');}
  });
+ // Rights revocation must not be masked by browser/proxy-cached product images or metadata.
+ app.use('/api/v1/products',(_req,res,next)=>{res.setHeader('Cache-Control','no-store');next();});
  app.get('/api/v1/products',async(req,res)=>{
    const q=listSchema.parse(req.query);
    const result=await listProducts(db,q);

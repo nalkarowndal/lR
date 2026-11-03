@@ -36,8 +36,14 @@ export function parseProductMedia(value:unknown):ProductMedia[]{
   if(!isObject(item)||typeof item.url!=='string'||typeof item.alt!=='string'||!item.alt.trim()||item.alt.length>160)
    throw new ApiError('CONTRACT','상품 이미지 설명이 올바르지 않습니다');
   let url:URL;try{url=new URL(item.url);}catch{throw new ApiError('CONTRACT','상품 이미지 주소가 잘못되었습니다');}
-  if(url.protocol!=='https:'||!url.hostname||url.username||url.password||item.url.length>2048)
-   throw new ApiError('CONTRACT','상품 이미지는 승인된 HTTPS 출처여야 합니다');
+  const approvedHosts: string=typeof process.env.EXPO_PUBLIC_MEDIA_HOSTS==='string'?process.env.EXPO_PUBLIC_MEDIA_HOSTS:'';
+  const origins=new Set(approvedHosts.split(',')
+   .map((host:string)=>host.trim().toLowerCase()).filter(Boolean));
+  if(url.protocol!=='https:'||!origins.has(url.hostname.toLowerCase())||url.username||url.password||
+   url.port||url.search||url.hash||item.url.length>2048||
+   !/\.(?:webp|avif|png|jpe?g)$/i.test(url.pathname)||
+   /[<>\u0000-\u001f\u007f]/.test(item.alt)||item.alt.trim().length<2)
+   throw new ApiError('CONTRACT','상품 이미지는 사용권을 확인한 HTTPS 출처에서만 제공합니다');
   return {url:item.url,alt:item.alt.trim()};
  });
 }
