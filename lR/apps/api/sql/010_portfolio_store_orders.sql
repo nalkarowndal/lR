@@ -1,4 +1,4 @@
--- M5-2C4-B: STORE channel receipt-only intake; no payment, stock hold or delivery.
+-- M5-2C4-B: STORE channel receipt-only intake, no payment, stock hold or delivery.
 -- Only in isolated lr_test, additive alongside rental portfolio intake.
 CREATE TABLE IF NOT EXISTS lr_portfolio_store_orders (
  id VARCHAR(40) PRIMARY KEY,
