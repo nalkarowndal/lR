@@ -35,6 +35,6 @@ test('signed-in STORE checkout saves an unpaid order, then owner history reads i
  expect(orderId).toMatch(/^[0-9a-f-]{36}$/);
  await page.getByRole('button',{name:'내 스토어 주문 내역 보기'}).click();
  await expect(page.getByText('접수된 스토어 주문',{exact:true})).toBeVisible();
- await page.getByText('The Sera Top Handle').click();
+ await page.getByRole('button',{name:/The Sera Top Handle/}).click();
  await expect(page.getByText('주문번호: '+orderId,{exact:true})).toBeVisible();
 });
