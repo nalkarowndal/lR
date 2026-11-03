@@ -51,3 +51,21 @@ test('real directory scan reads nested .map files, rejects corrupt JSON and empt
   assert.throws(()=>inspectExportDirectory(dir),/INVALID_NATIVE_SOURCE_MAP/);
  }finally{rmSync(dir,{recursive:true,force:true});}
 });
+
+test('handles Metro indexed source maps with embedded sections and refuses unresolved external source-map URLs',()=>{
+ const indexed={version:3,sections:[
+   {offset:{line:0,column:0},map:{version:3,sources:['src/app.tsx']}},
+   {offset:{line:10,column:0},map:{version:3,sections:[
+     {offset:{line:0,column:0},map:{version:3,sources:[
+       'node_modules/@expo/cli/build/metro-require/require.js',
+       'node_modules/glob/dist/index.js'
+     ]}}
+   ]}}
+ ]};
+ const result=inspectSourceMaps([indexed]);
+ assert.equal(result.mapsInspected,1);
+ assert.equal(result.sourceEntriesInspected,3);
+ assert.deepEqual(result.blockedPackageHits.map(x=>x.name),['glob']);
+ assert.throws(()=>inspectSourceMaps([{sections:[{url:'https://example.com/missing.map'}]}]),
+   /INVALID_NATIVE_SOURCE_MAP/);
+});
