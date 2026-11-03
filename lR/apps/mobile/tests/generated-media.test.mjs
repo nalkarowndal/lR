@@ -1,3 +1,5 @@
+import {readFile} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {getGeneratedDemoMedia,isGeneratedDemoMediaUrl} from '../src/domain/generated-media.ts';
@@ -36,4 +38,18 @@ test('a known generated demo image is allowed without arbitrary external media h
    root+'demo-bag-01-front.jpg?download=1'
   ])assert.throws(()=>parseProduct({...sample,media:[{url:wrong,alt:m[0].alt}]}),ApiError);
  }finally{if(previous!==undefined)process.env.EXPO_PUBLIC_MEDIA_HOSTS=previous;}
+});
+
+test('every committed generated gallery asset is a real small JPEG with nonempty pixels',async()=>{
+ const urls=[];
+ for(let n=1;n<=4;n++)urls.push(...getGeneratedDemoMedia('demo-bag-0'+n).map(x=>x.url));
+ for(const url of urls){
+  const filename=url.split('/').at(-1);
+  assert.match(filename,/^demo-bag-0[1-4]-(front|detail)\\.jpg$/);
+  const file=fileURLToPath(new URL('../assets/catalog/'+filename,import.meta.url));
+  const bytes=await readFile(file);
+  assert.ok(bytes.length>10000 && bytes.length<300000,filename+' byte count '+bytes.length);
+  assert.equal(bytes[0],0xff);assert.equal(bytes[1],0xd8);
+  assert.equal(bytes[bytes.length-2],0xff);assert.equal(bytes[bytes.length-1],0xd9);
+ }
 });
