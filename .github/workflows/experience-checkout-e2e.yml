@@ -71,7 +71,7 @@ jobs:
             sleep 1
           done
           curl --fail http://127.0.0.1:4000/ready
-      - name: Run signed-in checkout and ADMIN read in live Chromium
+      - name: Run signed-in checkout and saved order history in live Chromium
         env:
           NODE_ENV: development
         run: npm run qa:web --workspace @luxuryrental/mobile -- e2e/m5-experience-live.spec.ts
