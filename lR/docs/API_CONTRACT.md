@@ -1,6 +1,6 @@
 # M1 API_CONTRACT — luxuryRental Node.js REST API v1.0
 
-**상태:** 계약 설계 기준선, **미구현**. **일자:** 2026-11-02.  
+**상태:** M1 설계 기준선(일부 구현 완료). 실제 실행된 기능·검증 증거는 아래 M5-2C3 현황 및 [프로젝트 상태](PROJECT_STATUS.md)에서 확인한다. **일자:** 2026-11-02.  
 **런타임:** Node.js + Express 5 + TypeScript, MySQL/InnoDB 우선, JSON REST. `/api/v1`는 향후 기본 URL prefix.  
 **고정 근거:** [REQUIREMENTS](REQUIREMENTS.md) / [DATA_MODEL](DATA_MODEL.md) / [USER_FLOWS](USER_FLOWS.md).
 
@@ -175,4 +175,22 @@ M3 작업 전 OpenAPI 3.1 문서를 생성하고 이 표의 DTO 차이에 대한
 - [TossPayments 금액 검증과 서버 최종 승인](https://docs.tosspayments.com/guides/v2/get-started/llms-quick-reference)
 - [MySQL InnoDB locking reads](https://dev.mysql.com/doc/refman/8.4/en/innodb-locking-reads.html)
 
-**설계용 문서이며 현재 실행되는 API를 의미하지 않는다.**
+**위 M1 설계 계약은 향후 목표도 포함하며 전체가 구현됐다는 뜻이 아니다.** 아래 M5-2C3는 실제 `lr_test` 실행 API 계약을 따로 기록한다.
+
+## 8. M5-2C3 구현 완료 — 비금전 체험 주문 접수 API
+
+**API가 저장하는 실체는 `lr_portfolio_orders`의 주문 접수 기록이다.** 상용 주문·예약/재고 홀드·PG 승인·배송 처리는 아니다. `APP_MODE=demo` + `NODE_ENV=test` + `DB_NAME=lr_test`가 모두 일치해야 라우트가 열리고 DB 세션에서 인증된 actor ID만 사용한다.
+
+| Method & path | RBAC | 내용 |
+|---|---|---|
+| `POST /api/v1/experience/orders` | 로그인 | `Idempotency-Key: <UUID>` 필수. 허용된 상품/날짜·옵션을 서버에서 검사하고 가격 재계산 후 접수 201, 동일 재전송 200, 키 충돌 409 |
+| `GET /api/v1/experience/orders?limit=20&offset=0` | 로그인 | 로그인한 사용자의 접수 목록만 조회 |
+| `GET /api/v1/experience/orders/:id` | 소유자 | 서버 저장 주문 상세, 타인 주문은 404 |
+| `GET /api/v1/admin/experience/orders?limit=20&offset=0` | ADMIN | 내부 접수 전체 목록(읽기 전용), 고객 이메일·비밀번호·실주소/전화 미포함 |
+
+생성 요청 본문 예시는 `{ "productId":"demo-bag-01","startDate":"2026-11-10","returnDate":"2026-11-13","paymentMethod":"CARD","deliveryMethod":"COURIER","deliveryPreset":"SAMPLE_SEOUL" }` 이며 결제수단은 `CARD|TRANSFER|EASY_PAY`, 수령방식은 `COURIER+SAMPLE_SEOUL|PICKUP+SHOWROOM`만 허용한다. 카드번호·실주소·금액·결제상태/주문상태 입력은 스키마에 없으므로 422. 금액은 서버의 유효한 RENTAL offer로 계산하고 재고 가능성만 확인하며 **예약/재고 할당은 하지 않는다**.
+
+응답 `data`의 `orderId`·`productId`·`title`·`startDate`·`returnDate`·`rentalDays`·`paymentMethod`·`deliveryMethod`·`deliveryPreset`·`rentalFeeKrw`·`depositKrw`·`payableKrw`·`status:RECEIVED`·`paymentStatus:NOT_CHARGED`·`demo:true`·`createdAt`는 실제 서버 DB 접수 결과를 나타낸다. 결제·배송 상태가 변경되었다고 해석하면 안 된다. 요청·응답 모두 서버 ACL 검증 및 `Cache-Control: no-store`를 따른다.
+
+**차단 유지:** `POST /api/v1/orders`, `POST /api/v1/payments/confirm` → 501. 판매완료, 실대여 계약, 보증금 청구/환불, PG 키 연결, 고객 실주소 수집은 여전히 미구현·미승인. [코드·CI·차이 상세](M5_2C3_PORTFOLIO_ORDER_INTAKE.md).
+

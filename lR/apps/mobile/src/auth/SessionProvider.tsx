@@ -1,6 +1,7 @@
 import React,{createContext,useCallback,useContext,useEffect,useMemo,useRef,useState} from 'react';
 import {apiBaseUrl} from '../api/client';
 import {createAdminDemoOrdersClient,type DemoAdminOrder,type DemoAdminDetail} from './admin-demo-orders';
+import {createExperienceOrdersClient,type ExperienceOrder,type ExperienceOrderInput} from './experience-orders';
 import {createDemoAuthClient,AuthError,sessionIsCurrent,type Identity,type TokenSession} from './api';
 import {readNativeSession,writeNativeSession,clearNativeSession} from './token-storage';
 import {useAppState} from '../state/AppState';
@@ -14,6 +15,10 @@ interface Context{
  refresh:()=>Promise<void>;
  listAdminDemoOrders:()=>Promise<DemoAdminOrder[]>;
  getAdminDemoOrder:(id:string)=>Promise<DemoAdminDetail>;
+ createExperienceOrder:(input:ExperienceOrderInput,key:string)=>Promise<ExperienceOrder>;
+ listExperienceOrders:()=>Promise<ExperienceOrder[]>;
+ getExperienceOrder:(id:string)=>Promise<ExperienceOrder>;
+ listAdminExperienceOrders:()=>Promise<ExperienceOrder[]>;
 }
 const Ctx=createContext<Context|null>(null);
 const client=()=>{
@@ -113,8 +118,27 @@ export function SessionProvider({children}:{children:React.ReactNode}){
   if(!base)throw new AuthError('테스트 API 주소가 설정되지 않았습니다');
   return createAdminDemoOrdersClient(base).detail(token,id);
  },[adminToken]);
- const value=useMemo<Context>(()=>({status,busy,identity,error,login,register,logout,refresh,listAdminDemoOrders,getAdminDemoOrder}),
-  [status,busy,identity,error,login,register,logout,refresh,listAdminDemoOrders,getAdminDemoOrder]);
+ const experienceToken=useCallback(()=>{
+  const current=saved.current;
+  if(status!=='signed-in'||!identity||!sessionIsCurrent(current))
+   throw new AuthError('주문 접수를 위해 테스트 계정 로그인이 필요합니다',401,'UNAUTHENTICATED');
+  return current!.accessToken;
+ },[status,identity]);
+ const experienceClient=()=>{
+  const base=apiBaseUrl();
+  if(!base)throw new AuthError('주문 접수 API가 설정되지 않았습니다');
+  return createExperienceOrdersClient(base);
+ };
+ const createExperienceOrder=useCallback(async(input:ExperienceOrderInput,key:string)=>
+  experienceClient().create(experienceToken(),key,input),[experienceToken]);
+ const listExperienceOrders=useCallback(async()=>experienceClient().list(experienceToken()),[experienceToken]);
+ const getExperienceOrder=useCallback(async(id:string)=>
+  experienceClient().detail(experienceToken(),id),[experienceToken]);
+ const listAdminExperienceOrders=useCallback(async()=>experienceClient().adminList(adminToken()),[adminToken]);
+ const value=useMemo<Context>(()=>({status,busy,identity,error,login,register,logout,refresh,
+  listAdminDemoOrders,getAdminDemoOrder,createExperienceOrder,listExperienceOrders,getExperienceOrder,listAdminExperienceOrders}),
+  [status,busy,identity,error,login,register,logout,refresh,listAdminDemoOrders,getAdminDemoOrder,
+   createExperienceOrder,listExperienceOrders,getExperienceOrder,listAdminExperienceOrders]);
  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 export function useDemoSession(){const c=useContext(Ctx);if(!c)throw new Error('SessionProvider missing');return c;}

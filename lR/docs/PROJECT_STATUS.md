@@ -99,6 +99,15 @@
 - **범위 한계:** 상태 조회 **읽기 전용**(검수/변경 API 없음). 고객용 M5-2C1의 React 세션 영수는 백엔드에 저장되지 않으므로 관리자 화면에 표시되지 않는다. 운영 주문/결제 `POST /api/v1/orders`, `/api/v1/payments/confirm`은 501; 실제 PG·배송·예약/환불·ERP·민감정보 취급 승인 전 계속 금지
 - **다음:** M5-2C3 — 포트폴리오 브라우저용 **격리된 테스트 데이터 시드·관리자 E2E 연계 검증**을 설계하고, 승인·정책 없는 운영 거래와의 혼동을 피할 것. [Issue #19](https://github.com/nalkarowndal/lR/issues/19) 최종 UI/이미지 고도화는 기능 완료 후
 
+## M5-2C3 — API 기반 체험 주문 접수·완료·내역 (2026-11-03)
+
+- **목표:** 포트폴리오에서 사용자가 결제수단·수령방식 선택 → **주문 접수** → 서버 저장 주문번호/결과 확인 → 내 주문 내역·관리자 접수 목록 조회를 경험. [상세 계약·안전 범위](M5_2C3_PORTFOLIO_ORDER_INTAKE.md), [PR #40](https://github.com/nalkarowndal/lR/pull/40)
+- **구현:** 격리 `lr_test`의 `lr_portfolio_orders` + Node `POST/GET /api/v1/experience/orders`, `GET /api/v1/experience/orders/:id`, `GET /api/v1/admin/experience/orders`; Expo 주문서(결제수단 카드/계좌이체/간편결제·택배/방문 선택)·주문 접수 결과·내역·관리자 읽기 화면. 고객 계정 인증/소유권·서버 가격 재계산·중복 제출 방지
+- **검증:** [Node API #41577706132](https://github.com/nalkarowndal/lR/actions/runs/41577706132) **116/116**, live HTTP **6/6** PASS. [Mobile #41577706051](https://github.com/nalkarowndal/lR/actions/runs/41577706051) **37/37**·Expo web export PASS. [실제 Chromium→Expo→API→MySQL #41577706025](https://github.com/nalkarowndal/lR/actions/runs/41577706025) **3/3** PASS(360/390/768px, 테스트 계정 등록/로그인→선택→접수→완료→내역). 기존 모드 [M4N #41577706003](https://github.com/nalkarowndal/lR/actions/runs/41577706003)의 회귀 결과는 해당 실행 링크 기준
+- **안전 구분:** HTTP API **실제로 주문 접수 레코드를 저장**하지만 금융 거래가 아니라 `status=RECEIVED`, `paymentStatus=NOT_CHARGED`이며 **재고 홀드·실예약·배송·PG 호출이 없음**. 가상 수령지 선택만 저장, 전화번호·실주소·카드번호 불수집. `APP_MODE=demo` + `NODE_ENV=test` + `DB_NAME=lr_test` 및 관리자 RBAC 이외 501/401/403, `POST /api/v1/orders`와 실결제 승인 API는 기존대로 501
+- **차이:** M5-2C1 오프라인 모의 결제는 **React 메모리 세션에만** 기록되며 재로드 후 삭제. 본 M5-2C3 API 모드에서 접수한 주문만 별도 DB `lr_portfolio_orders`에 **로그인 소유자로 영속 저장**되고, M5-2C2의 결제검증 원장 `lr_demo_orders`와는 서로 다른 데이터. 자동 관리자 결제 승인/환불은 없다
+- **다음 API 보완:** 고객 장바구니·찜 서버 저장, 스토어 구매 주문 입력/접수, 기존 수선·위탁 신청 UI의 서버 API 연결, 편집/상품 이미지 관리. 정책·실PG·실배송·운영 계정/운영 DB 및 외부 ERP는 별도 승인 범위, Native Android/iOS 실기기 QA는 사용자 결정으로 SKIPPED
+
 ## 다음 연속 작업 패키지
 
 > **이하 M4~M6 항목은 이전 작업 패키지의 이력 기록입니다.** 2026-11-03 이후 우선순위와 네이티브 기기 QA 제외 결정은 위 M5-2C2 및 [웹 QA 범위](WEB_PORTFOLIO_QA_SCOPE.md)가 우선합니다.

@@ -83,3 +83,18 @@ These endpoints are **read-only, TEST ONLY**. They require `APP_MODE=demo`, `NOD
 A user with ADMIN in **isolated test** `lr_user_roles` can navigate My → 테스트 결제 원장 검수 in the Expo browser app after signing in over localhost or HTTPS. Synthetic fixture seeding does **not** create sample payment orders automatically; local internal integration tests or another explicitly isolated fixture must generate entries. Browser-session mock receipts from M5-2C1 **are not persisted** and therefore will not be listed.
 
 [Detailed contract, QA, and limitations](../../docs/M5_2C2_ADMIN_LEDGER_READ.md).
+
+## M5-2C3 portfolio order intake (server-persisted, NO real charge)
+
+**Only for** `APP_MODE=demo` + `NODE_ENV=test` + `DB_NAME=lr_test`, with authenticated DB-backed customer sessions:
+
+```
+POST /api/v1/experience/orders
+GET  /api/v1/experience/orders?limit=20&offset=0
+GET  /api/v1/experience/orders/:id
+GET  /api/v1/admin/experience/orders?limit=20&offset=0   # ADMIN only
+```
+
+`POST` requires `Idempotency-Key: <UUID>` and strict JSON `{productId,startDate,returnDate,paymentMethod,deliveryMethod,deliveryPreset}`; only allowed non-financial options are accepted. No client amount, status or real buyer identity/addresses. API **recalculates rental fee/deposit** from the sample offer; same user + key replay is 200, new order 201, conflicting payload 409. Response `status=RECEIVED` and `paymentStatus=NOT_CHARGED`, `demo=true`. No inventory hold, fulfillment, PG call or sale is created. It persists a **portfolio-only intake record** in `lr_portfolio_orders` and offers owner-scoped GET; original `POST /api/v1/orders` and `/api/v1/payments/confirm` remain 501.
+
+Run guarded `db:migrate:test` to install `008_portfolio_experience_orders.sql`, then `api:test`. [Live customer browser API/MySQL test #41577706025](https://github.com/nalkarowndal/lR/actions/runs/41577706025) verifies the actual checkout and history across 360/390/768px; see [full contract and safety notes](../../docs/M5_2C3_PORTFOLIO_ORDER_INTAKE.md).

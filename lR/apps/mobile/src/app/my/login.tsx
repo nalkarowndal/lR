@@ -58,7 +58,7 @@ export default function DemoLogin(){
   </Panel>
   <Panel><Heading>서비스 출시 전 필수 항목</Heading>
    <Body muted>이메일 인증·비밀번호 복구·다중기기 세션·개인정보 동의·봇 방어 및 보안 심사 완료 전 실제 고객 계정을 받지 않습니다.</Body>
-   <Body muted>테스트 계정으로 로그인해도 렌탈 홀드/실주문/결제는 모바일에서 실행하지 않습니다.</Body>
+   <Body muted>테스트 계정으로 체험 주문 접수 내역을 서버에 저장할 수 있지만, 실제 결제·예약 확정·배송은 진행되지 않습니다.</Body>
   </Panel>
  </Screen>;
 }

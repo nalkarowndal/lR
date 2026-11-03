@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createApiClient,ApiError} from '../src/api/client.ts';
 import {createDemoAuthClient,AuthError} from '../src/auth/api.ts';
+import {createExperienceOrdersClient} from '../src/auth/experience-orders.ts';
 import {randomUUID} from 'node:crypto';
 
 const client=createApiClient(process.env.TEST_API_URL||'http://127.0.0.1:4000');
@@ -55,4 +56,36 @@ test('M5 demo user can register, log in, verify /me, rotate, and revoke via live
  assert.equal(me2.userId,registered.userId);
  await auth.logout(rotated.accessToken);
  await assert.rejects(()=>auth.me(rotated.accessToken),e=>e instanceof AuthError&&e.status===401);
+});
+
+test('M5-2C3 user creates persisted order over real Node/MySQL API, reopens history and has zero charge',async()=>{
+ if(process.env.DB_NAME!=='lr_test'||process.env.NODE_ENV!=='test')throw Error('Live intake integration requires lr_test');
+ const base=process.env.TEST_API_URL||'http://127.0.0.1:4000';
+ const auth=createDemoAuthClient(base),orders=createExperienceOrdersClient(base);
+ const email='m5-order-'+randomUUID().slice(0,13)+'@example.invalid';
+ const password='isolated-portfolio-order-2026';
+ await auth.register(email,password);
+ const logged=await auth.login(email,password);
+ const payload={productId:'demo-bag-01',startDate:'2026-11-10',returnDate:'2026-11-13',
+  paymentMethod:'EASY_PAY',deliveryMethod:'PICKUP',deliveryPreset:'SHOWROOM'};
+ const key=randomUUID();
+ const created=await orders.create(logged.accessToken,key,payload);
+ assert.equal(created.status,'RECEIVED');
+ assert.equal(created.paymentStatus,'NOT_CHARGED');
+ assert.equal(created.payableKrw,184000);
+ assert.equal(created.deliveryPreset,'SHOWROOM');
+ const replay=await orders.create(logged.accessToken,key,payload);
+ assert.equal(replay.orderId,created.orderId);
+ const detail=await orders.detail(logged.accessToken,created.orderId);
+ assert.equal(detail.orderId,created.orderId);
+ assert.equal(detail.paymentStatus,'NOT_CHARGED');
+ const mine=await orders.list(logged.accessToken);
+ assert.equal(mine.filter(row=>row.orderId===created.orderId).length,1);
+ const another='m5-other-'+randomUUID().slice(0,12)+'@example.invalid';
+ await auth.register(another,password);
+ const outsider=await auth.login(another,password);
+ await assert.rejects(()=>orders.detail(outsider.accessToken,created.orderId),
+  e=>e instanceof AuthError&&e.status===404);
+ await auth.logout(outsider.accessToken);
+ await auth.logout(logged.accessToken);
 });

@@ -1,0 +1,87 @@
+name: Portfolio saved checkout live browser E2E
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'lR/apps/api/**'
+      - 'lR/apps/mobile/**'
+      - '.github/workflows/experience-checkout-e2e.yml'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: lR
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: testpass
+          MYSQL_DATABASE: lr_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -p$$MYSQL_ROOT_PASSWORD"
+          --health-interval=5s
+          --health-timeout=4s
+          --health-retries=20
+    env:
+      NODE_ENV: test
+      APP_MODE: demo
+      API_HOST: 127.0.0.1
+      API_PORT: '4000'
+      API_CORS_ORIGINS: http://127.0.0.1:8081
+      DB_HOST: 127.0.0.1
+      DB_PORT: '3306'
+      DB_USER: root
+      DB_PASSWORD: testpass
+      DB_NAME: lr_test
+      EXPO_PUBLIC_API_URL: http://127.0.0.1:4000
+      CI: '1'
+      EXPO_NO_TELEMETRY: '1'
+      M4N_MODE: experience-live
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: lR/package-lock.json
+      - name: Install exact workspaces
+        run: npm ci --include=dev --no-audit --no-fund
+      - name: Build API
+        run: npm run api:build
+      - name: Apply strictly isolated additive SQL schema
+        run: npm run db:migrate:test --workspace @luxuryrental/api
+      - name: Seed synthetic catalog only
+        run: npm run db:seed:test --workspace @luxuryrental/api
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Start strictly test-only API
+        run: |
+          npm run start --workspace @luxuryrental/api > /tmp/portfolio-order-e2e-api.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:4000/ready > /dev/null; then break; fi
+            sleep 1
+          done
+          curl --fail http://127.0.0.1:4000/ready
+      - name: Run signed-in checkout and saved order history in live Chromium
+        env:
+          NODE_ENV: development
+        run: npm run qa:web --workspace @luxuryrental/mobile -- e2e/m5-experience-live.spec.ts
+      - name: Upload screenshots and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portfolio-order-live-e2e-${{ github.run_id }}
+          path: |
+            lR/apps/mobile/playwright-report/
+            lR/apps/mobile/test-results/
+          if-no-files-found: warn
+          retention-days: 14

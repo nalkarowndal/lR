@@ -3,6 +3,7 @@ import {Text,View} from 'react-native';
 import {useRouter} from 'expo-router';
 import {useDemoSession} from '../../auth/SessionProvider';
 import type{DemoAdminOrder,DemoAdminDetail} from '../../auth/admin-demo-orders';
+import type{ExperienceOrder} from '../../auth/experience-orders';
 import {Screen,Panel,Heading,Body,Action,RowLink,DemoNotice} from '../../components/ui';
 import {Back} from '../../components/Back';
 import {colors,formatKrw} from '../../theme';
@@ -10,21 +11,29 @@ import {colors,formatKrw} from '../../theme';
 export default function AdminDemoOrders(){
  const router=useRouter(),session=useDemoSession();
  const [orders,setOrders]=useState<DemoAdminOrder[]>([]);
+ const [received,setReceived]=useState<ExperienceOrder[]>([]);
+ const [receiveError,setReceiveError]=useState<string|null>(null);
  const [selected,setSelected]=useState<DemoAdminDetail|null>(null);
  const [loading,setLoading]=useState(false),[error,setError]=useState<string|null>(null);
  const [detailBusy,setDetailBusy]=useState(false),[refresh,setRefresh]=useState(0);
  const allowed=session.status==='signed-in'&&session.identity?.roles.includes('ADMIN')===true;
  useEffect(()=>{
-  if(!allowed){setOrders([]);setSelected(null);setError(null);return;}
+  if(!allowed){setOrders([]);setReceived([]);setSelected(null);setError(null);setReceiveError(null);return;}
   let live=true;
   setLoading(true);setError(null);setSelected(null);
+  setReceiveError(null);
+  void session.listAdminExperienceOrders().then(items=>{
+   if(live)setReceived(items);
+  }).catch(err=>{
+   if(live){setReceived([]);setReceiveError(err instanceof Error?err.message:'접수 목록을 조회할 수 없습니다');}
+  });
   void session.listAdminDemoOrders().then(items=>{
    if(live)setOrders(items);
   }).catch(err=>{
    if(live){setOrders([]);setError(err instanceof Error?err.message:'테스트 원장을 확인할 수 없습니다');}
   }).finally(()=>{if(live)setLoading(false)});
   return()=>{live=false};
- },[allowed,session.listAdminDemoOrders,refresh]);
+ },[allowed,session.listAdminDemoOrders,session.listAdminExperienceOrders,refresh]);
  const select=async(orderId:string)=>{
   if(!allowed||detailBusy)return;
   setSelected(null);setDetailBusy(true);setError(null);
@@ -39,6 +48,16 @@ export default function AdminDemoOrders(){
     <Body muted>관리자 권한이 확인된 테스트 API 세션에서만 모의 결제 원장을 볼 수 있습니다. 표시할 가짜 서버 기록을 생성하지 않습니다.</Body>
     <Action label="마이페이지로 돌아가기" onPress={()=>router.replace('/(tabs)/my')}/>
    </Panel>:<>
+   <Panel>
+    <Heading>고객 주문 접수 현황</Heading>
+    <Body muted>서버에 제출된 체험 주문의 접수 상태를 읽기 전용으로 조회합니다. 실제 결제 승인이나 배송 요청은 아닙니다.</Body>
+    {received.length===0&&!receiveError?<Body muted>접수된 주문이 없습니다.</Body>:null}
+    {received.map(item=><View key={item.orderId} style={{gap:4,paddingVertical:6}}>
+     <Body>{item.title} · 접수 완료 · 미결제</Body>
+     <Body muted>{formatKrw(item.payableKrw)} · 주문번호 {item.orderId}</Body>
+    </View>)}
+    {receiveError?<Text accessibilityRole="alert" style={{color:colors.error}}>{receiveError}</Text>:null}
+   </Panel>
    <Panel>
     <Heading>관리자 검수 목록</Heading>
     <Body muted>이 목록은 격리된 lr_test 내부 원장의 모의 거래입니다. 앞서 고객 화면에서 선택한 브라우저 세션의 결제 시뮬레이션과 연결되지 않으며 실제 주문·결제·예약이 아닙니다.</Body>

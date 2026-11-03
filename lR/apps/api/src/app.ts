@@ -10,6 +10,7 @@ import {mountAuthRoutes} from './auth.js';
 import {mountRentalHoldRoutes} from './rental-hold-routes.js';
 import {mountServiceRequestRoutes} from './service-request-routes.js';
 import {mountAdminDemoOrderRoutes} from './demo-order-admin-routes.js';
+import {mountPortfolioOrderRoutes} from './portfolio-order-routes.js';
 
 const listSchema=z.object({
  q:z.string().trim().max(100).optional(),brand:z.string().trim().max(120).optional(),
@@ -50,6 +51,7 @@ export function createApp(db:Database,{demoMode=false,corsOrigins=[]}:{demoMode?
  mountRentalHoldRoutes(app,db,{demoMode});
  mountServiceRequestRoutes(app,db,{demoMode});
  mountAdminDemoOrderRoutes(app,db,{demoMode});
+ mountPortfolioOrderRoutes(app,db,{demoMode});
  app.get('/health',(_req,res)=>{res.json({status:'ok'});});
  app.get('/ready',async(req,res)=>{
    try{await db.query('SELECT 1');res.json({status:'ready'});}

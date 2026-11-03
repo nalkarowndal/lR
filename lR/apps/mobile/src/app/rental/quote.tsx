@@ -1,6 +1,7 @@
 import {Text,View} from 'react-native';
 import {useRouter} from 'expo-router';
 import {useQuote,useProduct} from '../../api/hooks';
+import {apiEnabled} from '../../api/client';
 import {useAppState} from '../../state/AppState';
 import {colors,formatKrw} from '../../theme';
 import {Screen,Panel,Heading,Body,Action,DemoNotice,Badge} from '../../components/ui';
@@ -34,6 +35,6 @@ export default function Quote(){
    <Text style={{fontSize:27,fontWeight:'900',color:colors.ink}}>{formatKrw(quote.payableNowKrw)}</Text>
    <Body muted>{quote.disclaimer} · 견적 만료(한국 시간): {koreanExpiry(quote.quoteExpiresAt)}</Body>
   </Panel>
-  <Action label="렌탈 주문서 미리보기 (실제 결제 없음)" onPress={()=>router.push('/rental/checkout')}/></>:null}
+  <Action label={apiEnabled()?"주문서 작성하기":"렌탈 주문서 미리보기 (실제 결제 없음)"} onPress={()=>router.push('/rental/checkout')}/></>:null}
  </Screen>;
 }
