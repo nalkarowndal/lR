@@ -10,7 +10,7 @@ export interface AdminEditorial{
  publishedRevision:number;demo:true;
 }
 export interface MediaRightsRow{
- productId:string;title:string;registeredCount:number;rightsApprovedCount:number;
+ productId:string;title:string;registeredCount:number;rightsApprovedCount:number;generatedCount:number;
  displayReady:boolean;reason:string;
 }
 export const defaultHomeEditorial:EditorialCopy={
@@ -55,12 +55,12 @@ export function parseRightsReport(raw:unknown):MediaRightsRow[]{
   throw new AuthError('미디어 권리 보고서 응답이 올바르지 않습니다');
  return d.map((r:unknown)=>{
   if(!obj(r)||typeof r.productId!=='string'||!r.productId.length||r.productId.length>40||
-   !safeString(r.title,2,255)||!nonNegativeInteger(r.registeredCount)||!nonNegativeInteger(r.rightsApprovedCount)||
+   !safeString(r.title,2,255)||!nonNegativeInteger(r.registeredCount)||!nonNegativeInteger(r.rightsApprovedCount)||!nonNegativeInteger(r.generatedCount)||
    r.rightsApprovedCount>r.registeredCount||typeof r.displayReady!=='boolean'||
    !safeString(r.reason,2,255))
    throw new AuthError('미디어 권리 보고서 항목이 올바르지 않습니다');
   return {productId:r.productId,title:r.title,registeredCount:r.registeredCount,
-   rightsApprovedCount:r.rightsApprovedCount,displayReady:r.displayReady,reason:r.reason};
+   rightsApprovedCount:r.rightsApprovedCount,generatedCount:r.generatedCount,displayReady:r.displayReady,reason:r.reason};
  });
 }
 export function createEditorialClient(base:string,fetcher:HttpFetch=fetch){
