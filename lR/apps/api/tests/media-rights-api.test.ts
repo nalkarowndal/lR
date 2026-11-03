@@ -26,6 +26,7 @@ async function admin(){
 test('product JSON explicitly has empty media by default and no public upload endpoint',async()=>{
  const list=await request(app).get('/api/v1/products?brand=DEMO');
  assert.equal(list.status,200);
+ assert.match(String(list.headers['cache-control']),/no-store/);
  assert.deepEqual(list.body.data[0].media,[]);
  const detail=await request(app).get('/api/v1/products/demo-bag-01');
  assert.deepEqual(detail.body.data.media,[]);
