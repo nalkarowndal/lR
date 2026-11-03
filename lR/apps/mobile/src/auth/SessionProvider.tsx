@@ -5,6 +5,7 @@ import {createExperienceOrdersClient,type ExperienceOrder,type ExperienceOrderIn
 import {createDemoAuthClient,AuthError,sessionIsCurrent,type Identity,type TokenSession} from './api';
 import {readNativeSession,writeNativeSession,clearNativeSession} from './token-storage';
 import {createSavedCollectionsClient,type SavedList} from './saved-collections';
+import {createStoreOrdersClient,type StoreOrder,type StoreOrderInput} from './store-orders';
 
 type Status='restoring'|'guest'|'signed-in';
 interface Context{
@@ -22,6 +23,10 @@ interface Context{
  listSaved:(kind:SavedList)=>Promise<string[]>;
  addSaved:(kind:SavedList,id:string)=>Promise<string[]>;
  removeSaved:(kind:SavedList,id:string)=>Promise<void>;
+ createStoreOrder:(input:StoreOrderInput,key:string)=>Promise<StoreOrder>;
+ listStoreOrders:()=>Promise<StoreOrder[]>;
+ getStoreOrder:(id:string)=>Promise<StoreOrder>;
+ listAdminStoreOrders:()=>Promise<StoreOrder[]>;
 }
 const Ctx=createContext<Context|null>(null);
 const client=()=>{
@@ -147,11 +152,21 @@ export function SessionProvider({children}:{children:React.ReactNode}){
  const removeSaved=useCallback(async(kind:SavedList,id:string)=>{
   await savedClient().remove(experienceToken(),kind,id);
  },[experienceToken]);
+ const storeClient=()=>{
+  const base=apiBaseUrl();
+  if(!base)throw new AuthError('테스트 스토어 주문 API가 설정되지 않았습니다');
+  return createStoreOrdersClient(base);
+ };
+ const createStoreOrder=useCallback(async(input:StoreOrderInput,key:string)=>
+  storeClient().create(experienceToken(),key,input),[experienceToken]);
+ const listStoreOrders=useCallback(async()=>storeClient().list(experienceToken()),[experienceToken]);
+ const getStoreOrder=useCallback(async(id:string)=>storeClient().detail(experienceToken(),id),[experienceToken]);
+ const listAdminStoreOrders=useCallback(async()=>storeClient().adminList(adminToken()),[adminToken]);
  const value=useMemo<Context>(()=>({status,busy,identity,error,login,register,logout,refresh,
   listAdminDemoOrders,getAdminDemoOrder,createExperienceOrder,listExperienceOrders,getExperienceOrder,listAdminExperienceOrders,
-  listSaved,addSaved,removeSaved}),
+  listSaved,addSaved,removeSaved,createStoreOrder,listStoreOrders,getStoreOrder,listAdminStoreOrders}),
   [status,busy,identity,error,login,register,logout,refresh,listAdminDemoOrders,getAdminDemoOrder,
-   createExperienceOrder,listExperienceOrders,getExperienceOrder,listAdminExperienceOrders,listSaved,addSaved,removeSaved]);
+   createExperienceOrder,listExperienceOrders,getExperienceOrder,listAdminExperienceOrders,listSaved,addSaved,removeSaved,createStoreOrder,listStoreOrders,getStoreOrder,listAdminStoreOrders]);
  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 export function useDemoSession(){const c=useContext(Ctx);if(!c)throw new Error('SessionProvider missing');return c;}
