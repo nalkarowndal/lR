@@ -3,9 +3,9 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
-      - 'apps/mobile/**'
-      - 'package.json'
-      - 'package-lock.json'
+      - 'lR/apps/mobile/**'
+      - 'lR/package.json'
+      - 'lR/package-lock.json'
       - '.github/workflows/m4n-visual.yml'
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -14,6 +14,9 @@ permissions:
   contents: read
 jobs:
   visual:
+    defaults:
+      run:
+        working-directory: lR
     name: Chromium ${{ matrix.mode }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -32,7 +35,7 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: package-lock.json
+          cache-dependency-path: lR/package-lock.json
       - name: Install npm workspaces
         run: npm ci --include=dev --no-audit --no-fund
       - name: Install Chromium Playwright browser
@@ -45,7 +48,7 @@ jobs:
         with:
           name: m4n-web-${{ matrix.mode }}-${{ github.run_id }}
           path: |
-            apps/mobile/playwright-report/
-            apps/mobile/test-results/
+            lR/apps/mobile/playwright-report/
+            lR/apps/mobile/test-results/
           if-no-files-found: warn
           retention-days: 14
