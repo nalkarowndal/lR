@@ -7,7 +7,7 @@ const copy={eyebrow:'CURATED FOR YOU',headline:'오늘의 시연 컬렉션',desc
  ctaLabel:'렌탈 둘러보기',ctaTarget:'RENTAL'};
 const pub={data:{slot:'HOME_HERO',copy,revision:2,demo:true}};
 const admin={data:{slot:'HOME_HERO',draft:copy,published:copy,revision:2,publishedRevision:2,demo:true}};
-const report={data:[{productId:'demo-bag-01',title:'The Sera Top Handle',registeredCount:0,rightsApprovedCount:0,
+const report={data:[{productId:'demo-bag-01',title:'The Sera Top Handle',registeredCount:0,rightsApprovedCount:0,generatedCount:2,
  displayReady:false,reason:'사용권 증빙이 아직 없어 시연용 일러스트를 표시합니다'}],meta:{demo:true}};
 const ok=(v,status=200)=>new Response(JSON.stringify(v),{status,headers:{'content-type':'application/json'}});
 test('published and admin editorial contracts validate content and whitelist CTA only',()=>{
