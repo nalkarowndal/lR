@@ -41,7 +41,8 @@ function sourcesFromMap(map, depth = 0) {
   });
 }
 
-export function inspectSourceMaps(maps) {
+export function inspectSourceMaps(maps, platform = 'ios') {
+  if (platform !== 'ios' && platform !== 'android') throw new Error('INVALID_PLATFORM');
   if (!Array.isArray(maps) || maps.length === 0) throw new Error('NO_NATIVE_SOURCE_MAPS');
   const counts = new Map();
   let sourceCount = 0;
@@ -57,10 +58,10 @@ export function inspectSourceMaps(maps) {
   const packages = [...counts.entries()].sort(([a],[b])=>a.localeCompare(b))
     .map(([name,sourceEntries])=>({name,sourceEntries}));
   return {
-    target:'ios-production-js-export', mapsInspected:maps.length, sourceEntriesInspected:sourceCount,
+    target:platform+'-production-js-export', mapsInspected:maps.length, sourceEntriesInspected:sourceCount,
     blockedPackageHits:packages, requiresReview:packages.length !== 0,
     releaseApproved:false,
-    limitations:'Only the inspected iOS JS source maps are covered; no native binary, OTA, web, input reachability, or actual device security claim.'
+    limitations:'Only the inspected '+platform+' JS source maps are covered; no native binary, OTA, web, input reachability, or actual device security claim.'
   };
 }
 
@@ -74,10 +75,11 @@ function findSourceMaps(dir) {
   return found;
 }
 
-export function inspectExportDirectory(directory) {
+export function inspectExportDirectory(directory, platform = 'ios') {
+  if (platform !== 'ios' && platform !== 'android') throw new Error('INVALID_PLATFORM');
   const paths=findSourceMaps(directory);
   if (paths.length===0) throw new Error('NO_NATIVE_SOURCE_MAPS');
-  return inspectSourceMaps(paths.map(path=>{
+  const maps=paths.map(path=>{
     const raw=readFileSync(path,'utf8');
     let map;
     try { map=JSON.parse(raw); }
@@ -97,12 +99,14 @@ export function inspectExportDirectory(directory) {
       throw new Error('INVALID_NATIVE_SOURCE_MAP');
     }
     return map;
-  }));
+  });
+  return inspectSourceMaps(maps, platform);
 }
 
 export function renderNativeEvidence(report) {
   const status=report.requiresReview?'REVIEW_REQUIRED':'NO_RISK_PACKAGES_IN_INSPECTED_MAPS';
-  return '# M6-1B2 iOS JavaScript bundle source-map evidence\n\n'
+  const platform=report.target === 'android-production-js-export' ? 'Android' : 'iOS';
+  return '# M6 native '+platform+' JavaScript bundle source-map evidence\n\n'
     + '- Status: '+status+'\n'
     + '- Source maps inspected: '+report.mapsInspected+'\n'
     + '- Source entries: '+report.sourceEntriesInspected+'\n'
@@ -114,14 +118,14 @@ export function renderNativeEvidence(report) {
 
 if (process.argv[1] && import.meta.url === new URL('file://' + process.argv[1]).href) {
   try {
-    const [directory,outputPrefix]=process.argv.slice(2);
+    const [directory,outputPrefix,platform='ios']=process.argv.slice(2);
     if (!directory || !outputPrefix) throw new Error('USAGE: export-directory output-prefix');
-    const evidence=inspectExportDirectory(directory);
+    const evidence=inspectExportDirectory(directory,platform);
     const markdown=renderNativeEvidence(evidence);
     writeFileSync(outputPrefix+'.json',JSON.stringify(evidence,null,2)+'\n');
     writeFileSync(outputPrefix+'.md',markdown);
     if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY,markdown+'\n');
-    console.log('M6-1B2 source-map scan: '+evidence.mapsInspected+' maps, '+
+    console.log('M6 native '+platform+' source-map scan: '+evidence.mapsInspected+' maps, '+
       evidence.sourceEntriesInspected+' source entries, '+evidence.blockedPackageHits.length+' risk package names');
     if(evidence.requiresReview) process.exitCode=2;
   } catch (error) {

@@ -42,7 +42,17 @@
 
 기존 [UX-A PR #17](https://github.com/nalkarowndal/lR/pull/17)와 [UX-BC PR #18](https://github.com/nalkarowndal/lR/pull/18)의 병합 결과는 그대로 유지. 기능 불량·접근성·보안상 필수 QA는 기존 단계 중에도 수행한다. 외부 사업 정책 승인이나 테스트/실기기 증거가 없으면 완료·출시 가능이라고 표기하지 않는다.
 
-## 2026-11-03 경로·보안 작업 이어받기\n\n- 목표: 프로젝트 루트는 GitHub `main/lR/`이며 `npm ci`·개발 명령은 `cd lR`부터 실행. 원본 사이트 `567890`과 운영 DB는 변경 금지.\n- M6-1B1: PR #31을 새 경로에 이식 후 main 병합, 감사 CI 8/8·모바일 25/25 통과.\n- M6-1B2: PR #33 iOS **JS 소스맵** 자동 검사, [CI](https://github.com/nalkarowndal/lR/actions/runs/41554033948) 보안 테스트 13/13·소스 1,215개 중 추적 패키지 0건. 실기기·Android·웹·원격 입력 노출은 증명하지 않음.\n- 위험: npm audit moderate 11 미수정. Expo [upstream #52735](https://github.com/expo/expo/issues/52735) 패치/유지관리 의견을 모니터링하고 실제 업데이트 가능 버전에서 CI 재검증. 임의 `overrides`·`--force` 금지.\n- 다음: SDK58 호환 패치 재평가 → Issue #10 실제 Android/iOS QA → Issue #14 실PG·사업 정책 게이트 → UX-D Issue #19 후순위. 출시는 계속 차단.\n\n## 다음 연속 작업 패키지
+## 2026-11-03 경로·보안 작업 이어받기\n\n- 목표: 프로젝트 루트는 GitHub `main/lR/`이며 `npm ci`·개발 명령은 `cd lR`부터 실행. 원본 사이트 `567890`과 운영 DB는 변경 금지.\n- M6-1B1: PR #31을 새 경로에 이식 후 main 병합, 감사 CI 8/8·모바일 25/25 통과.\n- M6-1B2: PR #33 iOS **JS 소스맵** 자동 검사, [CI](https://github.com/nalkarowndal/lR/actions/runs/41554033948) 보안 테스트 13/13·소스 1,215개 중 추적 패키지 0건. 실기기·Android·웹·원격 입력 노출은 증명하지 않음.\n- 위험: npm audit moderate 11 미수정. Expo [upstream #52735](https://github.com/expo/expo/issues/52735) 패치/유지관리 의견을 모니터링하고 실제 업데이트 가능 버전에서 CI 재검증. 임의 `overrides`·`--force` 금지.\n- 다음: SDK58 호환 패치 재평가 → Issue #10 실제 Android/iOS QA → Issue #14 실PG·사업 정책 게이트 → UX-D Issue #19 후순위. 출시는 계속 차단.\n\n
+## M6-1B3 — Android JS 소스맵 보안 검사·SDK58 호환성
+
+- 목표: `main/lR/` 개발 유지, iOS 검사에 Android 프로덕션 JS 검사 확장
+- 변경: `scripts/security/native-bundle-surface.mjs`, 회귀 테스트, 보안 감사 Actions, [분류 문서](M6_1B_ADVISORY_TRIAGE.md)
+- PR/CI: [PR #34](https://github.com/nalkarowndal/lR/pull/34), [보안 CI #41559865818](https://github.com/nalkarowndal/lR/actions/runs/41559865818), [모바일 CI #41559865778](https://github.com/nalkarowndal/lR/actions/runs/41559865778)
+- QA: 보안 테스트 16/16, Expo SDK 호환성 검사 PASS, iOS JS 1,215개 · Android JS 1,209개 소스 검사, 추적 패키지 모듈 각 0건
+- 위험: npm audit moderate 11개 유지; 앱 번들 외 네이티브·실기기·외부 입력 검증 미완료, 실결제/운영 기능 차단
+- 다음: 공식 Expo58 호환 패치 확인·검증, 필요 시 최소 의존성 업데이트/전체 CI 재실행 후 Issue #10 실기기 QA 및 Issue #14 사업 정책 승인
+
+## 다음 연속 작업 패키지
 
 **M6-1A 의존성 보안 감사·릴리스 API 차단 회귀 병합 완료, 다음 M6-1B 취약점 11개 패키지 분류:** API/MySQL 106/106, HTTP 5/5, 모바일 25/25 PASS. 직전 Chromium 40/40 PASS(이번 PR 미실행). 실제 PG 테스트 키·운영 정책 승인은 여전히 미완료. 실제 Android/iOS 기기·접근성, 운영 계정·PG·보증금/취소/물류 정책 미승인으로 **상용 출시 Gate는 미통과**.
 
