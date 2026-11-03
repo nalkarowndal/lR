@@ -13,15 +13,15 @@ const categoryIcon=(category?:string):IconName=>{
  if(category?.includes('숄더'))return 'bag-outline';
  return 'bag-handle-outline';
 };
-export function ProductVisual({background,small=false,product,mediaIndex=0}:{
- background:Product['art'];small?:boolean;product?:Product;mediaIndex?:number
+export function ProductVisual({background,small=false,product,mediaIndex=0,heightOverride}:{
+ background:Product['art'];small?:boolean;product?:Product;mediaIndex?:number;heightOverride?:number
 }){
  const media=product?.media?.[mediaIndex];
  const localSource=media?bundledDemoImageSource(media.url):null;
  const synthetic=!!localSource&&!!product?.demo;
  const [broken,setBroken]=useState(false),[loaded,setLoaded]=useState(false);
  useEffect(()=>{setBroken(false);setLoaded(false)},[media?.url]);
- const height=small?146:280;
+ const height=heightOverride??(small?146:280);
  if(media&&!broken)return <View style={{backgroundColor:background,height,borderRadius:14,overflow:'hidden'}}>
   {!loaded?<View style={{position:'absolute',left:0,right:0,top:0,bottom:0,
    alignItems:'center',justifyContent:'center'}}>
@@ -33,7 +33,7 @@ export function ProductVisual({background,small=false,product,mediaIndex=0}:{
    resizeMode="contain" style={{width:'100%',height:'100%'}}/>
   {synthetic?<View accessible={false} style={{position:'absolute',right:8,bottom:8,
     borderRadius:7,backgroundColor:'rgba(255,255,255,0.93)',paddingHorizontal:7,paddingVertical:4}}>
-    <Text style={{fontSize:small?9:11,fontWeight:'800',color:colors.ink}}>AI 생성 · 실물 아님</Text>
+    <Text style={{fontSize:heightOverride&&heightOverride<90?8:small?9:11,fontWeight:'800',color:colors.ink}}>AI 생성 · 실물 아님</Text>
    </View>:null}
  </View>;
  return <View accessible accessibilityRole="image"
