@@ -26,9 +26,15 @@
 - [ ] 360px/390px/tablet true native safe area and portrait/landscape support
 - [ ] Sample vs real Node API from device Wi-Fi, timeout/offline, 401/403/409 behavior
 - [ ] Figma artwork and user-journey inspection of actual screenshots, license-approved product visuals
-- [ ] `npx expo-doctor` and Expo Native SDK dependency compatibility
+- [x] Expo Doctor **20/20** and `npx expo install --check` compatibility **PASS** on [CI #41566382082](https://github.com/nalkarowndal/lR/actions/runs/41566382082); this is static preflight, not real-device QA
 - [ ] UI issue triage and fixes with rerun logs
 
 This is a **pre-M5 QA package**, not commercial release approval. Order/booking/payments are not active. Existing `567890` web and operational database remain untouched.
 
 References: [Playwright Test configuration](https://playwright.dev/docs/test-configuration), [Expo CLI CI](https://docs.expo.dev/more/expo-cli/), [Issue #10](https://github.com/nalkarowndal/lR/issues/10).
+
+## M6-1B5 native project preflight (2026-11-03)
+
+- [PR #36](https://github.com/nalkarowndal/lR/pull/36) runs Expo Doctor within mobile CI and removes obsolete `android.edgeToEdgeEnabled` and `newArchEnabled` options from SDK 58 app config. Android edge-to-edge and React Native New Architecture remain platform defaults.
+- [CI #41566382082](https://github.com/nalkarowndal/lR/actions/runs/41566382082): **20/20 Expo Doctor**, `expo install --check` compatible, mobile **25/25** and Expo web export. Actual native device/simulator and VoiceOver/TalkBack are still **NOT RUN**.
+- Device test IDs, OS/device/build evidence rules, offline vs TEST HTTPS scenarios: [M6-1B5 runbook](M6_1B5_DEVICE_QA_RUNBOOK.md). Open [Issue #10](https://github.com/nalkarowndal/lR/issues/10) until real native evidence is supplied.
