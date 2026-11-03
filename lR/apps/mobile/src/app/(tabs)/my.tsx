@@ -44,6 +44,8 @@ export default function My(){
     <RowLink title="스토어 접수 관리자 목록" subtitle="관리자 읽기 전용 · 테스트 DB" onPress={()=>router.push('/my/admin-store-orders')}/>:null}
    {loggedIn&&session.identity?.roles.includes('ADMIN')&&apiEnabled()?
     <RowLink title="서비스 신청 관리자 검수" subtitle="수선·위탁 신청 상태 전이 · 테스트 DB" onPress={()=>router.push('/my/admin-service-requests')}/>:null}
+   {loggedIn&&session.identity?.roles.includes('ADMIN')&&apiEnabled()?
+    <RowLink title="에디토리얼 관리" subtitle="시연 홈 배너 초안·게시 및 상품 사진 사용권 점검" onPress={()=>router.push('/my/admin-editorial')}/>:null}
    <RowLink title="수선 서비스" onPress={()=>router.push('/(tabs)/care')}/>
   </Panel>
  </Screen>;
