@@ -194,3 +194,19 @@ M3 작업 전 OpenAPI 3.1 문서를 생성하고 이 표의 DTO 차이에 대한
 
 **차단 유지:** `POST /api/v1/orders`, `POST /api/v1/payments/confirm` → 501. 판매완료, 실대여 계약, 보증금 청구/환불, PG 키 연결, 고객 실주소 수집은 여전히 미구현·미승인. [코드·CI·차이 상세](M5_2C3_PORTFOLIO_ORDER_INTAKE.md).
 
+
+
+## 9. M5-2C4-B — STORE 채널 비금전 주문 접수 API
+
+실제 금전 주문 API `POST /api/v1/orders`는 여전히 501이다. 아래는 **별도 테스트 DB**의 `RECEIVED`/`NOT_CHARGED` 스토어 접수만 저장한다.
+
+| Method | Endpoint | 인증/결과 |
+|---|---|---|
+| POST | `/api/v1/experience/store-orders` | 로그인 + `Idempotency-Key: UUID` 필요. 신규 201, 같은 입력 재전송 200, 변경 본문/같은 키 409 |
+| GET | `/api/v1/experience/store-orders` | 로그인 소유자 접수 내역, `limit` 1~50, `offset` 0~1000 |
+| GET | `/api/v1/experience/store-orders/:id` | 소유자만 200, 타인 404 |
+| GET | `/api/v1/admin/experience/store-orders` | ADMIN 목록 읽기 전용, 일반 사용자 403 |
+
+요청 본문: `{productIds:string[1..10],paymentMethod:"CARD"|"EASY_PAY"|"TRANSFER",deliveryMethod:"COURIER"|"PICKUP",deliveryPreset:"SAMPLE_SEOUL"|"SHOWROOM"}`. 중복 상품/임의 결제 상태/클라이언트 금액/실주소/결제 자격증명은 입력 금지(422). 서버는 각 활성 STORE 오퍼 금액과 READY 재고·홀드·진행 중 대여 상태를 재검증하며, **한 상품이라도 접수 불가면 전체 접수 거절**한다. 응답은 주문 ID, 상품별 가격 스냅샷, 합계, `status=RECEIVED`, `paymentStatus=NOT_CHARGED`, `channel=STORE` 및 `demo=true`를 포함한다.
+
+세 조건 `demoMode=true`, `NODE_ENV=test`, `DB_NAME=lr_test` 외에는 501. 성공은 **시연 접수번호 저장**만 뜻하며 재고 차감·판매완료·배송·결제·원장/ERP 기록은 만들지 않는다. [상세 명세](M5_2C4B_STORE_INTAKE.md).
