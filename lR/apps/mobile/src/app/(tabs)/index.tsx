@@ -17,9 +17,15 @@ export default function Home(){
  useEffect(()=>{
   if(!apiEnabled()){setHero(defaultHomeEditorial);setEditorialError(false);return;}
   let live=true;
-  void createEditorialClient(apiBaseUrl()!).published().then(result=>{
-   if(live){setHero(result.copy);setEditorialError(false);}
-  }).catch(()=>{if(live){setHero(defaultHomeEditorial);setEditorialError(true);}});
+  const read=async()=>{
+   try{
+    const result=await createEditorialClient(apiBaseUrl()!).published();
+    if(live){setHero(result.copy);setEditorialError(false);}
+   }catch{
+    if(live){setHero(defaultHomeEditorial);setEditorialError(true);}
+   }
+  };
+  void read();
   return()=>{live=false};
  },[]);
  const heroTarget=(target:EditorialTarget)=>{
