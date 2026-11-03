@@ -1,6 +1,7 @@
 /** Approved media only. Rights evidence is reviewed offline; never accept untrusted image uploads here. */
 import type{RowDataPacket} from 'mysql2';
 import type{Database} from './db.js';
+import {generatedDemoAssetCount} from './generated-demo-media.js';
 export interface PublishedMedia {url:string;alt:string}
 interface MediaRow extends RowDataPacket{
  product_id:string;asset_url:string;alt:string;rights_status:'PENDING'|'APPROVED'|'REVOKED';
@@ -46,7 +47,7 @@ interface RightsReportRow extends RowDataPacket{
  id:string;title:string;registered_count:string|number;rights_approved_count:string|number;
 }
 export interface MediaRightsReport{
- productId:string;title:string;registeredCount:number;rightsApprovedCount:number;
+ productId:string;title:string;registeredCount:number;rightsApprovedCount:number;generatedCount:number;
  displayReady:boolean;reason:string;
 }
 export async function listMediaRights(db:Database):Promise<MediaRightsReport[]>{
@@ -60,10 +61,16 @@ export async function listMediaRights(db:Database):Promise<MediaRightsReport[]>{
   WHERE p.is_demo=1 AND p.published=1
   GROUP BY p.id,p.title ORDER BY p.id LIMIT 50`);
  const visible=await approvedProductMedia(db,rows.map(x=>x.id));
- return rows.map(row=>({
-  productId:row.id,title:row.title,registeredCount:Number(row.registered_count),
-  rightsApprovedCount:Number(row.rights_approved_count),displayReady:(visible.get(row.id)?.length||0)>0,
-  reason:(visible.get(row.id)?.length||0)>0?'검수된 데모 미디어 사용 가능':
-   '사용권 증빙 및 승인된 이미지 호스트가 확인되지 않아 일러스트를 표시합니다'
- }));
+ return rows.map(row=>{
+  const generatedCount=generatedDemoAssetCount(row.id);
+  const manualCount=visible.get(row.id)?.length||0;
+  return {productId:row.id,title:row.title,registeredCount:Number(row.registered_count),
+   rightsApprovedCount:Number(row.rights_approved_count),generatedCount,
+   displayReady:generatedCount+manualCount>0,
+   reason:generatedCount>0?
+    'AI로 생성한 가상 상품 이미지 '+generatedCount+'장 · 실물 사진이나 브랜드 정품 증빙이 아닙니다':
+    manualCount>0?'별도 사용권 검수된 이미지 사용 가능':
+    '사용권 증빙 및 승인된 이미지 호스트가 확인되지 않아 일러스트를 표시합니다'
+  };
+ });
 }
