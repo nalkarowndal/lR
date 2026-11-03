@@ -42,7 +42,7 @@ function sourcesFromMap(map, depth = 0) {
 }
 
 export function inspectSourceMaps(maps, platform = 'ios') {
-  if (platform !== 'ios' && platform !== 'android' && platform !== 'web' && platform !== 'web') throw new Error('INVALID_PLATFORM');
+  if (platform !== 'ios' && platform !== 'android' && platform !== 'web') throw new Error('INVALID_PLATFORM');
   if (!Array.isArray(maps) || maps.length === 0) throw new Error('NO_NATIVE_SOURCE_MAPS');
   const counts = new Map();
   let sourceCount = 0;
@@ -76,7 +76,7 @@ function findSourceMaps(dir) {
 }
 
 export function inspectExportDirectory(directory, platform = 'ios') {
-  if (platform !== 'ios' && platform !== 'android') throw new Error('INVALID_PLATFORM');
+  if (platform !== 'ios' && platform !== 'android' && platform !== 'web') throw new Error('INVALID_PLATFORM');
   const paths=findSourceMaps(directory);
   if (paths.length===0) throw new Error('NO_NATIVE_SOURCE_MAPS');
   const maps=paths.map(path=>{
