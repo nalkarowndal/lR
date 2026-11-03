@@ -1,5 +1,5 @@
 import type{Channel,Product,ProductArt,ProductMedia} from '../domain/catalog';
-import {getGeneratedDemoMedia,isGeneratedDemoMediaUrl} from '../domain/generated-media';
+import {getGeneratedDemoMedia,isGeneratedDemoMediaUrl} from '../domain/generated-media.ts';
 
 export type ApiErrorKind='HTTP'|'NETWORK'|'TIMEOUT'|'CONFIG'|'CONTRACT';
 export class ApiError extends Error {
