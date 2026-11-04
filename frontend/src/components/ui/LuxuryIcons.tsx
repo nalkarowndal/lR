@@ -367,6 +367,14 @@ export const BrandMonogram = ({ name, active = false }: { name: string; active?:
       case '샤넬': return { code: 'CC', font: 'font-serif font-black tracking-widest' };
       case 'CP 컴퍼니': return { code: 'C.P.', font: 'font-mono font-black tracking-wider' };
       case '셀린느': return { code: 'CEL', font: 'font-sans font-black tracking-widest' };
+      case '프라다': return { code: 'PRD', font: 'font-serif font-black tracking-wider' };
+      case '디올': return { code: 'CD', font: 'font-serif font-black tracking-widest' };
+      case '에르메스': return { code: 'H', font: 'font-serif font-black tracking-widest' };
+      case '보테가 베네타': return { code: 'BV', font: 'font-sans font-black tracking-wider' };
+      case '생로랑': return { code: 'YSL', font: 'font-serif font-black tracking-widest' };
+      case '발렌시아가': return { code: 'BB', font: 'font-sans font-black tracking-widest' };
+      case '롤렉스': return { code: 'RLX', font: 'font-serif font-black tracking-wider' };
+      case '까르띠에': return { code: 'CRT', font: 'font-serif font-black tracking-widest' };
       default: return { code: n.slice(0, 2).toUpperCase(), font: 'font-sans font-black' };
     }
   };

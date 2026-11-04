@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-04T08:02:50.149Z",
+  "timestamp": "2026-11-04T08:33:15.405Z",
   "tests": [
     {
       "id": "TEST-01-ACTION-CARDS-ENGRAVED",
@@ -128,7 +128,7 @@
           }
         ],
         "monograms": {
-          "count": 6,
+          "count": 14,
           "activeText": "LV루이비통"
         }
       }

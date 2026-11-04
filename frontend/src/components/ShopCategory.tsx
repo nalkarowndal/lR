@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, MessageCircle, ShoppingCart, ChevronRight, Heart } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
@@ -35,6 +35,20 @@ export const ShopCategory = () => {
   const [serverBrandProducts, setServerBrandProducts] = useState<CatalogProduct[]>([]);
   const [isLoadingBrand, setIsLoadingBrand] = useState(false);
 
+  // 브랜드 가로 스크롤 및 좌우 이동 상태 관리
+  const brandScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [isAutoScrollActive, setIsAutoScrollActive] = useState(true);
+  const isHoveredRef = useRef(false);
+  const autoScrollDirection = useRef<'right' | 'left'>('right');
+
+  // 마우스 드래그로 좌우 이동 처리
+  const isMouseDownRef = useRef(false);
+  const startXRef = useRef(0);
+  const scrollLeftRef = useRef(0);
+  const hasDraggedRef = useRef(false);
+
   const leftCategories = ['가방/핸드백', '의류', '슈즈', '지갑', '패션잡화', '시계/액세서리', '골프', '화장품/향수'];
   const currentSubCategories = SUBCATEGORIES_BY_CATEGORY[leftActive] || SUBCATEGORIES_BY_CATEGORY['가방/핸드백'];
 
@@ -44,7 +58,15 @@ export const ShopCategory = () => {
     { name: '구찌' }, 
     { name: '샤넬' },
     { name: 'CP 컴퍼니' }, 
-    { name: '셀린느' }
+    { name: '셀린느' },
+    { name: '프라다' },
+    { name: '디올' },
+    { name: '에르메스' },
+    { name: '보테가 베네타' },
+    { name: '생로랑' },
+    { name: '발렌시아가' },
+    { name: '롤렉스' },
+    { name: '까르띠에' }
   ];
 
   // 브랜드 탭 전환 시 서버 데이터베이스에서 실시간 조회 (관리자가 등록한 최신 상품 포함)
@@ -99,6 +121,100 @@ export const ShopCategory = () => {
   const handleSubCategoryClick = (sub: string) => {
     setSelectedSubCategory(sub);
     showToast(`${leftActive} > ${sub} 필터가 적용되었습니다.`, 'info');
+  };
+
+  // 좌우 스크롤 가능 여부 실시간 업데이트
+  const updateScrollButtons = () => {
+    if (!brandScrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = brandScrollRef.current;
+    setCanScrollLeft(scrollLeft > 10);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 10);
+  };
+
+  useEffect(() => {
+    if (mainTab !== 'BRAND') return;
+    const el = brandScrollRef.current;
+    if (!el) return;
+    
+    const timer = setTimeout(updateScrollButtons, 100);
+    el.addEventListener('scroll', updateScrollButtons, { passive: true });
+    window.addEventListener('resize', updateScrollButtons);
+
+    return () => {
+      clearTimeout(timer);
+      el.removeEventListener('scroll', updateScrollButtons);
+      window.removeEventListener('resize', updateScrollButtons);
+    };
+  }, [mainTab, brands.length]);
+
+  // 좌우 화살표 버튼 클릭 시 부드러운 스크롤 이동
+  const handleBrandScroll = (direction: 'left' | 'right') => {
+    if (!brandScrollRef.current) return;
+    const offset = direction === 'left' ? -220 : 220;
+    brandScrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+    setTimeout(updateScrollButtons, 350);
+  };
+
+  // 마우스 드래그로 좌우 스크롤
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!brandScrollRef.current) return;
+    isMouseDownRef.current = true;
+    hasDraggedRef.current = false;
+    startXRef.current = e.pageX - brandScrollRef.current.offsetLeft;
+    scrollLeftRef.current = brandScrollRef.current.scrollLeft;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isMouseDownRef.current || !brandScrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - brandScrollRef.current.offsetLeft;
+    const walk = (x - startXRef.current) * 1.5;
+    if (Math.abs(walk) > 4) {
+      hasDraggedRef.current = true;
+    }
+    brandScrollRef.current.scrollLeft = scrollLeftRef.current - walk;
+    updateScrollButtons();
+  };
+
+  const handleMouseUp = () => {
+    isMouseDownRef.current = false;
+    setTimeout(() => { hasDraggedRef.current = false; }, 60);
+  };
+
+  // 부드러운 자동 좌우 롤링/이동 (사용자가 마우스 호버 또는 드래그 중일 때는 정지)
+  useEffect(() => {
+    if (mainTab !== 'BRAND' || !isAutoScrollActive) return;
+
+    const interval = setInterval(() => {
+      if (isHoveredRef.current || isMouseDownRef.current || !brandScrollRef.current) return;
+      const { scrollLeft, scrollWidth, clientWidth } = brandScrollRef.current;
+      
+      if (autoScrollDirection.current === 'right') {
+        if (scrollLeft + clientWidth >= scrollWidth - 15) {
+          autoScrollDirection.current = 'left';
+          brandScrollRef.current.scrollBy({ left: -140, behavior: 'smooth' });
+        } else {
+          brandScrollRef.current.scrollBy({ left: 140, behavior: 'smooth' });
+        }
+      } else {
+        if (scrollLeft <= 15) {
+          autoScrollDirection.current = 'right';
+          brandScrollRef.current.scrollBy({ left: 140, behavior: 'smooth' });
+        } else {
+          brandScrollRef.current.scrollBy({ left: -140, behavior: 'smooth' });
+        }
+      }
+      setTimeout(updateScrollButtons, 400);
+    }, 3200);
+
+    return () => clearInterval(interval);
+  }, [mainTab, isAutoScrollActive]);
+
+  const handleBrandSelect = (brandName: string, element: HTMLElement) => {
+    if (hasDraggedRef.current) return;
+    setActiveBrand(brandName);
+    element.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    setTimeout(updateScrollButtons, 350);
   };
 
   return (
@@ -273,27 +389,105 @@ export const ShopCategory = () => {
       {/* 3-B. 브랜드 뷰 */}
       {mainTab === 'BRAND' && (
         <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-black text-lg text-gray-950 tracking-tight">인기 브랜드 ({brands.length})</h2>
-            <span className="text-xs text-gray-400 font-medium">전체 {currentBrandProducts.length}개 상품</span>
+          {/* 상단 타이틀 & 좌우 이동 컨트롤 */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <h2 className="font-black text-lg text-gray-950 tracking-tight">인기 브랜드 ({brands.length})</h2>
+              <button
+                type="button"
+                onClick={() => setIsAutoScrollActive(prev => !prev)}
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-full border transition-all flex items-center gap-1 ${
+                  isAutoScrollActive 
+                    ? 'bg-amber-50 text-amber-900 border-amber-300 shadow-2xs' 
+                    : 'bg-gray-100 text-gray-500 border-gray-200'
+                }`}
+                title={isAutoScrollActive ? '좌우 자동 이동 멈춤' : '좌우 자동 이동 시작'}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${isAutoScrollActive ? 'bg-amber-500 animate-pulse' : 'bg-gray-400'}`} />
+                {isAutoScrollActive ? '좌우 슬라이드' : '슬라이드 정지'}
+              </button>
+            </div>
+            
+            {/* 좌우 이동 퀵 컨트롤 버튼 */}
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                aria-label="이전 브랜드 보기"
+                onClick={() => handleBrandScroll('left')}
+                className="w-7 h-7 rounded-full bg-white border border-gray-200 hover:border-gray-400 hover:bg-gray-50 text-gray-700 hover:text-black flex items-center justify-center transition shadow-2xs active:scale-95"
+              >
+                <ChevronLeft size={15} />
+              </button>
+              <button
+                type="button"
+                aria-label="다음 브랜드 보기"
+                onClick={() => handleBrandScroll('right')}
+                className="w-7 h-7 rounded-full bg-white border border-gray-200 hover:border-gray-400 hover:bg-gray-50 text-gray-700 hover:text-black flex items-center justify-center transition shadow-2xs active:scale-95"
+              >
+                <ChevronRight size={15} />
+              </button>
+            </div>
           </div>
           
-          {/* 인기 브랜드 모노그램 칩 가로 스크롤 */}
-          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 mb-6">
-            {brands.map((brand, i) => (
-              <div 
-                key={i} 
-                onClick={() => setActiveBrand(brand.name)} 
-                className="flex flex-col items-center gap-2 cursor-pointer min-w-[60px] active:scale-95 transition-transform"
+          {/* 인기 브랜드 모노그램 칩 가로 스크롤 & 좌우 이동 슬라이더 */}
+          <div 
+            className="relative group mb-6"
+            onMouseEnter={() => { isHoveredRef.current = true; }}
+            onMouseLeave={() => { isHoveredRef.current = false; handleMouseUp(); }}
+            onTouchStart={() => { isHoveredRef.current = true; }}
+            onTouchEnd={() => { isHoveredRef.current = false; }}
+          >
+            {/* 좌측 플로팅 이동 버튼 */}
+            {canScrollLeft && (
+              <button
+                type="button"
+                aria-label="브랜드 왼쪽으로 이동"
+                onClick={() => handleBrandScroll('left')}
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/95 backdrop-blur-md border border-gray-200 shadow-md flex items-center justify-center text-gray-800 hover:text-black hover:scale-110 active:scale-95 transition"
               >
-                <BrandMonogram name={brand.name} active={activeBrand === brand.name} />
-                <span className={`text-[11px] transition-colors ${
-                  activeBrand === brand.name ? 'text-[#252525] font-black' : 'text-gray-600 font-bold'
-                }`}>
-                  {brand.name}
-                </span>
-              </div>
-            ))}
+                <ChevronLeft size={16} />
+              </button>
+            )}
+
+            {/* 우측 플로팅 이동 버튼 */}
+            {canScrollRight && (
+              <button
+                type="button"
+                aria-label="브랜드 오른쪽으로 이동"
+                onClick={() => handleBrandScroll('right')}
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/95 backdrop-blur-md border border-gray-200 shadow-md flex items-center justify-center text-gray-800 hover:text-black hover:scale-110 active:scale-95 transition"
+              >
+                <ChevronRight size={16} />
+              </button>
+            )}
+
+            {/* 좌우 페이드 그라디언트 오버레이 */}
+            <div className={`absolute left-0 top-0 bottom-2 w-6 bg-gradient-to-r from-white to-transparent pointer-events-none z-10 transition-opacity ${canScrollLeft ? 'opacity-100' : 'opacity-0'}`} />
+            <div className={`absolute right-0 top-0 bottom-2 w-6 bg-gradient-to-l from-white to-transparent pointer-events-none z-10 transition-opacity ${canScrollRight ? 'opacity-100' : 'opacity-0'}`} />
+
+            {/* 브랜드 모노그램 칩 가로 스크롤 컨테이너 */}
+            <div 
+              ref={brandScrollRef}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 pt-1 scroll-smooth select-none cursor-grab active:cursor-grabbing px-1"
+            >
+              {brands.map((brand, i) => (
+                <div 
+                  key={i} 
+                  onClick={(e) => handleBrandSelect(brand.name, e.currentTarget)} 
+                  className="flex flex-col items-center gap-2 cursor-pointer min-w-[62px] active:scale-95 transition-transform shrink-0"
+                >
+                  <BrandMonogram name={brand.name} active={activeBrand === brand.name} />
+                  <span className={`text-[11px] whitespace-nowrap transition-colors ${
+                    activeBrand === brand.name ? 'text-[#252525] font-black' : 'text-gray-600 font-bold'
+                  }`}>
+                    {brand.name}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* 선택된 브랜드 상품 그리드 (2열) */}
