@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, Search as SearchIcon, X, ArrowUp, ArrowDown } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { ProductImage } from './ui/ProductImage';
 import { SEARCH_CATALOG, type CatalogProduct } from '../data/catalog';
+import { api } from '../services/api';
 
 export const ShopSearch = () => {
   const { activeOverlay, setActiveOverlay } = useApp();
@@ -48,14 +49,65 @@ export const ShopSearch = () => {
     { rank: 10, name: '구찌', status: { type: 'new', text: 'new' } },
   ];
 
-  // 검색어 입력 시 필터링 결과
-  const filteredResults = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return [];
-    return SEARCH_CATALOG.filter((item: CatalogProduct) => 
-      item.brand.toLowerCase().includes(q) || 
-      item.title.toLowerCase().includes(q)
-    );
+  // 서버 실시간 상품 DB 검색 (관리자 등록 상품 포함) 및 오프라인 폴백
+  const [searchResults, setSearchResults] = useState<CatalogProduct[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (!q) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    let isCurrent = true;
+    setIsSearching(true);
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await api.search(q);
+        if (isCurrent && res?.success && Array.isArray(res.data) && res.data.length > 0) {
+          const mapped: CatalogProduct[] = res.data.map(item => ({
+            id: item.id,
+            brand: item.brand,
+            title: item.title,
+            price: typeof item.price === 'number' ? `${item.price.toLocaleString()}원` : String(item.price),
+            category: item.category || 'bag',
+            imageUrl: item.image_url || undefined,
+            tag: item.tag || (item.type === 'RENT' ? '렌트' : '구매'),
+            imageStatus: 'READY' as const
+          }));
+          setSearchResults(mapped);
+        } else if (isCurrent) {
+          // If server returns 0 results, also check local catalog
+          const lowerQ = q.toLowerCase();
+          const fallback = SEARCH_CATALOG.filter((item: CatalogProduct) => 
+            item.brand.toLowerCase().includes(lowerQ) || 
+            item.title.toLowerCase().includes(lowerQ)
+          );
+          setSearchResults(fallback);
+        }
+      } catch (err) {
+        if (isCurrent) {
+          const lowerQ = q.toLowerCase();
+          const fallback = SEARCH_CATALOG.filter((item: CatalogProduct) => 
+            item.brand.toLowerCase().includes(lowerQ) || 
+            item.title.toLowerCase().includes(lowerQ)
+          );
+          setSearchResults(fallback);
+        }
+      } finally {
+        if (isCurrent) {
+          setIsSearching(false);
+        }
+      }
+    }, 120);
+
+    return () => {
+      isCurrent = false;
+      clearTimeout(timer);
+    };
   }, [searchQuery]);
 
   const handleKeywordClick = (word: string) => {
@@ -114,8 +166,9 @@ export const ShopSearch = () => {
         {searchQuery.trim().length > 0 ? (
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-extrabold text-[16px] text-gray-900">
-                검색 결과 <span className="text-indigo-600 font-black">({filteredResults.length})</span>
+              <h3 className="font-extrabold text-[16px] text-gray-900 flex items-center gap-2">
+                검색 결과 <span className="text-indigo-600 font-black">({searchResults.length})</span>
+                {isSearching && <span className="text-xs text-gray-400 font-normal">검색 중...</span>}
               </h3>
               <button 
                 type="button"
@@ -126,14 +179,14 @@ export const ShopSearch = () => {
               </button>
             </div>
 
-            {filteredResults.length === 0 ? (
+            {searchResults.length === 0 && !isSearching ? (
               <div className="py-16 text-center">
                 <p className="text-gray-400 text-sm font-semibold mb-2">'{searchQuery}'에 대한 검색 결과가 없습니다.</p>
                 <p className="text-xs text-gray-400">정확한 브랜드명 또는 상품명을 다시 입력해보세요.</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3">
-                {filteredResults.map((item: CatalogProduct) => (
+                {searchResults.map((item: CatalogProduct) => (
                   <div key={item.id} className="flex flex-col group cursor-pointer p-2 rounded-xl hover:bg-gray-50 transition">
                     <div className="relative aspect-square bg-gray-100 rounded-xl mb-2 flex items-center justify-center overflow-hidden border border-gray-100 shadow-2xs">
                       <ProductImage 

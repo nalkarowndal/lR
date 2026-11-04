@@ -39,8 +39,9 @@ const YoutubeIcon = ({ size }: { size: number }) => (
   </svg>
 );
 
-// 맞춤 추천 데이터 세트 (연령/성별 탭 연동)
+// 맞춤 추천 데이터 세트 (연령/성별 탭 연동 - 서버 DB 상품 ID 1:1 정합화)
 const RECOMMENDATIONS_DATA: Record<string, Array<{
+  id: number;
   brand: string;
   title: string;
   price: string;
@@ -51,34 +52,34 @@ const RECOMMENDATIONS_DATA: Record<string, Array<{
   image?: string;
 }>> = {
   '20대 여성': [
-    { brand: '생로랑', title: '블랙 페이던트 Le 5 A 7 호보...', price: '10,230원', original: '44,400원', discount: '77%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/saint_laurent_le5a7.jpg' },
-    { brand: '발렌시아가', title: '블랙 르 시티 모토 스몰 숄더백', price: '18,510원', original: '80,400원', discount: '77%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/balenciaga_le_city.jpg' },
-    { brand: '샤넬', title: '블랙 캐비어 호보 미니 토트백', price: '101,600원', original: '170,400원', discount: '41%', tag: '앱전용', category: 'bag', image: '/assets/products/bags/chanel_caviar_hobo.jpg' },
-    { brand: '샤넬', title: '블랙 클래식 플랩 흑장 체인 숄...', price: '24,500원', original: '', discount: '72%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/chanel_classic_flap.jpg' }
+    { id: 1, brand: '생로랑', title: '블랙 페이던트 Le 5 A 7 호보...', price: '10,230원', original: '44,400원', discount: '77%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/saint_laurent_le5a7.jpg' },
+    { id: 2, brand: '발렌시아가', title: '블랙 르 시티 모토 스몰 숄더백', price: '18,510원', original: '80,400원', discount: '77%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/balenciaga_le_city.jpg' },
+    { id: 3, brand: '샤넬', title: '블랙 캐비어 호보 미니 토트백', price: '101,600원', original: '170,400원', discount: '41%', tag: '앱전용', category: 'bag', image: '/assets/products/bags/chanel_caviar_hobo.jpg' },
+    { id: 4, brand: '샤넬', title: '블랙 클래식 플랩 흑장 체인 숄...', price: '24,500원', original: '', discount: '72%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/chanel_classic_flap.jpg' }
   ],
   '20대 남성': [
-    { brand: '메종 마르지엘라', title: '남성 5AC 블랙 크로스백 미디엄', price: '14,200원', original: '48,000원', discount: '70%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/maison_margiela_5ac.jpg' },
-    { brand: '프라다', title: '리나일론 삼각로고 남성 벨트백', price: '16,800원', original: '56,000원', discount: '70%', tag: '앱전용', category: 'bag', image: '/assets/products/bags/prada_renylon_belt.jpg' },
-    { brand: '보테가 베네타', title: '카세트 인트레치아토 크로스백', price: '19,500원', original: '65,000원', discount: '70%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/bottega_cassette.jpg' },
-    { brand: '아미', title: '하트 로고 크루넥 남성 니트', price: '11,000원', original: '38,000원', discount: '71%', tag: '예약 마감', category: 'clothing', image: '/assets/products/clothing/ami_heart_knit.jpg' }
+    { id: 5, brand: '메종 마르지엘라', title: '남성 5AC 블랙 크로스백 미디엄', price: '14,200원', original: '48,000원', discount: '70%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/maison_margiela_5ac.jpg' },
+    { id: 6, brand: '프라다', title: '리나일론 삼각로고 남성 벨트백', price: '16,800원', original: '56,000원', discount: '70%', tag: '앱전용', category: 'bag', image: '/assets/products/bags/prada_renylon_belt.jpg' },
+    { id: 7, brand: '보테가 베네타', title: '카세트 인트레치아토 크로스백', price: '19,500원', original: '65,000원', discount: '70%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/bottega_cassette.jpg' },
+    { id: 8, brand: '아미', title: '하트 로고 크루넥 남성 니트', price: '11,000원', original: '38,000원', discount: '71%', tag: '예약 마감', category: 'clothing', image: '/assets/products/clothing/ami_heart_knit.jpg' }
   ],
   '30대 여성': [
-    { brand: '샤넬', title: '샤넬 22 미니 퀼팅 숄더 핸드백', price: '45,000원', original: '150,000원', discount: '70%', tag: '앱전용', category: 'bag', image: '/assets/products/bags/chanel_22_mini.jpg' },
-    { brand: '에르메스', title: '에블린 TPM 미니 크로스 에토프', price: '42,000원', original: '120,000원', discount: '65%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/hermes_evelyne_tpm.jpg' },
-    { brand: '셀린느', title: '틴 트리옹프 샤이니 카프스킨', price: '29,000원', original: '98,000원', discount: '70%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/celine_triomphe.jpg' },
-    { brand: '크리스찬 디올', title: '레이디 D-Joy 까나쥬 스몰백', price: '38,000원', original: '130,000원', discount: '71%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/dior_lady_djoy.jpg' }
+    { id: 9, brand: '샤넬', title: '샤넬 22 미니 퀼팅 숄더 핸드백', price: '45,000원', original: '150,000원', discount: '70%', tag: '앱전용', category: 'bag', image: '/assets/products/bags/chanel_22_mini.jpg' },
+    { id: 10, brand: '에르메스', title: '에블린 TPM 미니 크로스 에토프', price: '42,000원', original: '120,000원', discount: '65%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/hermes_evelyne_tpm.jpg' },
+    { id: 11, brand: '셀린느', title: '틴 트리옹프 샤이니 카프스킨', price: '29,000원', original: '98,000원', discount: '70%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/celine_triomphe.jpg' },
+    { id: 12, brand: '크리스찬 디올', title: '레이디 D-Joy 까나쥬 스몰백', price: '38,000원', original: '130,000원', discount: '71%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/dior_lady_djoy.jpg' }
   ],
   '30대 남성': [
-    { brand: '톰브라운', title: '삼선 그로그랭 페블 레더 클러치', price: '13,500원', original: '45,000원', discount: '70%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/thombrowne_clutch.jpg' },
-    { brand: '구찌', title: 'GG 수프림 캔버스 슬링 메신저백', price: '15,000원', original: '50,000원', discount: '70%', tag: '앱전용', category: 'bag', image: '/assets/products/bags/gucci_gg_supreme.jpg' },
-    { brand: '롤렉스', title: '오이스터 서브마리너 블랙 데이트', price: '85,000원', original: '250,000원', discount: '66%', tag: '예약 마감', category: 'watch', image: '/assets/products/watches/rolex_submariner.jpg' },
-    { brand: '생로랑', title: '시티 나일론 블랙 백팩 클래식', price: '16,000원', original: '55,000원', discount: '71%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/saint_laurent_backpack.jpg' }
+    { id: 13, brand: '톰브라운', title: '삼선 그로그랭 페블 레더 클러치', price: '13,500원', original: '45,000원', discount: '70%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/thombrowne_clutch.jpg' },
+    { id: 14, brand: '구찌', title: 'GG 수프림 캔버스 슬링 메신저백', price: '15,000원', original: '50,000원', discount: '70%', tag: '앱전용', category: 'bag', image: '/assets/products/bags/gucci_gg_supreme.jpg' },
+    { id: 15, brand: '롤렉스', title: '오이스터 서브마리너 블랙 데이트', price: '85,000원', original: '250,000원', discount: '66%', tag: '예약 마감', category: 'watch', image: '/assets/products/watches/rolex_submariner.jpg' },
+    { id: 16, brand: '생로랑', title: '시티 나일론 블랙 백팩 클래식', price: '16,000원', original: '55,000원', discount: '71%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/saint_laurent_backpack.jpg' }
   ],
   '40대 여성': [
-    { brand: '에르메스', title: '버킨 25 토고 골드 하드웨어', price: '115,000원', original: '350,000원', discount: '67%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/hermes_birkin_25.jpg' },
-    { brand: '루이비통', title: '카푸신 BB 블랙 토뤼옹 핸드백', price: '39,000원', original: '130,000원', discount: '70%', tag: '앱전용', category: 'bag', image: '/assets/products/bags/louisvuitton_capucines_bb.jpg' },
-    { brand: '샤넬', title: '클래식 미디엄 캐비어 금장 플랩', price: '58,000원', original: '190,000원', discount: '69%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/chanel_classic_medium.jpg' },
-    { brand: '반클리프 아펠', title: '빈티지 알함브라 펜던트 옐로골드', price: '28,000원', original: '85,000원', discount: '67%', tag: '예약 마감', category: 'jewelry', image: '/assets/products/jewelry/vancleef_alhambra.jpg' }
+    { id: 17, brand: '에르메스', title: '버킨 25 토고 골드 하드웨어', price: '115,000원', original: '350,000원', discount: '67%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/hermes_birkin_25.jpg' },
+    { id: 18, brand: '루이비통', title: '카푸신 BB 블랙 토뤼옹 핸드백', price: '39,000원', original: '130,000원', discount: '70%', tag: '앱전용', category: 'bag', image: '/assets/products/bags/louisvuitton_capucines_bb.jpg' },
+    { id: 19, brand: '샤넬', title: '클래식 미디엄 캐비어 금장 플랩', price: '58,000원', original: '190,000원', discount: '69%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/chanel_classic_medium.jpg' },
+    { id: 20, brand: '반클리프 아펠', title: '빈티지 알함브라 펜던트 옐로골드', price: '28,000원', original: '85,000원', discount: '67%', tag: '예약 마감', category: 'jewelry', image: '/assets/products/jewelry/vancleef_alhambra.jpg' }
   ]
 };
 
@@ -406,12 +407,11 @@ export const ShopMain = () => {
           ))}
         </div>
         <div className="grid grid-cols-2 gap-3">
-          {currentRecommendList.map((item, i) => {
-            const pseudoId = 100 + i;
-            const isFav = favorites.includes(pseudoId);
+          {currentRecommendList.map((item) => {
+            const isFav = favorites.includes(item.id);
             return (
               <div 
-                key={i} 
+                key={item.id} 
                 onClick={() => {
                   showToast(`'${item.brand} ${item.title}' 상품 상세 화면으로 이동합니다.`, 'info');
                   setCurrentView('SHOP_CATEGORY');
@@ -429,8 +429,12 @@ export const ShopMain = () => {
                         showToast('좋아요를 저장하려면 먼저 로그인해주세요.', 'info');
                         setActiveOverlay('LOGIN');
                       } else {
-                        const isNowFav = await toggleFavorite(pseudoId);
-                        showToast(isNowFav ? `'${item.title}' 관심 상품에 추가되었습니다.` : `'${item.title}' 관심 상품에서 해제되었습니다.`, 'info');
+                        try {
+                          const isNowFav = await toggleFavorite(item.id);
+                          showToast(isNowFav ? `'${item.title}' 관심 상품에 추가되었습니다.` : `'${item.title}' 관심 상품에서 해제되었습니다.`, 'info');
+                        } catch (err: any) {
+                          showToast('좋아요 저장 중 서버 오류가 발생했습니다. 다시 시도해주세요.', 'error');
+                        }
                       }
                     }}
                     className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-md text-gray-400 hover:text-red-500 hover:bg-white transition shadow-xs z-10"

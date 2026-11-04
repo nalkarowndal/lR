@@ -55,13 +55,10 @@ export const ShopLike = () => {
     try {
       const res = await api.login({ email: email.trim(), password });
       if (res?.success) {
-        setAuthToken(res.token);
-        if (!rememberMe) {
-          // If rememberMe is false, clear on unload
-          window.sessionStorage.setItem('lr_session_only', '1');
-        } else {
-          window.sessionStorage.removeItem('lr_session_only');
-        }
+        // Enforce token storage destination based on '로그인 상태 유지' (rememberMe) checkbox:
+        // true -> localStorage (persistent across browser restarts)
+        // false -> sessionStorage (cleared immediately when browser session ends)
+        setAuthToken(res.token, rememberMe);
         setUser(res.user);
         setLoginSuccess(true);
         showToast(`${res.user.name}님, 환영합니다!`, 'success');

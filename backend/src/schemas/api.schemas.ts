@@ -11,7 +11,8 @@ export const CreateProductSchema = z.object({
 
 export const CreateSellRequestSchema = z.object({
   brandName: z.string().min(1, '판매할 브랜드명을 입력해주세요'),
-  userName: z.string().optional().default('고객')
+  userName: z.string().optional().default('고객'),
+  phone: z.string().optional().default('')
 });
 
 export const CreateRecruitRequestSchema = z.object({

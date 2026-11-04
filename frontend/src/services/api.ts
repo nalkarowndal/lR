@@ -7,18 +7,25 @@ const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://loca
 
 export function getAuthToken(): string | null {
   try {
-    return localStorage.getItem('lr_token');
+    return sessionStorage.getItem('lr_token') || localStorage.getItem('lr_token');
   } catch {
     return null;
   }
 }
 
-export function setAuthToken(token: string | null): void {
+export function setAuthToken(token: string | null, rememberMe = true): void {
   try {
     if (token) {
-      localStorage.setItem('lr_token', token);
+      if (rememberMe) {
+        localStorage.setItem('lr_token', token);
+        sessionStorage.removeItem('lr_token');
+      } else {
+        sessionStorage.setItem('lr_token', token);
+        localStorage.removeItem('lr_token');
+      }
     } else {
       localStorage.removeItem('lr_token');
+      sessionStorage.removeItem('lr_token');
     }
   } catch {}
 }
@@ -171,8 +178,14 @@ export const api = {
   },
 
   // Products
-  getProducts: async () => {
-    return fetchJson<{ success: boolean; data: any[] }>('/products');
+  getProducts: async (params?: { brand?: string; category?: string; type?: string; limit?: number }) => {
+    const qs = new URLSearchParams();
+    if (params?.brand) qs.set('brand', params.brand);
+    if (params?.category) qs.set('category', params.category);
+    if (params?.type) qs.set('type', params.type);
+    if (params?.limit) qs.set('limit', String(params.limit));
+    const query = qs.toString() ? `?${qs.toString()}` : '';
+    return fetchJson<{ success: boolean; data: any[] }>(`/products${query}`);
   },
 
   getProductById: async (id: number) => {
@@ -206,10 +219,10 @@ export const api = {
   },
 
   // Sell Requests
-  createSellRequest: async (brandName: string, userName = '고객') => {
+  createSellRequest: async (brandName: string, userName = '고객', phone = '') => {
     return fetchJson<{ success: boolean; message: string; data: any }>('/sell-requests', {
       method: 'POST',
-      body: JSON.stringify({ brandName, userName })
+      body: JSON.stringify({ brandName, userName, phone })
     });
   },
 

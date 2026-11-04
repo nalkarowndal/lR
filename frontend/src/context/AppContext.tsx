@@ -86,7 +86,7 @@ interface AppContextType {
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   isAuthLoading: boolean;
   logoutUser: () => Promise<void>;
-  checkUserAuth: () => Promise<void>;
+  checkUserAuth: () => Promise<User | null>;
   
   userSettings: UserSettings;
   updateUserSettings: (newSettings: Partial<UserSettings>) => Promise<void>;
@@ -184,24 +184,27 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }, 250);
   }, []);
 
-  const checkUserAuth = async () => {
+  const checkUserAuth = async (): Promise<User | null> => {
     try {
       setIsAuthLoading(true);
       const res = await api.getMyProfile();
       if (res?.success && res.profile) {
-        setUser({
+        const authedUser: User = {
           id: res.profile.id,
           email: res.profile.email,
           name: res.profile.name,
           role: res.profile.role,
           phone: res.profile.phone,
           avatar_url: res.profile.avatar_url
-        });
+        };
+        setUser(authedUser);
         if (res.profile.settings) {
           setUserSettings(res.profile.settings);
         }
+        return authedUser;
       } else {
         setUser(null);
+        return null;
       }
     } catch {
       // Fallback: check basic session
@@ -209,11 +212,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         const basicRes = await api.getMe();
         if (basicRes?.success && basicRes.user) {
           setUser(basicRes.user);
+          return basicRes.user;
         } else {
           setUser(null);
+          return null;
         }
       } catch {
         setUser(null);
+        return null;
       }
     } finally {
       setIsAuthLoading(false);
@@ -271,18 +277,27 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const isFav = favorites.includes(productId);
+    const previousFavorites = [...favorites];
     if (isFav) {
       setFavorites(prev => prev.filter(id => id !== productId));
       try {
         await api.removeFavorite(productId);
-      } catch {}
-      return false;
+        return false;
+      } catch (err) {
+        setFavorites(previousFavorites); // Revert on error
+        console.error('[AppContext] Failed to remove favorite:', err);
+        throw err;
+      }
     } else {
       setFavorites(prev => [...prev, productId]);
       try {
         await api.addFavorite(productId);
-      } catch {}
-      return true;
+        return true;
+      } catch (err) {
+        setFavorites(previousFavorites); // Revert on error
+        console.error('[AppContext] Failed to add favorite:', err);
+        throw err;
+      }
     }
   };
 
@@ -302,41 +317,63 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       setIsBackendConnected(true);
 
       // 0. Check Auth Session
-      await checkUserAuth();
+      const currentUser = await checkUserAuth();
 
-      // 1. Products
-      const prodsRes = await api.getProducts();
-      if (prodsRes?.success && Array.isArray(prodsRes.data)) {
-        setProducts(prodsRes.data.map(p => ({
-          id: p.id,
-          title: p.title,
-          type: p.type,
-          price: p.price,
-          brand: p.brand,
-          category: p.category,
-          image_url: p.image_url
-        })));
+      // 1. Products (Publicly accessible)
+      try {
+        const prodsRes = await api.getProducts();
+        if (prodsRes?.success && Array.isArray(prodsRes.data)) {
+          setProducts(prodsRes.data.map(p => ({
+            id: p.id,
+            title: p.title,
+            type: p.type,
+            price: p.price,
+            brand: p.brand,
+            category: p.category,
+            image_url: p.image_url
+          })));
+        }
+      } catch (err) {
+        console.warn('[AppContext] Failed to fetch products:', err);
       }
 
-      // 2. Recruit Requests
-      const recruitRes = await api.getRecruitRequests();
-      if (recruitRes?.success && Array.isArray(recruitRes.data)) {
-        setRequests(recruitRes.data);
-      }
+      // 2. Admin Datasets: only fetch when logged in as ADMIN
+      // This strictly prevents 403 Forbidden errors for regular customers or guests
+      if (currentUser?.role === 'ADMIN') {
+        try {
+          const recruitRes = await api.getRecruitRequests();
+          if (recruitRes?.success && Array.isArray(recruitRes.data)) {
+            setRequests(recruitRes.data);
+          }
+        } catch (err) {
+          console.warn('[AppContext] Admin recruit fetch notice:', err);
+        }
 
-      // 3. Workers
-      const workersRes = await api.getWorkers();
-      if (workersRes?.success && Array.isArray(workersRes.data)) {
-        setWorkerDB(workersRes.data.map(w => ({ ...w, checked: true })));
-      }
+        try {
+          const workersRes = await api.getWorkers();
+          if (workersRes?.success && Array.isArray(workersRes.data)) {
+            setWorkerDB(workersRes.data.map(w => ({ ...w, checked: true })));
+          }
+        } catch (err) {
+          console.warn('[AppContext] Admin workers fetch notice:', err);
+        }
 
-      // 4. Messages
-      const msgsRes = await api.getMessages();
-      if (msgsRes?.success && Array.isArray(msgsRes.data)) {
-        setMessages(msgsRes.data);
+        try {
+          const msgsRes = await api.getMessages();
+          if (msgsRes?.success && Array.isArray(msgsRes.data)) {
+            setMessages(msgsRes.data);
+          }
+        } catch (err) {
+          console.warn('[AppContext] Admin messages fetch notice:', err);
+        }
       }
-    } catch {
-      setIsBackendConnected(false);
+    } catch (err: any) {
+      console.warn('[AppContext] refreshData error:', err);
+      // Only set backend disconnected if health check fails or a network connection failure occurs
+      const isConnectionIssue = !navigator.onLine || err?.message?.includes('Failed to fetch') || err?.message?.includes('NetworkError');
+      if (isConnectionIssue) {
+        setIsBackendConnected(false);
+      }
       setIsAuthLoading(false);
     }
   };

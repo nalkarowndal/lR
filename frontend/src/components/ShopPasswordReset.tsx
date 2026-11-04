@@ -26,6 +26,16 @@ export const ShopPasswordReset = () => {
         }
       };
       window.addEventListener('keydown', handleKeyDown);
+
+      // Check if URL contains resetToken query param from email link
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlToken = urlParams.get('resetToken') || urlParams.get('token');
+      if (urlToken) {
+        setToken(urlToken);
+        setStep('RESET');
+        setSuccessMsg('이메일 재설정 링크가 확인되었습니다. 변경하실 새 비밀번호를 입력해주세요.');
+      }
+
       return () => window.removeEventListener('keydown', handleKeyDown);
     } else {
       setStep('REQUEST');
@@ -44,9 +54,8 @@ export const ShopPasswordReset = () => {
     try {
       const res = await api.forgotPassword(email.trim());
       if (res?.success) {
-        setSuccessMsg('재설정 안내가 처리되었습니다.');
+        setSuccessMsg(res.message || '등록된 이메일 계정으로 재설정 링크가 전송되었습니다.');
         if (res.resetToken) {
-          // Dev / demo: auto-fill reset token
           setToken(res.resetToken);
         }
         setStep('RESET');
@@ -162,6 +171,9 @@ export const ShopPasswordReset = () => {
                 required
                 className="w-full border border-gray-200 focus:border-gray-950 rounded-xl p-3.5 text-sm font-mono outline-none transition"
               />
+              <p className="text-[11px] text-gray-500 mt-1.5 leading-normal">
+                이메일 링크로 접속하신 경우 토큰이 자동 입력됩니다. 수동 입력 시 발송된 안내 메일 또는 서버 콘솔의 인증 토큰을 입력해주세요.
+              </p>
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-1.5">새 비밀번호</label>

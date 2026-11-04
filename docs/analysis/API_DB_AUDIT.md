@@ -63,3 +63,4 @@
    - 프로필 아바타: `frontend/public/assets/uploads/avatars/avatar_{userId}_{timestamp}.{ext}`
 3. **요청 본문 크기 상한 증액**:
    - `express.json({ limit: '10mb' })` 적용으로 최대 5MB 이미지의 Base64 전송 시 JSON 본문 초과 오류(Payload Too Large)를 원천 해결했습니다.
+

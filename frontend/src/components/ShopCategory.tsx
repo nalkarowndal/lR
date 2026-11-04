@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, MessageCircle, ShoppingCart, ChevronRight, Heart } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
@@ -9,6 +9,7 @@ import {
   CATEGORY_TOP_TILES,
   type CatalogProduct 
 } from '../data/catalog';
+import { api } from '../services/api';
 
 // 카테고리별 세부 서브카테고리 매핑
 const SUBCATEGORIES_BY_CATEGORY: Record<string, string[]> = {
@@ -31,6 +32,9 @@ export const ShopCategory = () => {
   const [activeBrand, setActiveBrand] = useState('루이비통');
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>('전체');
 
+  const [serverBrandProducts, setServerBrandProducts] = useState<CatalogProduct[]>([]);
+  const [isLoadingBrand, setIsLoadingBrand] = useState(false);
+
   const leftCategories = ['가방/핸드백', '의류', '슈즈', '지갑', '패션잡화', '시계/액세서리', '골프', '화장품/향수'];
   const currentSubCategories = SUBCATEGORIES_BY_CATEGORY[leftActive] || SUBCATEGORIES_BY_CATEGORY['가방/핸드백'];
 
@@ -43,7 +47,46 @@ export const ShopCategory = () => {
     { name: '셀린느' }
   ];
 
-  const currentBrandProducts: CatalogProduct[] = BRAND_PRODUCTS_MAP[activeBrand] || BRAND_PRODUCTS_MAP['루이비통'] || [];
+  // 브랜드 탭 전환 시 서버 데이터베이스에서 실시간 조회 (관리자가 등록한 최신 상품 포함)
+  useEffect(() => {
+    if (mainTab === 'BRAND') {
+      let isCurrent = true;
+      setIsLoadingBrand(true);
+      api.getProducts({ brand: activeBrand })
+        .then(res => {
+          if (isCurrent && res?.success && Array.isArray(res.data) && res.data.length > 0) {
+            const mapped: CatalogProduct[] = res.data.map(item => ({
+              id: item.id, // REAL DB integer ID
+              brand: item.brand,
+              title: item.title,
+              price: typeof item.price === 'number' ? `${item.price.toLocaleString()}원` : String(item.price),
+              discount: item.discount_rate || '',
+              unit: item.unit || '/1일',
+              tag: item.tag || '',
+              isExcellent: item.price >= 800000 || item.tag === '프리미엄' || item.tag === '인기상품',
+              category: item.category || 'bag',
+              imageUrl: item.image_url || undefined,
+              imageStatus: 'READY'
+            }));
+            setServerBrandProducts(mapped);
+          } else if (isCurrent) {
+            setServerBrandProducts([]);
+          }
+        })
+        .catch(() => {
+          if (isCurrent) setServerBrandProducts([]);
+        })
+        .finally(() => {
+          if (isCurrent) setIsLoadingBrand(false);
+        });
+
+      return () => { isCurrent = false; };
+    }
+  }, [mainTab, activeBrand]);
+
+  const currentBrandProducts: CatalogProduct[] = serverBrandProducts.length > 0
+    ? serverBrandProducts
+    : (BRAND_PRODUCTS_MAP[activeBrand] || BRAND_PRODUCTS_MAP['루이비통'] || []);
 
   const handleTileClick = (targetCategory: string, tileTitle: string) => {
     setLeftActive(targetCategory);
@@ -254,7 +297,9 @@ export const ShopCategory = () => {
           {/* 선택된 브랜드 상품 그리드 (2열) */}
           <div className="grid grid-cols-2 gap-x-3 gap-y-6 mb-6">
             {currentBrandProducts.map((item) => {
-              const numericId = parseInt(String(item.id).replace(/\D/g, ''), 10) || 1000;
+              const numericId = typeof item.id === 'number'
+                ? item.id
+                : (parseInt(String(item.id).replace(/\D/g, ''), 10) || 1);
               const isFav = favorites.includes(numericId);
               return (
                 <div 
@@ -278,8 +323,12 @@ export const ShopCategory = () => {
                           showToast('좋아요를 저장하려면 로그인이 필요합니다.', 'info');
                           setActiveOverlay('LOGIN');
                         } else {
-                          const isNowFav = await toggleFavorite(numericId);
-                          showToast(isNowFav ? `'${item.title}' 관심 상품에 추가되었습니다.` : `'${item.title}' 관심 상품에서 삭제되었습니다.`, 'info');
+                          try {
+                            const isNowFav = await toggleFavorite(numericId);
+                            showToast(isNowFav ? `'${item.title}' 관심 상품에 추가되었습니다.` : `'${item.title}' 관심 상품에서 해제되었습니다.`, 'info');
+                          } catch (err: any) {
+                            showToast('좋아요 저장 중 서버 오류가 발생했습니다. 다시 시도해주세요.', 'error');
+                          }
                         }
                       }}
                       className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-md text-gray-400 hover:text-red-500 hover:bg-white transition shadow-xs z-10"

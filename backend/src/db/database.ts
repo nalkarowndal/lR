@@ -70,6 +70,7 @@ function initSchema(db: DatabaseSync) {
       user_id INTEGER,
       brand_name TEXT NOT NULL,
       user_name TEXT NOT NULL DEFAULT '고객',
+      phone TEXT NOT NULL DEFAULT '',
       status TEXT NOT NULL DEFAULT '접수완료',
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
@@ -233,7 +234,10 @@ function initSchema(db: DatabaseSync) {
   } catch {}
 
   try {
-    db.exec(`ALTER TABLE sell_requests ADD COLUMN user_id INTEGER;`);
+    db.exec(`ALTER TABLE sell_requests ADD COLUMN user_id INTEGER;
+  } catch {}
+  try {
+    db.exec(ALTER TABLE sell_requests ADD COLUMN phone TEXT DEFAULT '';);`);
   } catch {}
 
   // Seed default legal documents if empty

@@ -37,3 +37,4 @@
 - **유효 파일**: Base64 JPEG 전송 시 200 OK 및 `/assets/uploads/avatars/avatar_...` 저장.
 - **비정상 파일**: 임의 텍스트 Base64 전송 시 400 Bad Request (`지원되지 않는 이미지 형식입니다.`).
 - **결과**: **PASS**
+

@@ -145,14 +145,25 @@ test('Backend Health & API Endpoints Suite', async (t) => {
     });
     const forgotData = await forgotRes.json();
     assert.equal(forgotRes.status, 200);
-    assert.ok(forgotData.resetToken);
+    assert.equal(forgotData.success, true);
+    // OWASP compliance: reset token must never be leaked in public response payload
+    assert.equal(forgotData.resetToken, undefined);
+
+    // Retrieve dispatched token from database (simulating receipt from user inbox)
+    const tokenRow = testDb.prepare(`
+      SELECT token FROM password_reset_tokens 
+      WHERE user_id = (SELECT id FROM users WHERE email = 'customer@luxuryrental.com')
+      ORDER BY created_at DESC LIMIT 1
+    `).get();
+    assert.ok(tokenRow && tokenRow.token);
+    const resetToken = tokenRow.token;
 
     // Reset password with token
     const resetRes = await fetch(`${baseUrl}/auth/reset-password`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
-        token: forgotData.resetToken,
+        token: resetToken,
         newPassword: 'newLuxuryPassword999!'
       })
     });
@@ -160,29 +171,33 @@ test('Backend Health & API Endpoints Suite', async (t) => {
     assert.equal(resetRes.status, 200);
     assert.equal(resetData.success, true);
 
-    // Try resetting again with same token (should fail 400)
+    // Try resetting again with same token (should fail 400 - used token)
     const repeatRes = await fetch(`${baseUrl}/auth/reset-password`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
-        token: forgotData.resetToken,
+        token: resetToken,
         newPassword: 'anotherPassword123!'
       })
     });
     assert.equal(repeatRes.status, 400);
 
     // Restore customer password
-    const restoreForgot = await fetch(`${baseUrl}/auth/forgot-password`, {
+    await fetch(`${baseUrl}/auth/forgot-password`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ email: 'customer@luxuryrental.com' })
     });
-    const restoreForgotData = await restoreForgot.json();
+    const restoreTokenRow = testDb.prepare(`
+      SELECT token FROM password_reset_tokens 
+      WHERE user_id = (SELECT id FROM users WHERE email = 'customer@luxuryrental.com')
+      ORDER BY created_at DESC LIMIT 1
+    `).get();
     await fetch(`${baseUrl}/auth/reset-password`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
-        token: restoreForgotData.resetToken,
+        token: restoreTokenRow.token,
         newPassword: 'luxury1234!'
       })
     });
@@ -306,12 +321,13 @@ test('Backend Health & API Endpoints Suite', async (t) => {
     const res = await fetch(`${baseUrl}/sell-requests`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ brandName: '고야드', userName: '테스트고객' })
+      body: JSON.stringify({ brandName: '고야드', userName: '테스트고객', phone: '010-1234-5678' })
     });
     const data = await res.json();
     assert.equal(res.status, 201);
     assert.equal(data.success, true);
     assert.equal(data.data.brandName, '고야드');
+    assert.equal(data.data.phone, '010-1234-5678');
   });
 
   await t.test('POST /sell-requests rejects empty brandName with 400', async () => {
@@ -692,6 +708,70 @@ test('Backend Health & API Endpoints Suite', async (t) => {
     await fetch(`${baseUrl}/admin/products/1/images/${data.data.id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+  });
+
+  // ==========================================
+  // [NEW COMPREHENSIVE QA VERIFICATION SUITE]
+  // ==========================================
+  await t.test('POST /sell-requests requires phone contact for guest applicants', async () => {
+    // 1. Unauthenticated guest request without phone -> rejected 400
+    const failRes = await fetch(`${baseUrl}/sell-requests`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ brandName: '구찌 (Gucci)' })
+    });
+    assert.equal(failRes.status, 400);
+    const failData = await failRes.json();
+    assert.ok(failData.error.includes('연락처'));
+
+    // 2. Unauthenticated guest request with phone -> succeeds 201
+    const okRes = await fetch(`${baseUrl}/sell-requests`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        brandName: '구찌 (Gucci)',
+        userName: '게스트신청자',
+        phone: '010-9876-5432'
+      })
+    });
+    assert.equal(okRes.status, 201);
+    const okData = await okRes.json();
+    assert.equal(okData.data.phone, '010-9876-5432');
+    assert.equal(okData.data.userName, '게스트신청자');
+  });
+
+  await t.test('GET /products?brand=스톤 아일랜드 returns real DB products with numeric IDs', async () => {
+    const res = await fetch(`${baseUrl}/products?brand=${encodeURIComponent('스톤 아일랜드')}`);
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.success, true);
+    assert.ok(data.data.length > 0);
+    for (const item of data.data) {
+      assert.equal(typeof item.id, 'number');
+      assert.equal(item.brand, '스톤 아일랜드');
+    }
+  });
+
+  await t.test('POST /users/me/favorites rejects invalid product IDs with foreign key enforcement', async () => {
+    // Foreign key enforcement (PRAGMA foreign_keys = ON) blocks non-existent product ID 999999
+    const failRes = await fetch(`${baseUrl}/users/me/favorites/999999`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${customerToken}` }
+    });
+    assert.equal(failRes.status, 500);
+
+    // Valid product ID 1 succeeds
+    const okRes = await fetch(`${baseUrl}/users/me/favorites/1`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${customerToken}` }
+    });
+    assert.equal(okRes.status, 200);
+
+    // Cleanup favorite
+    await fetch(`${baseUrl}/users/me/favorites/1`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${customerToken}` }
     });
   });
 

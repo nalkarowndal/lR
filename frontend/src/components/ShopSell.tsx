@@ -4,7 +4,7 @@ import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 
 export const ShopSell = () => {
-  const { goBack } = useApp();
+  const { goBack, user } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBrand, setSelectedBrand] = useState<{ ko: string; en: string } | null>(null);
   const [showDirectModal, setShowDirectModal] = useState(false);
@@ -23,6 +23,9 @@ export const ShopSell = () => {
     isOpen: false,
     message: ''
   });
+  const [guestName, setGuestName] = useState('');
+  const [guestPhone, setGuestPhone] = useState('');
+  const [guestPhoneError, setGuestPhoneError] = useState('');
 
   const brands = [
     { ko: '고야드', en: 'Goyard' },
@@ -51,14 +54,36 @@ export const ShopSell = () => {
   const handleConfirmSell = async () => {
     if (!confirmModal.brand) return;
     const brand = confirmModal.brand;
+
+    // 비회원인 경우 감정팀 회신 연락처 필수 검증
+    if (!user) {
+      const cleanPhone = guestPhone.trim();
+      if (!cleanPhone || cleanPhone.length < 9) {
+        setGuestPhoneError('감정팀의 안내 및 무료 수거 연락을 위해 연락처를 입력해주세요.');
+        return;
+      }
+    }
+
     setConfirmModal({ isOpen: false, brand: null });
     setIsSubmitting(true);
+    setGuestPhoneError('');
+
     try {
-      await api.createSellRequest(`${brand.ko} (${brand.en})`);
+      const applicantName = user ? user.name : (guestName.trim() || '고객');
+      const applicantPhone = user ? (user.phone || '') : guestPhone.trim();
+
+      await api.createSellRequest(
+        brand.en === 'Custom' ? brand.ko : `${brand.ko} (${brand.en})`,
+        applicantName,
+        applicantPhone
+      );
+
       setSellModal({
         isOpen: true,
-        message: `'${brand.ko} (${brand.en})' 브랜드 위탁 판매 신청이 정상 접수되었습니다. 전문 감정팀 검수 후 안내 연락을 드립니다.`
+        message: `'${brand.ko}' 위탁 판매 신청이 정상 접수되었습니다. 감정팀이 ${applicantPhone ? `'${applicantPhone}' 번호로 ` : ''}안내 연락을 드립니다.`
       });
+      setGuestPhone('');
+      setGuestName('');
     } catch (err: any) {
       setErrorModal({
         isOpen: true,
@@ -69,28 +94,14 @@ export const ShopSell = () => {
     }
   };
 
-  const handleDirectRegister = async (e: React.FormEvent) => {
+  const handleDirectRegister = (e: React.FormEvent) => {
     e.preventDefault();
     const name = directBrandName.trim();
     if (!name) return;
     setShowDirectModal(false);
     setSelectedBrand({ ko: name, en: 'Custom' });
-    setIsSubmitting(true);
-    try {
-      await api.createSellRequest(name);
-      setSellModal({
-        isOpen: true,
-        message: `'${name}' 브랜드 직접 등록이 정상 접수되었습니다. 전문 감정팀 검수 후 판매 절차가 진행됩니다.`
-      });
-      setDirectBrandName('');
-    } catch (err: any) {
-      setErrorModal({
-        isOpen: true,
-        message: err.message || '브랜드 직접 등록 접수 중 오류가 발생했습니다.'
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    setConfirmModal({ isOpen: true, brand: { ko: name, en: 'Custom' } });
+    setDirectBrandName('');
   };
 
   return (
@@ -106,7 +117,7 @@ export const ShopSell = () => {
             <p className="text-xs text-gray-500 mb-4">
               선택하신 <span className="font-bold text-gray-900">'{confirmModal.brand.ko} ({confirmModal.brand.en})'</span> 브랜드의 명품 위탁 판매를 접수하시겠습니까?
             </p>
-            <div className="w-full bg-gray-50 rounded-xl p-3 text-left text-[11px] text-gray-600 space-y-1 mb-5">
+            <div className="w-full bg-gray-50 rounded-xl p-3 text-left text-[11px] text-gray-600 space-y-1 mb-4">
               <div className="flex items-center gap-1.5 font-bold text-gray-800">
                 <Check size={12} className="text-emerald-600" /> 감정팀 무료 방문·택배 수거
               </div>
@@ -117,10 +128,60 @@ export const ShopSell = () => {
                 <Check size={12} className="text-emerald-600" /> 월간 렌탈 정산 수익 보장
               </div>
             </div>
+
+            {/* 회원 신청자 정보 또는 비회원 연락처 입력 */}
+            {user ? (
+              <div className="w-full bg-gray-100/70 border border-gray-200 rounded-xl p-2.5 mb-4 text-left">
+                <p className="text-[11px] text-gray-500 font-medium">신청 회원</p>
+                <p className="text-xs font-bold text-gray-900 mt-0.5">
+                  {user.name} <span className="text-gray-500 font-normal">({user.phone || user.email})</span>
+                </p>
+              </div>
+            ) : (
+              <div className="w-full text-left space-y-2 mb-4">
+                <div className="bg-amber-50/80 border border-amber-200/80 rounded-xl p-2.5 text-[11px] text-amber-900 leading-tight">
+                  <span className="font-bold">비회원 안내:</span> 감정팀의 안내 및 무료 수거 방문을 위해 연락처를 입력해주세요.
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-gray-700 block mb-1">신청자 성명 (선택)</label>
+                  <input 
+                    type="text" 
+                    value={guestName}
+                    onChange={(e) => setGuestName(e.target.value)}
+                    placeholder="성함 입력 (예: 홍길동)"
+                    className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl outline-none focus:border-black transition"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-gray-700 block mb-1">
+                    회신 연락처 <span className="text-red-500 font-black">*</span>
+                  </label>
+                  <input 
+                    type="tel" 
+                    value={guestPhone}
+                    onChange={(e) => {
+                      setGuestPhone(e.target.value);
+                      if (guestPhoneError) setGuestPhoneError('');
+                    }}
+                    placeholder="010-1234-5678"
+                    className={`w-full text-xs px-3 py-2 border rounded-xl outline-none transition ${
+                      guestPhoneError ? 'border-red-500 bg-red-50/30' : 'border-gray-200 focus:border-black'
+                    }`}
+                  />
+                  {guestPhoneError && (
+                    <p className="text-[11px] text-red-600 mt-1 font-semibold">{guestPhoneError}</p>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-2 w-full">
               <button 
                 type="button"
-                onClick={() => setConfirmModal({ isOpen: false, brand: null })}
+                onClick={() => {
+                  setConfirmModal({ isOpen: false, brand: null });
+                  setGuestPhoneError('');
+                }}
                 className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-xs transition"
               >
                 취소

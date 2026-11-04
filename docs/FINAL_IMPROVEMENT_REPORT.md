@@ -60,3 +60,4 @@
 - **Backend**: Node.js + Express + TypeScript + SQLite (`http://localhost:4000`)
 - **관리자 계정**: `admin@luxuryrental.com` / `admin1234!`
 - **일반 회원 계정**: `customer@luxuryrental.com` / `luxury1234!`
+
