@@ -242,8 +242,8 @@ export const ShopCategory = () => {
                 className="flex flex-col items-center gap-2 cursor-pointer min-w-[60px] active:scale-95 transition-transform"
               >
                 <BrandMonogram name={brand.name} active={activeBrand === brand.name} />
-                <span className={`text-[11px] font-extrabold ${
-                  activeBrand === brand.name ? 'text-blue-600' : 'text-gray-700'
+                <span className={`text-[11px] transition-colors ${
+                  activeBrand === brand.name ? 'text-[#252525] font-black' : 'text-gray-600 font-bold'
                 }`}>
                   {brand.name}
                 </span>
@@ -284,7 +284,7 @@ export const ShopCategory = () => {
                     </div>
                   )}
                 </div>
-                <span className="font-black text-xs text-gray-900 group-hover:text-blue-600 transition-colors">{activeBrand}</span>
+                <span className="font-black text-xs text-gray-900 group-hover:text-[#B49A67] transition-colors">{activeBrand}</span>
                 <span className="text-[11px] text-gray-600 truncate">{item.title}</span>
                 <div className="mt-1 flex items-baseline gap-1">
                   {item.discount && <span className="text-teal-600 font-extrabold text-sm">{item.discount}</span>}

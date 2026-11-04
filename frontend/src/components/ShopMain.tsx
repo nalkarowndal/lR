@@ -245,17 +245,17 @@ export const ShopMain = () => {
               tabIndex={0}
               onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigateTo('SHOP_CATEGORY')}
               onClick={() => navigateTo('SHOP_CATEGORY')}
-              className="bg-pink-50/70 border border-pink-100 hover:border-pink-200 hover:shadow-md active:scale-[0.98] p-4 rounded-2xl flex flex-col justify-between cursor-pointer transition-all group"
+              className="bg-[#FBF9F5] border border-[#EBE6DC] hover:border-[#B49A67]/50 hover:shadow-md active:scale-[0.98] p-4 rounded-2xl flex flex-col justify-between cursor-pointer transition-all group"
             >
               <div>
-                <span className="text-[11px] bg-pink-500 text-white font-extrabold px-2 py-0.5 rounded-md inline-block mb-2 shadow-xs">
+                <span className="text-[11px] bg-[#252525] text-[#DFCA9B] font-extrabold px-2.5 py-0.5 rounded-md inline-block mb-2 shadow-xs border border-[#B49A67]/30">
                   첫 렌트 70% 할인
                 </span>
-                <h4 className="font-extrabold text-gray-900 text-base group-hover:text-pink-600 transition-colors">렌트하기</h4>
+                <h4 className="font-extrabold text-gray-900 text-base group-hover:text-[#8C734B] transition-colors">렌트하기</h4>
                 <p className="text-[11px] text-gray-500 mt-0.5 leading-tight">특별한 날,<br />마음껏 렌트하기</p>
               </div>
               <div className="flex justify-end mt-3">
-                <LuxuryDressIcon className="w-10 h-10 text-pink-500 transition-transform group-hover:scale-110" />
+                <LuxuryDressIcon className="w-11 h-11 transition-transform group-hover:scale-105" />
               </div>
             </div>
 
@@ -264,17 +264,17 @@ export const ShopMain = () => {
               tabIndex={0}
               onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigateTo('SHOP_CATEGORY')}
               onClick={() => navigateTo('SHOP_CATEGORY')}
-              className="bg-blue-50/70 border border-blue-100 hover:border-blue-200 hover:shadow-md active:scale-[0.98] p-4 rounded-2xl flex flex-col justify-between cursor-pointer transition-all group"
+              className="bg-[#F8F9FA] border border-[#E7E9ED] hover:border-gray-400 hover:shadow-md active:scale-[0.98] p-4 rounded-2xl flex flex-col justify-between cursor-pointer transition-all group"
             >
               <div>
-                <span className="text-[11px] bg-blue-500 text-white font-extrabold px-2 py-0.5 rounded-md inline-block mb-2 shadow-xs">
+                <span className="text-[11px] bg-[#252525] text-white font-extrabold px-2.5 py-0.5 rounded-md inline-block mb-2 shadow-xs">
                   정품 보증
                 </span>
-                <h4 className="font-extrabold text-gray-900 text-base group-hover:text-blue-600 transition-colors">구매하기</h4>
-                <p className="text-[11px] text-gray-500 mt-0.5 leading-tight">내 마 음에 쏙,<br />지금 바로 구매하기</p>
+                <h4 className="font-extrabold text-gray-900 text-base group-hover:text-black transition-colors">구매하기</h4>
+                <p className="text-[11px] text-gray-500 mt-0.5 leading-tight">내 마음에 쏙,<br />지금 바로 구매하기</p>
               </div>
               <div className="flex justify-end mt-3">
-                <LuxuryBagIcon className="w-10 h-10 text-blue-500 transition-transform group-hover:scale-110" />
+                <LuxuryBagIcon className="w-11 h-11 transition-transform group-hover:scale-105" />
               </div>
             </div>
           </div>
@@ -284,17 +284,17 @@ export const ShopMain = () => {
             tabIndex={0}
             onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigateTo('SHOP_SELL')}
             onClick={() => navigateTo('SHOP_SELL')}
-            className="bg-emerald-50/70 border border-emerald-100 hover:border-emerald-200 hover:shadow-md active:scale-[0.99] p-4 rounded-2xl flex justify-between items-center cursor-pointer transition-all group"
+            className="bg-[#FAF9F5] border border-[#EBE5D8] hover:border-[#B49A67]/50 hover:shadow-md active:scale-[0.99] p-4 rounded-2xl flex justify-between items-center cursor-pointer transition-all group"
           >
             <div>
-              <span className="text-[11px] bg-emerald-600 text-white font-extrabold px-2 py-0.5 rounded-md inline-block mb-1.5 shadow-xs">
+              <span className="text-[11px] bg-[#8C734B] text-white font-extrabold px-2.5 py-0.5 rounded-md inline-block mb-1.5 shadow-xs">
                 간편 위탁
               </span>
-              <h4 className="font-extrabold text-gray-900 text-base group-hover:text-emerald-700 transition-colors">판매하기</h4>
+              <h4 className="font-extrabold text-gray-900 text-base group-hover:text-[#8C734B] transition-colors">판매하기</h4>
               <p className="text-[11px] text-gray-500">내 명품, 쉽고 빠르게 판매하기</p>
             </div>
             <div className="pr-1">
-              <LuxuryHandshakeIcon className="w-11 h-11 text-emerald-600 transition-transform group-hover:scale-110" />
+              <LuxuryHandshakeIcon className="w-12 h-12 transition-transform group-hover:scale-105" />
             </div>
           </div>
         </div>
@@ -337,7 +337,7 @@ export const ShopMain = () => {
           </div>
         </div>
 
-        {/* 8-Grid 프리미엄 아이콘 메뉴 */}
+        {/* 8-Grid 프리미엄 각인 아이콘 메뉴 */}
         <div className="grid grid-cols-4 gap-y-6 gap-x-2 text-center bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
           {[
             { icon: <MenuHangerIcon />, title: '렌트 소개' },
@@ -357,7 +357,7 @@ export const ShopMain = () => {
               onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleMenuClick(menu.title)}
               className="flex flex-col items-center gap-2 cursor-pointer group active:scale-95 transition-transform"
             >
-              <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center border border-gray-100 shadow-2xs group-hover:bg-gray-100 group-hover:border-gray-200 transition-colors">
+              <div className="w-12 h-12 bg-[#FAF9F6] rounded-2xl flex items-center justify-center border border-[#EAE6DD] shadow-2xs group-hover:bg-[#F2EFE9] group-hover:border-[#B49A67]/50 group-hover:shadow-xs transition-all">
                 {menu.icon}
               </div>
               <span className="text-[11px] font-bold text-gray-800 group-hover:text-black transition-colors">{menu.title}</span>

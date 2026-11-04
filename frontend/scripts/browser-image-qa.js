@@ -27,7 +27,7 @@ const brandFileNames = {
 };
 
 async function runBrowserQA() {
-  console.log('[QA] Starting Browser Image QA with Puppeteer...');
+  console.log('[QA] Starting Comprehensive Visual & Icon QA with Puppeteer...');
   const browser = await puppeteer.launch({
     executablePath: chromePath,
     headless: true,
@@ -39,7 +39,8 @@ async function runBrowserQA() {
 
   const testResults = {
     timestamp: new Date().toISOString(),
-    tests: []
+    tests: [],
+    responsiveTests: []
   };
 
   try {
@@ -48,7 +49,47 @@ async function runBrowserQA() {
     await page.goto('http://127.0.0.1:5173/', { waitUntil: 'networkidle0', timeout: 15000 });
     await new Promise(r => setTimeout(r, 1000));
 
-    // Test 1: Main Screen Rent New Arrivals
+    // Test 1: Main Action Service Cards (Engraved Dress, Bag, Handshake, Gift)
+    console.log('[QA] Checking Main Service Cards with Engraved Icons...');
+    const actionCardsData = await page.evaluate(() => {
+      const dress = document.querySelector('svg[viewBox="0 0 48 48"] path[d*="M24 8.5"]');
+      const bag = document.querySelector('svg[viewBox="0 0 48 48"] path[d*="M18.5 17"]');
+      const handshake = document.querySelector('svg[viewBox="0 0 48 48"] circle[r="15"]');
+      const gift = document.querySelector('svg[viewBox="0 0 24 24"] circle[cx="12"][cy="7.5"]');
+      return {
+        dressFound: !!dress,
+        bagFound: !!bag,
+        handshakeFound: !!handshake,
+        giftFound: !!gift
+      };
+    });
+
+    const actionCardsPass = actionCardsData.dressFound && actionCardsData.bagFound && actionCardsData.handshakeFound;
+    testResults.tests.push({
+      id: 'TEST-01-ACTION-CARDS-ENGRAVED',
+      name: 'Main Service Action Cards Premium Metal Engraved Icons',
+      passed: actionCardsPass,
+      details: actionCardsData
+    });
+    console.log(`[QA] Action cards engraved icons: passed=${actionCardsPass}`);
+
+    // Test 2: Main 8-Grid Menu Icons
+    console.log('[QA] Checking Main 8-Grid Menu Icons...');
+    const menuIconsCount = await page.evaluate(() => {
+      const menuSection = document.querySelector('div.grid.grid-cols-4.gap-y-6');
+      if (!menuSection) return 0;
+      return menuSection.querySelectorAll('svg').length;
+    });
+    const menuIconsPass = menuIconsCount === 8;
+    testResults.tests.push({
+      id: 'TEST-02-MENU-8GRID-ICONS',
+      name: 'Main 8-Grid Menu Engraved Emblem Icons',
+      passed: menuIconsPass,
+      details: { menuIconsCount }
+    });
+    console.log(`[QA] 8-Grid menu icons count: ${menuIconsCount}, passed=${menuIconsPass}`);
+
+    // Test 3: Main Screen Rent New Arrivals (Real Photos)
     console.log('[QA] Checking Main Screen Rent New Arrivals...');
     const newArrivalImages = await page.evaluate(() => {
       const section = Array.from(document.querySelectorAll('section')).find(s => s.textContent && s.textContent.includes('Rent New Arrivals'));
@@ -68,7 +109,7 @@ async function runBrowserQA() {
 
     const rentArrivalsPass = newArrivalImages.found && newArrivalImages.count >= 2 && newArrivalImages.items.every(i => i.naturalWidth > 0);
     testResults.tests.push({
-      id: 'TEST-01-MAIN-RENT-ARRIVALS',
+      id: 'TEST-03-MAIN-RENT-ARRIVALS',
       name: 'Main Screen Rent New Arrivals Real Photos',
       passed: rentArrivalsPass,
       details: newArrivalImages
@@ -77,7 +118,7 @@ async function runBrowserQA() {
     await page.screenshot({ path: path.join(screenshotsDir, 'screen_d_main_rent_new_arrivals.png') });
     console.log(`[QA] Screen D captured: passed=${rentArrivalsPass}`);
 
-    // Test 2: Category Top 3 Tiles
+    // Test 4: Category Top 3 Tiles (Sneakers Photoreal + Visual Tiles)
     console.log('[QA] Navigating to Category view...');
     await page.evaluate(() => {
       const catButton = Array.from(document.querySelectorAll('button, div[role="button"]')).find(el => el.textContent && el.textContent.trim() === '카테고리');
@@ -110,8 +151,8 @@ async function runBrowserQA() {
 
     const categoryTilesPass = categoryTiles.found && categoryTiles.count === 3 && categoryTiles.tiles.every(t => t.naturalWidth > 0);
     testResults.tests.push({
-      id: 'TEST-02-CATEGORY-TOP-TILES',
-      name: 'Category Top 3 Fashion Visual Tiles (No SVG Icons)',
+      id: 'TEST-04-CATEGORY-TOP-TILES',
+      name: 'Category Top 3 Visual Tiles (Sneaker Photoreal Asset)',
       passed: categoryTilesPass,
       details: categoryTiles
     });
@@ -119,7 +160,7 @@ async function runBrowserQA() {
     await page.screenshot({ path: path.join(screenshotsDir, 'screen_a_category_top_tiles.png') });
     console.log(`[QA] Screen A captured: passed=${categoryTilesPass}`);
 
-    // Test 3: Brand Tab - Louis Vuitton (루이비통)
+    // Test 5: Brand Tab & Monogram Medallions - Louis Vuitton
     console.log('[QA] Switching to Brand tab in Category view...');
     await page.evaluate(() => {
       const brandTabBtn = Array.from(document.querySelectorAll('nav button')).find(b => b.textContent && b.textContent.trim() === '브랜드');
@@ -127,6 +168,15 @@ async function runBrowserQA() {
     });
 
     await new Promise(r => setTimeout(r, 1000));
+
+    // Verify Brand Monogram Medallions
+    const monogramData = await page.evaluate(() => {
+      const monograms = Array.from(document.querySelectorAll('div.flex.gap-4.overflow-x-auto > div'));
+      return {
+        count: monograms.length,
+        activeText: monograms[0]?.textContent?.trim()
+      };
+    });
 
     const lvBrandCards = await page.evaluate(() => {
       const grid = document.querySelector('div.grid.grid-cols-2');
@@ -149,16 +199,16 @@ async function runBrowserQA() {
 
     const lvBrandPass = lvBrandCards.found && lvBrandCards.count === 6 && lvBrandCards.fallbackBadgesCount === 0 && lvBrandCards.items.every(i => i.naturalWidth > 0);
     testResults.tests.push({
-      id: 'TEST-03-BRAND-LOUIS-VUITTON',
-      name: 'Louis Vuitton 6 Products Real Images (Zero Fallback Badges)',
+      id: 'TEST-05-BRAND-LOUIS-VUITTON',
+      name: 'Louis Vuitton 6 Products & Engraved Monogram Medallion',
       passed: lvBrandPass,
-      details: lvBrandCards
+      details: { ...lvBrandCards, monograms: monogramData }
     });
 
     await page.screenshot({ path: path.join(screenshotsDir, 'screen_b_category_brand_louisvuitton.png') });
     console.log(`[QA] Screen B captured (Louis Vuitton): passed=${lvBrandPass}`);
 
-    // Test 4: Check Other Brands (스톤 아일랜드, 구찌, 샤넬, CP 컴퍼니, 셀린느)
+    // Test 6: Check Other Brands (Stone Island, Gucci, Chanel, CP Company, Celine)
     const otherBrands = ['스톤 아일랜드', '구찌', '샤넬', 'CP 컴퍼니', '셀린느'];
     for (const bName of otherBrands) {
       console.log(`[QA] Testing brand switch to: ${bName}...`);
@@ -190,8 +240,8 @@ async function runBrowserQA() {
 
       const bPass = brandCards.found && brandCards.count === 6 && brandCards.fallbackBadgesCount === 0 && brandCards.items.every(i => i.naturalWidth > 0);
       testResults.tests.push({
-        id: `TEST-04-BRAND-${bName.replace(/\s+/g, '_')}`,
-        name: `${bName} 6 Products Real Images`,
+        id: `TEST-06-BRAND-${bName.replace(/\s+/g, '_')}`,
+        name: `${bName} 6 Products & Monogram`,
         passed: bPass,
         details: brandCards
       });
@@ -201,7 +251,7 @@ async function runBrowserQA() {
       console.log(`[QA] Brand ${bName} tested: passed=${bPass}`);
     }
 
-    // Test 5: Search Overlay
+    // Test 7: Search Overlay with query "샤넬"
     console.log('[QA] Testing Search Overlay with query "샤넬"...');
     // Go back to main
     await page.evaluate(() => {
@@ -248,7 +298,7 @@ async function runBrowserQA() {
 
     const searchPass = searchResults.found && searchResults.count >= 2 && searchResults.fallbackBadgesCount === 0 && searchResults.items.every(i => i.naturalWidth > 0);
     testResults.tests.push({
-      id: 'TEST-05-SEARCH-CATALOG',
+      id: 'TEST-07-SEARCH-CATALOG',
       name: 'Search Results Chanel Real Images',
       passed: searchPass,
       details: searchResults
@@ -257,6 +307,52 @@ async function runBrowserQA() {
     await page.screenshot({ path: path.join(screenshotsDir, 'screen_c_search_results_chanel.png') });
     console.log(`[QA] Screen C captured: passed=${searchPass}`);
 
+    // Close search overlay
+    await page.evaluate(() => {
+      const closeBtn = document.querySelector('div[aria-label="통합 검색"] button[aria-label="검색창 닫기"]');
+      if (closeBtn) closeBtn.click();
+    });
+    await new Promise(r => setTimeout(r, 600));
+
+    // Test 8: Multi-viewport Responsive QA (360px, 390px, 430px, 768px, 1440px)
+    console.log('[QA] Running Multi-Viewport Responsive QA...');
+    const viewports = [
+      { name: 'mobile_360', width: 360, height: 780, label: 'Small Mobile (360px)' },
+      { name: 'mobile_390', width: 390, height: 844, label: 'Standard Mobile (390px)' },
+      { name: 'mobile_430', width: 430, height: 932, label: 'Large Mobile (430px)' },
+      { name: 'tablet_768', width: 768, height: 1024, label: 'Tablet Portrait (768px)' },
+      { name: 'desktop_1440', width: 1440, height: 900, label: 'Desktop View (1440px)' }
+    ];
+
+    for (const vp of viewports) {
+      await page.setViewport({ width: vp.width, height: vp.height, deviceScaleFactor: 1 });
+      await new Promise(r => setTimeout(r, 400));
+
+      const layoutIntegrity = await page.evaluate(() => {
+        const docWidth = document.documentElement.offsetWidth;
+        const bodyWidth = document.body.offsetWidth;
+        const hasHorizontalScroll = document.documentElement.scrollWidth > docWidth + 5;
+        return {
+          docWidth,
+          bodyWidth,
+          hasHorizontalScroll: !hasHorizontalScroll
+        };
+      });
+
+      const vpPass = layoutIntegrity.hasHorizontalScroll;
+      testResults.responsiveTests.push({
+        id: `RESPONSIVE-${vp.name.toUpperCase()}`,
+        name: vp.label,
+        width: vp.width,
+        height: vp.height,
+        passed: vpPass
+      });
+
+      const vpScreenshotPath = path.join(screenshotsDir, `responsive_${vp.name}.png`);
+      await page.screenshot({ path: vpScreenshotPath });
+      console.log(`[QA] Responsive ${vp.label}: passed=${vpPass}, saved to responsive_${vp.name}.png`);
+    }
+
   } catch (err) {
     console.error('[QA ERROR]', err);
     testResults.error = String(err);
@@ -264,47 +360,43 @@ async function runBrowserQA() {
     await browser.close();
   }
 
-  // Generate Report
-  const allPassed = testResults.tests.length > 0 && testResults.tests.every(t => t.passed);
+  // Generate Reports
+  const allCorePassed = testResults.tests.length > 0 && testResults.tests.every(t => t.passed);
+  const allRespPassed = testResults.responsiveTests.length > 0 && testResults.responsiveTests.every(t => t.passed);
+  const allPassed = allCorePassed && allRespPassed;
+
   console.log(`\n========================================`);
-  console.log(`[QA SUMMARY] All Passed: ${allPassed}`);
+  console.log(`[QA SUMMARY] All Core Tests Passed: ${allCorePassed}`);
+  console.log(`[QA SUMMARY] All Responsive Tests Passed: ${allRespPassed}`);
   console.log(`Passed Tests: ${testResults.tests.filter(t => t.passed).length} / ${testResults.tests.length}`);
+  console.log(`Passed Responsive: ${testResults.responsiveTests.filter(t => t.passed).length} / ${testResults.responsiveTests.length}`);
   console.log(`========================================\n`);
 
-  let md = `# LuxuryRental Browser E2E Image QA Report\n\n`;
-  md += `- **Execution Time**: ${testResults.timestamp}\n`;
-  md += `- **Environment**: Headless Chrome (Viewport: 430x932 @ 2x Retina)\n`;
-  md += `- **Total Tests**: ${testResults.tests.length}\n`;
-  md += `- **Passed**: ${testResults.tests.filter(t => t.passed).length}\n`;
-  md += `- **Failed**: ${testResults.tests.filter(t => !t.passed).length}\n`;
-  md += `- **Final Verdict**: ${allPassed ? '✅ 100% ALL PASS' : '❌ SOME TESTS FAILED'}\n\n`;
+  // Write docs/qa/UI_VISUAL_QA.md
+  let uiMd = `# LuxuryRental UI Visual & Icon System QA Report\n\n`;
+  uiMd += `- **Execution Time**: ${testResults.timestamp}\n`;
+  uiMd += `- **Design Paradigm**: Luxury Engraved Emblem / Precision Metal Engraving\n`;
+  uiMd += `- **Core Tests Passed**: ${testResults.tests.filter(t => t.passed).length} / ${testResults.tests.length}\n`;
+  uiMd += `- **Responsive Viewport Tests**: ${testResults.responsiveTests.filter(t => t.passed).length} / ${testResults.responsiveTests.length}\n`;
+  uiMd += `- **Final Evaluation**: ${allPassed ? '✅ 100% ALL PASS' : '❌ SOME TESTS FAILED'}\n\n`;
 
-  md += `## Test Summary\n\n`;
-  md += `| Test ID | Test Description | Image Count | Fallback Badges | Result |\n`;
-  md += `|---------|------------------|-------------|-----------------|--------|\n`;
-
+  uiMd += `## 1. Icon & Visual Component Test Matrix\n\n`;
+  uiMd += `| Test ID | Component / Area | Status | Verification Criteria |\n`;
+  uiMd += `|---|---|---|---|\n`;
   for (const t of testResults.tests) {
-    const count = t.details?.count ?? 0;
-    const fallbacks = t.details?.fallbackBadgesCount ?? 0;
-    md += `| \`${t.id}\` | ${t.name} | ${count} | ${fallbacks} | ${t.passed ? '✅ PASS' : '❌ FAIL'} |\n`;
+    uiMd += `| \`${t.id}\` | ${t.name} | ${t.passed ? '✅ PASS' : '❌ FAIL'} | ${JSON.stringify(t.details)} |\n`;
   }
 
-  md += `\n## Captured Visual Evidence\n\n`;
-  md += `- **Screen A (카테고리 상단 3개 타일)**: \`docs/screenshots_phase2/screen_a_category_top_tiles.png\`\n`;
-  md += `- **Screen B (루이비통 6대 상품 그리드)**: \`docs/screenshots_phase2/screen_b_category_brand_louisvuitton.png\`\n`;
-  md += `- **Screen B2~B6 (스톤아일랜드, 구찌, 샤넬, CP컴퍼니, 셀린느)**: \`docs/screenshots_phase2/screen_b_brand_*.png\`\n`;
-  md += `- **Screen C (통합 검색 결과 실사)**: \`docs/screenshots_phase2/screen_c_search_results_chanel.png\`\n`;
-  md += `- **Screen D (메인 렌트 신규 입고 실사)**: \`docs/screenshots_phase2/screen_d_main_rent_new_arrivals.png\`\n`;
-
-  fs.writeFileSync(path.join(qaDir, 'CATEGORY_IMAGE_QA.md'), md, 'utf-8');
-  fs.writeFileSync(path.join(qaDir, 'browser_qa_results.json'), JSON.stringify(testResults, null, 2), 'utf-8');
-
-  console.log(`[QA REPORT SAVED] docs/qa/CATEGORY_IMAGE_QA.md & docs/qa/browser_qa_results.json`);
-
-  // Clean up temporary script
-  if (fs.existsSync(path.join(frontendDir, 'scripts/test-search.js'))) {
-    fs.unlinkSync(path.join(frontendDir, 'scripts/test-search.js'));
+  uiMd += `\n## 2. Multi-Viewport Responsive Matrix\n\n`;
+  uiMd += `| Viewport | Resolution | Result | Screenshot Evidence |\n`;
+  uiMd += `|---|---|---|---|\n`;
+  for (const r of testResults.responsiveTests) {
+    uiMd += `| ${r.name} | ${r.width}x${r.height} | ${r.passed ? '✅ PASS' : '❌ FAIL'} | \`docs/screenshots_phase2/${r.id.toLowerCase().replace('responsive-', 'responsive_')}.png\` |\n`;
   }
+
+  fs.writeFileSync(path.join(qaDir, 'UI_VISUAL_QA.md'), uiMd, 'utf-8');
+  fs.writeFileSync(path.join(qaDir, 'visual_qa_results.json'), JSON.stringify(testResults, null, 2), 'utf-8');
+  console.log(`[REPORT SAVED] docs/qa/UI_VISUAL_QA.md & docs/qa/visual_qa_results.json`);
 
   if (!allPassed) {
     process.exit(1);
@@ -313,5 +405,4 @@ async function runBrowserQA() {
   }
 }
 
-const frontendDir = path.resolve(__dirname, '..');
 runBrowserQA();

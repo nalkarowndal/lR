@@ -1,33 +1,33 @@
-# luxuryRental UI/UX 및 시각적 회귀 QA 보고서 (UI_VISUAL_QA)
+# LuxuryRental UI Visual & Icon System QA Report
 
-## 1. 개요
+- **Execution Time**: 2026-11-04T05:33:07.433Z
+- **Design Paradigm**: Luxury Engraved Emblem / Precision Metal Engraving
+- **Core Tests Passed**: 11 / 11
+- **Responsive Viewport Tests**: 5 / 5
+- **Final Evaluation**: ✅ 100% ALL PASS
 
-기존 46개 기준선 스크린샷(`docs/screenshots/`)과 새로 구축된 고도화 화면(`docs/screenshots_phase2/`) 간의 시각적 일치성 및 인터랙션 품질을 다각도로 검수하였습니다.
+## 1. Icon & Visual Component Test Matrix
 
----
+| Test ID | Component / Area | Status | Verification Criteria |
+|---|---|---|---|
+| `TEST-01-ACTION-CARDS-ENGRAVED` | Main Service Action Cards Premium Metal Engraved Icons | ✅ PASS | {"dressFound":true,"bagFound":true,"handshakeFound":true,"giftFound":true} |
+| `TEST-02-MENU-8GRID-ICONS` | Main 8-Grid Menu Engraved Emblem Icons | ✅ PASS | {"menuIconsCount":8} |
+| `TEST-03-MAIN-RENT-ARRIVALS` | Main Screen Rent New Arrivals Real Photos | ✅ PASS | {"found":true,"count":2,"items":[{"src":"http://127.0.0.1:5173/assets/products/bags/balenciaga_le_city.jpg","naturalWidth":1024,"naturalHeight":1024,"complete":true},{"src":"http://127.0.0.1:5173/assets/products/bags/dior_lady_djoy.jpg","naturalWidth":1000,"naturalHeight":1000,"complete":true}]} |
+| `TEST-04-CATEGORY-TOP-TILES` | Category Top 3 Visual Tiles (Sneaker Photoreal Asset) | ✅ PASS | {"found":true,"count":3,"tiles":[{"src":"http://127.0.0.1:5173/assets/categories/sneaker_tile.jpg","alt":"오늘의 스니커즈","naturalWidth":1024,"naturalHeight":1024,"complete":true},{"src":"http://127.0.0.1:5173/assets/categories/jewelry_tile.jpg","alt":"요즘 이게 잘 나갑니다","naturalWidth":1000,"naturalHeight":1000,"complete":true},{"src":"http://127.0.0.1:5173/assets/categories/apparel_tile.jpg","alt":"봄 신상 코트·자켓","naturalWidth":1000,"naturalHeight":1000,"complete":true}]} |
+| `TEST-05-BRAND-LOUIS-VUITTON` | Louis Vuitton 6 Products & Engraved Monogram Medallion | ✅ PASS | {"found":true,"count":6,"fallbackBadgesCount":0,"items":[{"src":"http://127.0.0.1:5173/assets/products/clothing/louisvuitton_scarf.jpg","alt":"핑크 LV 에센셜 머플러","naturalWidth":1000,"naturalHeight":1000,"complete":true},{"src":"http://127.0.0.1:5173/assets/products/bags/louisvuitton_speedy.jpg","alt":"루이비통 M41526 모노그램 스피디 25","naturalWidth":1024,"naturalHeight":1024,"complete":true},{"src":"http://127.0.0.1:5173/assets/products/bags/louisvuitton_pouch_black.jpg","alt":"블랙 앙프렝뜨 이지 파우치 온 스트랩","naturalWidth":1000,"naturalHeight":1000,"complete":true},{"src":"http://127.0.0.1:5173/assets/products/bags/louisvuitton_epi_mirabeau.jpg","alt":"루이비통 블랙 에삐 레더 미라보 PM","naturalWidth":1000,"naturalHeight":1000,"complete":true},{"src":"http://127.0.0.1:5173/assets/products/bags/louisvuitton_nn14_canvas.jpg","alt":"루이비통 모노그램 NN14 이디스 버킷백","naturalWidth":1000,"naturalHeight":1000,"complete":true},{"src":"http://127.0.0.1:5173/assets/products/bags/louisvuitton_neonoe_bb.jpg","alt":"모노그램 네오노에 BB 버킷백","naturalWidth":1000,"naturalHeight":1000,"complete":true}],"monograms":{"count":6,"activeText":"LV루이비통"}} |
+| `TEST-06-BRAND-스톤_아일랜드` | 스톤 아일랜드 6 Products & Monogram | ✅ PASS | {"found":true,"count":6,"fallbackBadgesCount":0,"items":[{"src":"http://127.0.0.1:5173/assets/products/clothing/stoneisland_softshell_jacket.jpg","alt":"와펜 패치 소프트쉘 나일론 자켓","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/clothing/stoneisland_sweatshirt_black.jpg","alt":"크루넥 가먼트다잉 맨투맨 블랙","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/clothing/stoneisland_ghost_hoodie.jpg","alt":"고스트피스 나일론 메탈 후드","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/clothing/stoneisland_compass_cap.jpg","alt":"컴패스 로고 볼캡 블랙 프리","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/clothing/stoneisland_cargo_pants.jpg","alt":"카고 조거 팬츠 슬림핏 차콜","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/clothing/stoneisland_down_jacket.jpg","alt":"크링클 랩스 나일론 다운 패딩","naturalWidth":1000,"naturalHeight":1000}]} |
+| `TEST-06-BRAND-구찌` | 구찌 6 Products & Monogram | ✅ PASS | {"found":true,"count":6,"fallbackBadgesCount":0,"items":[{"src":"http://127.0.0.1:5173/assets/products/bags/gucci_marmont_black.jpg","alt":"GG 마몽 스몰 숄더백 블랙","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/bags/gucci_horsebit_1955.jpg","alt":"홀스빗 1955 미니 탑핸들백","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/bags/gucci_jackie_1961.jpg","alt":"재키 1961 스몰 숄더백 에토프","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/bags/gucci_interlocking_pouch.jpg","alt":"인터로킹 G 체인 크로스 파우치","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/bags/gucci_gg_supreme.jpg","alt":"GG 수프림 캔버스 슬링 메신저백","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/bags/gucci_dionysus_supermini.jpg","alt":"디오니소스 슈퍼미니 체인백","naturalWidth":1000,"naturalHeight":1000}]} |
+| `TEST-06-BRAND-샤넬` | 샤넬 6 Products & Monogram | ✅ PASS | {"found":true,"count":6,"fallbackBadgesCount":0,"items":[{"src":"http://127.0.0.1:5173/assets/products/bags/chanel_classic_medium.jpg","alt":"클래식 미디엄 캐비어 금장 플랩","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/bags/chanel_22_mini.jpg","alt":"샤넬 22 미니 핸드백 블랙 유광","naturalWidth":1024,"naturalHeight":1024},{"src":"http://127.0.0.1:5173/assets/products/bags/chanel_boy_chevron.jpg","alt":"보이 샤넬 스몰 쉐브론 체인백","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/wallets/chanel_classic_cardholder.jpg","alt":"CC 로고 클래식 카드홀더 캐비어","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/bags/chanel_gabrielle_hobo.jpg","alt":"가브리엘 호보백 스몰 빈티지","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/bags/chanel_coco_handle.jpg","alt":"코코핸들 미니 쉐브론 블랙 샴페인","naturalWidth":1000,"naturalHeight":1000}]} |
+| `TEST-06-BRAND-CP_컴퍼니` | CP 컴퍼니 6 Products & Monogram | ✅ PASS | {"found":true,"count":6,"fallbackBadgesCount":0,"items":[{"src":"http://127.0.0.1:5173/assets/products/clothing/cpcompany_lens_hoodie.jpg","alt":"렌즈 와펜 소프트쉘 후드 집업","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/clothing/cpcompany_goggle_jacket.jpg","alt":"크롬-R 고글 다운 자켓 올리브","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/clothing/cpcompany_lens_cargo.jpg","alt":"가먼트다잉 렌즈 카고 팬츠","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/clothing/cpcompany_goggle_anorak.jpg","alt":"프로-텍 고글 아노락 자켓","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/clothing/cpcompany_fleece_sweatshirt.jpg","alt":"다이애그널 플리스 스웻셔츠","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/bags/cpcompany_goggle_waistbag.jpg","alt":"나일론 B 크로스바디 고글 힙색","naturalWidth":1000,"naturalHeight":1000}]} |
+| `TEST-06-BRAND-셀린느` | 셀린느 6 Products & Monogram | ✅ PASS | {"found":true,"count":6,"fallbackBadgesCount":0,"items":[{"src":"http://127.0.0.1:5173/assets/products/bags/celine_triomphe.jpg","alt":"틴 트리옹프 샤이니 카프스킨 블랙","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/bags/celine_ava_canvas.jpg","alt":"트리옹프 캔버스 아바백 탄","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/bags/celine_classic_box.jpg","alt":"클래식 박스백 미디엄 카프스킨","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/bags/celine_folco_shoulder.jpg","alt":"트리옹프 폴코 백 미니 숄더백","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/bags/celine_luggage_nano.jpg","alt":"러기지 나노 수리 드럼드 카프","naturalWidth":1000,"naturalHeight":1000},{"src":"http://127.0.0.1:5173/assets/products/bags/celine_cabas_mini.jpg","alt":"카바스 트리옹프 미니 토트백","naturalWidth":1000,"naturalHeight":1000}]} |
+| `TEST-07-SEARCH-CATALOG` | Search Results Chanel Real Images | ✅ PASS | {"found":true,"count":2,"fallbackBadgesCount":0,"items":[{"src":"http://127.0.0.1:5173/assets/products/bags/chanel_classic_flap.jpg","alt":"샤넬 클래식 플랩백 흑장 체인","naturalWidth":1024,"naturalHeight":1024,"complete":true},{"src":"http://127.0.0.1:5173/assets/products/bags/chanel_22_mini.jpg","alt":"샤넬 22 미니 퀼팅 숄더 핸드백","naturalWidth":1024,"naturalHeight":1024,"complete":true}]} |
 
-## 2. 화면별 정밀 검수 결과
+## 2. Multi-Viewport Responsive Matrix
 
-| 화면 번호 / 명칭 | 검수 항목 | 원형 보존 검증 | 고도화 품질 판정 |
-|:---|:---|:---:|:---:|
-| `01_main_desktop_view` | 데스크톱 고정 QR 배너 위치 (`right-[calc(50%+244px)]`) | ✅ 보존 | 🟢 모바일 컨테이너와 겹침 없이 좌측 여백 정밀 안착 |
-| `02_main_top` ~ `07_main_bottom` | 메인 헤더, 8-Grid 메뉴, 렌트/구매/판매 카드, 푸터 | ✅ 보존 | 🟢 럭셔리 벡터 SVG 및 고해상도 제품 사진 매핑 |
-| `08_recommend_20w` ~ `12_recommend_40w` | 20대~40대 연령/성별 맞춤 추천 탭 전환 | ✅ 보존 | 🟢 탭별 고유 추천 데이터 및 스튜디오 룩북 이미지 연동 |
-| `13_search_open` ~ `16_search_click_tag` | 실시간 검색 오버레이, 태그 클릭, 지우기 | ✅ 보존 | 🟢 실시간 디바운스, 태그 클릭 즉시 검색창 반영, ESC 지원 |
-| `17_login_modal` | 간편 로그인 오버레이 (소셜 버튼, 로고) | ✅ 보존 | 🟢 이메일/비밀번호 폼, 비밀번호 토글, 회원가입 링크 연동 |
-| `18_category_default` ~ `23_category_sub_select` | 카테고리 8대 대분류 LNB 및 우측 서브카테고리 | ✅ 보존 | 🟢 LNB 선택 시 우측 세부 카테고리 실시간 완벽 동기화 |
-| `24_brand_tab` ~ `29_brand_product_detail` | 브랜드 모노그램 칩 및 2열 상품 그리드 | ✅ 보존 | 🟢 브랜드 칩 클릭 시 해당 브랜드 상품 그리드 필터링 |
-| `30_sell_page` ~ `33_sell_direct_submit` | 내 상품 판매 브랜드 검색 및 직접 등록 | ✅ 보존 | 🟢 비동기 로딩 스피너 및 실제 API 응답 기반 성공/오류 모달 |
-| `34_admin_dashboard` ~ `46_admin_return_to_app` | 관리자 글래스모피즘 다크테마, 구인, 채팅 | ✅ 보존 | 🟢 딥 다크 테마 유지, 신규 이미지 갤러리 관리 기능 추가 |
-
----
-
-## 3. 반응형 뷰포트 검수
-
-- **360px ~ 430px (모바일 디바이스)**:
-  - `max-w-md` 컨테이너 중앙 정렬, 하단 플로팅 바에 의한 컨텐츠 가림 방지 (`pb-28`), 터치 타겟 44px 이상 확보.
-- **768px (태블릿)**:
-  - 관리자 대시보드 2열 반응형 그리드 및 모바일 컨테이너 안정적 렌더링.
-- **1024px ~ 1920px (데스크톱)**:
-  - 데스크톱 고정 QR 다운로드 배너가 화면 중앙 모바일 컨테이너 좌측 여백에 정밀 앵커링되어 시각적 밸런스 유지.
-
+| Viewport | Resolution | Result | Screenshot Evidence |
+|---|---|---|---|
+| Small Mobile (360px) | 360x780 | ✅ PASS | `docs/screenshots_phase2/responsive_mobile_360.png` |
+| Standard Mobile (390px) | 390x844 | ✅ PASS | `docs/screenshots_phase2/responsive_mobile_390.png` |
+| Large Mobile (430px) | 430x932 | ✅ PASS | `docs/screenshots_phase2/responsive_mobile_430.png` |
+| Tablet Portrait (768px) | 768x1024 | ✅ PASS | `docs/screenshots_phase2/responsive_tablet_768.png` |
+| Desktop View (1440px) | 1440x900 | ✅ PASS | `docs/screenshots_phase2/responsive_desktop_1440.png` |

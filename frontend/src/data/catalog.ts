@@ -3,6 +3,12 @@
  * Single Source of Truth for Main, Category, Brand, Search, Wishlist, and Admin
  */
 
+export type AssetQualityStatus = 
+  | 'APPROVED_PHOTOREAL'     // Verified high-resolution genuine studio photograph
+  | 'REGENERATE_REQUIRED'    // Vector/geometric art requiring photoreal AI generation
+  | 'PRODUCT_MISMATCH'
+  | 'REVIEW_REQUIRED';
+
 export interface CatalogProduct {
   id: string;
   brand: string;
@@ -16,6 +22,9 @@ export interface CatalogProduct {
   isExcellent?: boolean;
   imageUrl: string;
   imageStatus: 'READY' | 'PENDING' | 'ERROR';
+  assetQuality?: AssetQualityStatus;
+  assetSource?: 'STUDIO_AI_PHOTOREAL' | 'VECTOR_RENDER' | 'CATALOG_ARCHIVE';
+  verifiedDate?: string;
   condition?: string;
   targetGroup?: string;
 }
@@ -67,7 +76,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: false,
       category: 'clothing',
       imageUrl: '/assets/products/clothing/louisvuitton_scarf.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'lv-02',
@@ -80,7 +92,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'bag',
       imageUrl: '/assets/products/bags/louisvuitton_speedy.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'lv-03',
@@ -93,7 +108,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: false,
       category: 'bag',
       imageUrl: '/assets/products/bags/louisvuitton_pouch_black.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'lv-04',
@@ -106,7 +124,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'bag',
       imageUrl: '/assets/products/bags/louisvuitton_epi_mirabeau.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'lv-05',
@@ -119,7 +140,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'bag',
       imageUrl: '/assets/products/bags/louisvuitton_nn14_canvas.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'lv-06',
@@ -132,7 +156,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'bag',
       imageUrl: '/assets/products/bags/louisvuitton_neonoe_bb.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     }
   ],
   '스톤 아일랜드': [
@@ -147,7 +174,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'clothing',
       imageUrl: '/assets/products/clothing/stoneisland_softshell_jacket.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'si-02',
@@ -160,7 +190,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: false,
       category: 'clothing',
       imageUrl: '/assets/products/clothing/stoneisland_sweatshirt_black.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'si-03',
@@ -173,7 +206,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'clothing',
       imageUrl: '/assets/products/clothing/stoneisland_ghost_hoodie.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'si-04',
@@ -186,7 +222,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: false,
       category: 'clothing',
       imageUrl: '/assets/products/clothing/stoneisland_compass_cap.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'si-05',
@@ -199,7 +238,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'clothing',
       imageUrl: '/assets/products/clothing/stoneisland_cargo_pants.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'si-06',
@@ -212,7 +254,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'clothing',
       imageUrl: '/assets/products/clothing/stoneisland_down_jacket.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     }
   ],
   '구찌': [
@@ -227,7 +272,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: false,
       category: 'bag',
       imageUrl: '/assets/products/bags/gucci_marmont_black.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'gu-02',
@@ -240,7 +288,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'bag',
       imageUrl: '/assets/products/bags/gucci_horsebit_1955.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'gu-03',
@@ -253,7 +304,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'bag',
       imageUrl: '/assets/products/bags/gucci_jackie_1961.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'gu-04',
@@ -266,7 +320,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: false,
       category: 'bag',
       imageUrl: '/assets/products/bags/gucci_interlocking_pouch.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'gu-05',
@@ -279,7 +336,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'bag',
       imageUrl: '/assets/products/bags/gucci_gg_supreme.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'gu-06',
@@ -292,7 +352,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'bag',
       imageUrl: '/assets/products/bags/gucci_dionysus_supermini.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     }
   ],
   '샤넬': [
@@ -307,7 +370,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'bag',
       imageUrl: '/assets/products/bags/chanel_classic_medium.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'ch-02',
@@ -320,7 +386,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: false,
       category: 'bag',
       imageUrl: '/assets/products/bags/chanel_22_mini.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'ch-03',
@@ -333,7 +402,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'bag',
       imageUrl: '/assets/products/bags/chanel_boy_chevron.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'ch-04',
@@ -346,7 +418,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: false,
       category: 'wallet',
       imageUrl: '/assets/products/wallets/chanel_classic_cardholder.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'ch-05',
@@ -359,7 +434,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'bag',
       imageUrl: '/assets/products/bags/chanel_gabrielle_hobo.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'ch-06',
@@ -372,7 +450,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'bag',
       imageUrl: '/assets/products/bags/chanel_coco_handle.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     }
   ],
   'CP 컴퍼니': [
@@ -387,7 +468,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'clothing',
       imageUrl: '/assets/products/clothing/cpcompany_lens_hoodie.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'cp-02',
@@ -400,7 +484,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: false,
       category: 'clothing',
       imageUrl: '/assets/products/clothing/cpcompany_goggle_jacket.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'cp-03',
@@ -413,7 +500,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'clothing',
       imageUrl: '/assets/products/clothing/cpcompany_lens_cargo.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'cp-04',
@@ -426,7 +516,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: false,
       category: 'clothing',
       imageUrl: '/assets/products/clothing/cpcompany_goggle_anorak.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'cp-05',
@@ -439,7 +532,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'clothing',
       imageUrl: '/assets/products/clothing/cpcompany_fleece_sweatshirt.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'cp-06',
@@ -452,7 +548,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'bag',
       imageUrl: '/assets/products/bags/cpcompany_goggle_waistbag.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     }
   ],
   '셀린느': [
@@ -467,7 +566,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: false,
       category: 'bag',
       imageUrl: '/assets/products/bags/celine_triomphe.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'ce-02',
@@ -480,7 +582,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'bag',
       imageUrl: '/assets/products/bags/celine_ava_canvas.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'ce-03',
@@ -493,7 +598,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'bag',
       imageUrl: '/assets/products/bags/celine_classic_box.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'ce-04',
@@ -506,7 +614,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: false,
       category: 'bag',
       imageUrl: '/assets/products/bags/celine_folco_shoulder.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'ce-05',
@@ -519,7 +630,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'bag',
       imageUrl: '/assets/products/bags/celine_luggage_nano.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'ce-06',
@@ -532,7 +646,10 @@ export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
       isExcellent: true,
       category: 'bag',
       imageUrl: '/assets/products/bags/celine_cabas_mini.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     }
   ]
 };
@@ -547,7 +664,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '예약 마감',
     category: 'bag',
     imageUrl: '/assets/products/bags/chanel_classic_flap.jpg',
-    imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
   },
   {
     id: 'search-02',
@@ -557,7 +677,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '앱전용',
     category: 'bag',
     imageUrl: '/assets/products/bags/chanel_22_mini.jpg',
-    imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
   },
   {
     id: 'search-03',
@@ -567,7 +690,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '예약 마감',
     category: 'watch',
     imageUrl: '/assets/products/watches/cartier_tank_must.jpg',
-    imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
   },
   {
     id: 'search-04',
@@ -577,7 +703,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '앱전용',
     category: 'jewelry',
     imageUrl: '/assets/products/jewelry/cartier_love_bracelet.jpg',
-    imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
   },
   {
     id: 'search-05',
@@ -587,7 +716,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '예약 마감',
     category: 'bag',
     imageUrl: '/assets/products/bags/balenciaga_le_city.jpg',
-    imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
   },
   {
     id: 'search-06',
@@ -597,7 +729,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '예약 마감',
     category: 'bag',
     imageUrl: '/assets/products/bags/celine_triomphe.jpg',
-    imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
   },
   {
     id: 'search-07',
@@ -607,7 +742,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '예약 마감',
     category: 'bag',
     imageUrl: '/assets/products/bags/dior_lady_djoy.jpg',
-    imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
   },
   {
     id: 'search-08',
@@ -617,7 +755,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '앱전용',
     category: 'bag',
     imageUrl: '/assets/products/bags/prada_renylon_belt.jpg',
-    imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
   },
   {
     id: 'search-09',
@@ -627,7 +768,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '예약 마감',
     category: 'bag',
     imageUrl: '/assets/products/bags/louisvuitton_neonoe_bb.jpg',
-    imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
   },
   {
     id: 'search-10',
@@ -637,7 +781,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '예약 마감',
     category: 'bag',
     imageUrl: '/assets/products/bags/goyard_saint_louis_pm.jpg',
-    imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
   },
   {
     id: 'search-11',
@@ -647,7 +794,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '앱전용',
     category: 'bag',
     imageUrl: '/assets/products/bags/gucci_horsebit_1955.jpg',
-    imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
   },
   {
     id: 'search-12',
@@ -657,7 +807,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '예약 마감',
     category: 'bag',
     imageUrl: '/assets/products/bags/hermes_evelyne_tpm.jpg',
-    imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
   }
 ];
 
@@ -674,7 +827,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '예약 마감',
       category: 'bag',
       imageUrl: '/assets/products/bags/saint_laurent_le5a7.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'rec-20w-02',
@@ -686,7 +842,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '예약 마감',
       category: 'bag',
       imageUrl: '/assets/products/bags/balenciaga_le_city.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'rec-20w-03',
@@ -698,7 +857,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '앱전용',
       category: 'bag',
       imageUrl: '/assets/products/bags/chanel_caviar_hobo.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'rec-20w-04',
@@ -710,7 +872,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '예약 마감',
       category: 'bag',
       imageUrl: '/assets/products/bags/chanel_classic_flap.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
     }
   ],
   '20대 남성': [
@@ -724,7 +889,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '예약 마감',
       category: 'bag',
       imageUrl: '/assets/products/bags/maison_margiela_5ac.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'rec-20m-02',
@@ -736,7 +904,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '앱전용',
       category: 'bag',
       imageUrl: '/assets/products/bags/prada_renylon_belt.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'rec-20m-03',
@@ -748,7 +919,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '예약 마감',
       category: 'bag',
       imageUrl: '/assets/products/bags/bottega_cassette.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'rec-20m-04',
@@ -760,7 +934,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '예약 마감',
       category: 'clothing',
       imageUrl: '/assets/products/clothing/ami_heart_knit.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
     }
   ],
   '30대 여성': [
@@ -774,7 +951,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '앱전용',
       category: 'bag',
       imageUrl: '/assets/products/bags/chanel_22_mini.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'rec-30w-02',
@@ -786,7 +966,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '예약 마감',
       category: 'bag',
       imageUrl: '/assets/products/bags/hermes_evelyne_tpm.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'rec-30w-03',
@@ -798,7 +981,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '예약 마감',
       category: 'bag',
       imageUrl: '/assets/products/bags/celine_triomphe.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'rec-30w-04',
@@ -810,7 +996,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '예약 마감',
       category: 'bag',
       imageUrl: '/assets/products/bags/dior_lady_djoy.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     }
   ],
   '30대 남성': [
@@ -824,7 +1013,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '예약 마감',
       category: 'bag',
       imageUrl: '/assets/products/bags/thombrowne_clutch.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'rec-30m-02',
@@ -836,7 +1028,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '앱전용',
       category: 'bag',
       imageUrl: '/assets/products/bags/gucci_gg_supreme.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'rec-30m-03',
@@ -848,7 +1043,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '예약 마감',
       category: 'watch',
       imageUrl: '/assets/products/watches/rolex_submariner.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'rec-30m-04',
@@ -860,7 +1058,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '예약 마감',
       category: 'bag',
       imageUrl: '/assets/products/bags/saint_laurent_backpack.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     }
   ],
   '40대 여성': [
@@ -874,7 +1075,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '예약 마감',
       category: 'bag',
       imageUrl: '/assets/products/bags/hermes_birkin_25.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'rec-40w-02',
@@ -886,7 +1090,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '앱전용',
       category: 'bag',
       imageUrl: '/assets/products/bags/louisvuitton_capucines_bb.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'rec-40w-03',
@@ -898,7 +1105,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '예약 마감',
       category: 'bag',
       imageUrl: '/assets/products/bags/chanel_classic_medium.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
     },
     {
       id: 'rec-40w-04',
@@ -910,7 +1120,10 @@ export const RECOMMENDATIONS_DATA: Record<string, CatalogProduct[]> = {
       tag: '예약 마감',
       category: 'jewelry',
       imageUrl: '/assets/products/jewelry/vancleef_alhambra.jpg',
-      imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
     }
   ]
 };
@@ -925,7 +1138,10 @@ export const RENT_NEW_ARRIVALS: CatalogProduct[] = [
     unit: '1일',
     category: 'bag',
     imageUrl: '/assets/products/bags/balenciaga_le_city.jpg',
-    imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'APPROVED_PHOTOREAL',
+      assetSource: 'STUDIO_AI_PHOTOREAL',
+      verifiedDate: '2026-11-04'
   },
   {
     id: 'arr-02',
@@ -935,7 +1151,10 @@ export const RENT_NEW_ARRIVALS: CatalogProduct[] = [
     unit: '1일',
     category: 'bag',
     imageUrl: '/assets/products/bags/dior_lady_djoy.jpg',
-    imageStatus: 'READY'
+      imageStatus: 'READY',
+      assetQuality: 'REGENERATE_REQUIRED',
+      assetSource: 'VECTOR_RENDER',
+      verifiedDate: '2026-11-04'
   }
 ];
 
@@ -969,3 +1188,4 @@ export function getAllCatalogProducts(): CatalogProduct[] {
 
   return list;
 }
+

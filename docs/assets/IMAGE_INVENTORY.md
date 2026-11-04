@@ -1,39 +1,77 @@
-# luxuryRental 상품 및 비주얼 이미지 인벤토리 (IMAGE_INVENTORY)
+# LuxuryRental Image Asset Inventory & Quality Audit (Phase 1)
 
-## 1. 개요
+- **Audit Timestamp**: 2026-11-04T05:27:25.904Z
+- **Audit Scope**: `frontend/public/assets/` and `frontend/src/data/catalog.ts`
+- **Total Checked Assets**: 58
+- **APPROVED_PHOTOREAL**: 14 files (High-resolution genuine studio photographic assets)
+- **REGENERATE_REQUIRED**: 44 files (SVG/CSS screenshot vector art requiring photorealistic replacement)
 
-본 인벤토리는 `luxuryRental` 서비스 내 모든 명품 렌탈 및 구매 상품, 브랜드, 카테고리, 배너 영역에 적용된 비주얼 에셋의 전수 목록과 경로, 연결 상품 ID, 파일 규격을 관리합니다.
+## 1. Classification Criteria
 
----
+- **`APPROVED_PHOTOREAL`**: High-end fashion editorial studio photograph with authentic microtexture (leather grain, fabric weave, precious metal reflection), natural contact shadows, 1024x1024+ resolution.
+- **`REGENERATE_REQUIRED`**: Vector-based or CSS/SVG geometric drawing saved as JPG. Does not meet luxury ecommerce photographic standards.
+- **`PRODUCT_MISMATCH`**: Silhouette, color, or hardware differs from catalog model specification.
+- **`ASSET_MISSING`**: Broken link or 404.
 
-## 2. 카테고리별 이미지 에셋 매핑 목록
+## 2. Complete Asset Audit Table
 
-| 상품명 / 카테고리 | 브랜드 | 로컬 에셋 경로 | 연결 상품 ID | 포맷 / 규격 | 용도 및 상태 |
-|:---|:---|:---|:---:|:---:|:---|
-| **블랙 페이던트 Le 5 A 7 호보백** | 생로랑 | `/assets/products/bags/saint_laurent_le5a7.jpg` | ID 1 | JPG / 1024x1024 | 20대 여성 맞춤 추천 대표 이미지 |
-| **블랙 르 시티 모토 스몰 숄더백** | 발렌시아가 | `/assets/products/bags/balenciaga_le_city.jpg` | ID 2 | JPG / 1024x1024 | 20대 여성 맞춤 추천 대표 이미지 |
-| **블랙 캐비어 호보 미니 토트백** | 샤넬 | `/assets/products/bags/chanel_caviar_hobo.jpg` | ID 3 | JPG / 1024x1024 | 20대 여성 맞춤 추천 대표 이미지 |
-| **블랙 클래식 플랩 흑장 체인백** | 샤넬 | `/assets/products/bags/chanel_classic_flap.jpg` | ID 4 | JPG / 1024x1024 | 20대 여성 맞춤 추천 대표 이미지 |
-| **하트 로고 크루넥 남성 니트** | 아미 | `/assets/products/clothing/ami_heart_knit.jpg` | ID 8 | JPG / 1024x1024 | 20대 남성 맞춤 추천 대표 이미지 |
-| **오이스터 서브마리너 블랙 데이트** | 롤렉스 | `/assets/products/watches/rolex_submariner.jpg` | ID 15 | JPG / 1024x1024 | 30대 남성 맞춤 추천 대표 이미지 |
-| **버킨 25 토고 골드 하드웨어** | 에르메스 | `/assets/products/bags/hermes_birkin_25.jpg` | ID 17 | JPG / 1024x1024 | 40대 여성 맞춤 추천 대표 이미지 |
-| **빈티지 알함브라 펜던트 옐로골드** | 반클리프 아펠 | `/assets/products/jewelry/vancleef_alhambra.jpg` | ID 20 | JPG / 1024x1024 | 40대 여성 맞춤 추천 대표 이미지 |
-| **루이비통 M41526 모노그램 토트백** | 루이비통 | `/assets/products/bags/louisvuitton_speedy.jpg` | ID 22 | JPG / 1024x1024 | 루이비통 브랜드 탭 대표 상품 |
-
----
-
-## 3. 디렉터리 아키텍처
-
-```text
-frontend/public/assets/
-├── products/
-│   ├── bags/           # 하이엔드 핸드백/숄더백/토트백 스튜디오 컷
-│   ├── clothing/       # 명품 니트/자켓/웨어 룩북
-│   ├── shoes/          # 명품 스니커즈/힐
-│   ├── jewelry/        # 파인 주얼리/목걸이/브레이슬릿
-│   ├── watches/        # 명품 타임피스/손목시계
-│   └── wallets/        # 카드홀더/지갑
-├── banners/            # 메인 기획전 및 회원가입 프로모션 배너
-└── placeholders/       # 오프라인 및 에러 대응 Fallback SVG
-```
-
+| # | Asset Path | File Size | Current Status | Generation Type | Audit Notes |
+|---|------------|-----------|----------------|-----------------|-------------|
+| 1 | `/assets/categories/apparel_tile.jpg` | 68.0 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 2 | `/assets/categories/jewelry_tile.jpg` | 73.8 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 3 | `/assets/categories/sneaker_tile.jpg` | 72.8 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 4 | `/assets/products/bags/balenciaga_le_city.jpg` | 719.2 KB | ✅ **APPROVED_PHOTOREAL** | AI Photoreal Studio 1024x1024 | High-end studio photography reproduction with authentic leather/fabric microtexture, depth of field, and natural soft contact shadow. |
+| 5 | `/assets/products/bags/bottega_cassette.jpg` | 599.2 KB | ✅ **APPROVED_PHOTOREAL** | AI Photoreal Studio 1024x1024 | High-end studio photography reproduction with authentic leather/fabric microtexture, depth of field, and natural soft contact shadow. |
+| 6 | `/assets/products/bags/celine_ava_canvas.jpg` | 74.4 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 7 | `/assets/products/bags/celine_cabas_mini.jpg` | 70.4 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 8 | `/assets/products/bags/celine_classic_box.jpg` | 68.3 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 9 | `/assets/products/bags/celine_folco_shoulder.jpg` | 72.4 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 10 | `/assets/products/bags/celine_luggage_nano.jpg` | 69.8 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 11 | `/assets/products/bags/celine_triomphe.jpg` | 71.2 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 12 | `/assets/products/bags/chanel_22_mini.jpg` | 643.4 KB | ✅ **APPROVED_PHOTOREAL** | AI Photoreal Studio 1024x1024 | High-end studio photography reproduction with authentic leather/fabric microtexture, depth of field, and natural soft contact shadow. |
+| 13 | `/assets/products/bags/chanel_boy_chevron.jpg` | 70.4 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 14 | `/assets/products/bags/chanel_caviar_hobo.jpg` | 646.8 KB | ✅ **APPROVED_PHOTOREAL** | AI Photoreal Studio 1024x1024 | High-end studio photography reproduction with authentic leather/fabric microtexture, depth of field, and natural soft contact shadow. |
+| 15 | `/assets/products/bags/chanel_classic_flap.jpg` | 578.0 KB | ✅ **APPROVED_PHOTOREAL** | AI Photoreal Studio 1024x1024 | High-end studio photography reproduction with authentic leather/fabric microtexture, depth of field, and natural soft contact shadow. |
+| 16 | `/assets/products/bags/chanel_classic_medium.jpg` | 83.3 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 17 | `/assets/products/bags/chanel_coco_handle.jpg` | 71.6 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 18 | `/assets/products/bags/chanel_gabrielle_hobo.jpg` | 69.7 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 19 | `/assets/products/bags/cpcompany_goggle_waistbag.jpg` | 69.0 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 20 | `/assets/products/bags/dior_lady_djoy.jpg` | 76.4 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 21 | `/assets/products/bags/goyard_saint_louis_pm.jpg` | 71.3 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 22 | `/assets/products/bags/gucci_dionysus_supermini.jpg` | 68.3 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 23 | `/assets/products/bags/gucci_gg_supreme.jpg` | 73.4 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 24 | `/assets/products/bags/gucci_horsebit_1955.jpg` | 72.2 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 25 | `/assets/products/bags/gucci_interlocking_pouch.jpg` | 69.5 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 26 | `/assets/products/bags/gucci_jackie_1961.jpg` | 72.9 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 27 | `/assets/products/bags/gucci_marmont_black.jpg` | 71.4 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 28 | `/assets/products/bags/hermes_birkin_25.jpg` | 651.1 KB | ✅ **APPROVED_PHOTOREAL** | AI Photoreal Studio 1024x1024 | High-end studio photography reproduction with authentic leather/fabric microtexture, depth of field, and natural soft contact shadow. |
+| 29 | `/assets/products/bags/hermes_evelyne_tpm.jpg` | 687.7 KB | ✅ **APPROVED_PHOTOREAL** | AI Photoreal Studio 1024x1024 | High-end studio photography reproduction with authentic leather/fabric microtexture, depth of field, and natural soft contact shadow. |
+| 30 | `/assets/products/bags/louisvuitton_capucines_bb.jpg` | 74.0 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 31 | `/assets/products/bags/louisvuitton_epi_mirabeau.jpg` | 70.7 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 32 | `/assets/products/bags/louisvuitton_neonoe_bb.jpg` | 73.8 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 33 | `/assets/products/bags/louisvuitton_nn14_canvas.jpg` | 74.0 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 34 | `/assets/products/bags/louisvuitton_pouch_black.jpg` | 68.2 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 35 | `/assets/products/bags/louisvuitton_speedy.jpg` | 786.8 KB | ✅ **APPROVED_PHOTOREAL** | AI Photoreal Studio 1024x1024 | High-end studio photography reproduction with authentic leather/fabric microtexture, depth of field, and natural soft contact shadow. |
+| 36 | `/assets/products/bags/maison_margiela_5ac.jpg` | 677.9 KB | ✅ **APPROVED_PHOTOREAL** | AI Photoreal Studio 1024x1024 | High-end studio photography reproduction with authentic leather/fabric microtexture, depth of field, and natural soft contact shadow. |
+| 37 | `/assets/products/bags/prada_renylon_belt.jpg` | 630.0 KB | ✅ **APPROVED_PHOTOREAL** | AI Photoreal Studio 1024x1024 | High-end studio photography reproduction with authentic leather/fabric microtexture, depth of field, and natural soft contact shadow. |
+| 38 | `/assets/products/bags/saint_laurent_backpack.jpg` | 72.2 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 39 | `/assets/products/bags/saint_laurent_le5a7.jpg` | 591.8 KB | ✅ **APPROVED_PHOTOREAL** | AI Photoreal Studio 1024x1024 | High-end studio photography reproduction with authentic leather/fabric microtexture, depth of field, and natural soft contact shadow. |
+| 40 | `/assets/products/bags/thombrowne_clutch.jpg` | 72.8 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 41 | `/assets/products/clothing/ami_heart_knit.jpg` | 789.1 KB | ✅ **APPROVED_PHOTOREAL** | AI Photoreal Studio 1024x1024 | High-end studio photography reproduction with authentic leather/fabric microtexture, depth of field, and natural soft contact shadow. |
+| 42 | `/assets/products/clothing/cpcompany_fleece_sweatshirt.jpg` | 69.4 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 43 | `/assets/products/clothing/cpcompany_goggle_anorak.jpg` | 70.8 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 44 | `/assets/products/clothing/cpcompany_goggle_jacket.jpg` | 71.3 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 45 | `/assets/products/clothing/cpcompany_lens_cargo.jpg` | 69.8 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 46 | `/assets/products/clothing/cpcompany_lens_hoodie.jpg` | 68.3 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 47 | `/assets/products/clothing/louisvuitton_scarf.jpg` | 66.9 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 48 | `/assets/products/clothing/stoneisland_cargo_pants.jpg` | 69.0 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 49 | `/assets/products/clothing/stoneisland_compass_cap.jpg` | 68.7 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 50 | `/assets/products/clothing/stoneisland_down_jacket.jpg` | 69.8 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 51 | `/assets/products/clothing/stoneisland_ghost_hoodie.jpg` | 67.9 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 52 | `/assets/products/clothing/stoneisland_softshell_jacket.jpg` | 69.9 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 53 | `/assets/products/clothing/stoneisland_sweatshirt_black.jpg` | 69.5 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 54 | `/assets/products/jewelry/cartier_love_bracelet.jpg` | 72.4 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 55 | `/assets/products/jewelry/vancleef_alhambra.jpg` | 638.5 KB | ✅ **APPROVED_PHOTOREAL** | AI Photoreal Studio 1024x1024 | High-end studio photography reproduction with authentic leather/fabric microtexture, depth of field, and natural soft contact shadow. |
+| 56 | `/assets/products/wallets/chanel_classic_cardholder.jpg` | 64.9 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 57 | `/assets/products/watches/cartier_tank_must.jpg` | 68.4 KB | ⚠️ **REGENERATE_REQUIRED** | SVG/CSS Screenshot (Geometric Vector Art) | Rendered via Puppeteer screenshot of SVG/CSS rectangles. Lacks photographic texture, authentic reflections, and natural depth. |
+| 58 | `/assets/products/watches/rolex_submariner.jpg` | 733.9 KB | ✅ **APPROVED_PHOTOREAL** | AI Photoreal Studio 1024x1024 | High-end studio photography reproduction with authentic leather/fabric microtexture, depth of field, and natural soft contact shadow. |
