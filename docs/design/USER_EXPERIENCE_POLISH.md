@@ -46,3 +46,4 @@
 ## 5. 시각적 검증 결과
 - 스크린샷: `docs/screenshots_phase2/57_mypage_avatar_file_upload.png`
 - 스크린샷: `docs/screenshots_phase2/58_admin_gallery_file_upload.png`
+

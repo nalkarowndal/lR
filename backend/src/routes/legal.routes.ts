@@ -16,3 +16,4 @@ legalRouter.get('/:docType', getLegalDocumentByType);
 // Authenticated user consent audit history & management
 legalRouter.get('/user/consents', requireAuth, getUserConsents);
 legalRouter.put('/user/consents', requireAuth, updateUserConsent);
+

@@ -3,11 +3,11 @@ import { ChevronLeft, Mail, CheckCircle2, Eye, EyeOff, AlertCircle } from 'lucid
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { api, setAuthToken } from '../services/api';
-import { 
-  KakaoOfficialSymbol, 
-  AppleOfficialSymbol, 
-  NaverOfficialSymbol, 
-  PaycoOfficialSymbol 
+import {
+  KakaoOfficialSymbol,
+  AppleOfficialSymbol,
+  NaverOfficialSymbol,
+  PaycoOfficialSymbol
 } from './ui/AuthSymbols';
 
 export const ShopLike = () => {
@@ -88,20 +88,19 @@ export const ShopLike = () => {
   };
 
   return (
-    <div 
+    <div
       aria-modal="true"
       role="dialog"
       aria-label="간편 로그인"
-      className={`absolute inset-0 bg-white z-[100] transition-transform duration-300 ease-in-out flex flex-col ${
-        isOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'
-      }`}
+      className={`absolute inset-0 bg-white z-[100] transition-transform duration-300 ease-in-out flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'
+        }`}
     >
       {/* 1. Header */}
       <div className="px-4 py-3 bg-white border-b border-gray-100 flex items-center justify-between">
-        <button 
+        <button
           type="button"
           aria-label="로그인 창 닫기"
-          onClick={() => setActiveOverlay(null)} 
+          onClick={() => setActiveOverlay(null)}
           className="p-1 -ml-1 text-black hover:text-gray-600 transition"
         >
           <ChevronLeft size={24} />
@@ -130,7 +129,7 @@ export const ShopLike = () => {
         )}
 
         {/* Event Banner */}
-        <div 
+        <div
           onClick={() => setActiveOverlay('REGISTER')}
           className="relative mb-5 flex flex-col items-center cursor-pointer hover:scale-[1.02] transition"
         >
@@ -143,14 +142,14 @@ export const ShopLike = () => {
 
         {/* Tab Selection: 간편 로그인 vs 이메일 로그인 */}
         <div className="flex w-full max-w-sm bg-gray-100 p-1 rounded-xl mb-5 text-xs font-bold">
-          <button 
+          <button
             type="button"
             onClick={() => setLoginType('SOCIAL')}
             className={`flex-1 py-2 rounded-lg transition ${loginType === 'SOCIAL' ? 'bg-white text-black shadow-xs' : 'text-gray-500 hover:text-black'}`}
           >
             소셜 간편 로그인
           </button>
-          <button 
+          <button
             type="button"
             onClick={() => setLoginType('EMAIL')}
             className={`flex-1 py-2 rounded-lg transition ${loginType === 'EMAIL' ? 'bg-white text-black shadow-xs' : 'text-gray-500 hover:text-black'}`}
@@ -162,7 +161,7 @@ export const ShopLike = () => {
         {loginType === 'SOCIAL' ? (
           <div className="w-full max-w-sm flex flex-col items-center animate-fadeIn">
             {/* Kakao Official Button */}
-            <button 
+            <button
               type="button"
               onClick={() => handleSocialLogin('카카오')}
               disabled={!!loggingInProvider}
@@ -177,7 +176,7 @@ export const ShopLike = () => {
             </button>
 
             {/* Apple Official Button */}
-            <button 
+            <button
               type="button"
               onClick={() => handleSocialLogin('Apple')}
               disabled={!!loggingInProvider}
@@ -193,7 +192,7 @@ export const ShopLike = () => {
 
             {/* Sub Social Row: Naver, PAYCO, Email Switch */}
             <div className="flex items-center gap-5 mb-8">
-              <button 
+              <button
                 type="button"
                 aria-label="네이버 로그인"
                 title="네이버로 계속하기"
@@ -203,7 +202,7 @@ export const ShopLike = () => {
               >
                 <NaverOfficialSymbol className="w-4 h-4" />
               </button>
-              <button 
+              <button
                 type="button"
                 aria-label="페이코 로그인"
                 title="PAYCO로 계속하기"
@@ -213,7 +212,7 @@ export const ShopLike = () => {
               >
                 <PaycoOfficialSymbol className="w-5 h-5" />
               </button>
-              <button 
+              <button
                 type="button"
                 aria-label="이메일 로그인 전환"
                 title="이메일 로그인"
@@ -227,7 +226,7 @@ export const ShopLike = () => {
         ) : (
           <form onSubmit={handleEmailLogin} className="w-full max-w-sm space-y-3.5 mb-6 animate-fadeIn">
             <div>
-              <input 
+              <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -237,7 +236,7 @@ export const ShopLike = () => {
               />
             </div>
             <div className="relative">
-              <input 
+              <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -245,7 +244,7 @@ export const ShopLike = () => {
                 required
                 className="w-full border border-gray-200 focus:border-gray-950 rounded-xl p-3.5 pr-11 text-sm outline-none transition"
               />
-              <button 
+              <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black p-1"
@@ -257,7 +256,7 @@ export const ShopLike = () => {
 
             <div className="flex items-center justify-between text-xs pt-1 pb-1">
               <label className="flex items-center gap-2 cursor-pointer text-gray-600 font-medium select-none">
-                <input 
+                <input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
@@ -266,7 +265,7 @@ export const ShopLike = () => {
                 <span>로그인 상태 유지</span>
               </label>
 
-              <button 
+              <button
                 type="button"
                 onClick={() => setActiveOverlay('FORGOT_PASSWORD')}
                 className="text-gray-500 hover:text-black underline font-semibold"
@@ -275,7 +274,7 @@ export const ShopLike = () => {
               </button>
             </div>
 
-            <button 
+            <button
               type="submit"
               disabled={isLoading}
               className="w-full bg-gray-950 hover:bg-black active:scale-[0.99] text-white py-3.5 rounded-xl font-extrabold text-sm transition shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
@@ -288,7 +287,7 @@ export const ShopLike = () => {
             </button>
 
             <div className="text-center pt-2">
-              <button 
+              <button
                 type="button"
                 onClick={() => setActiveOverlay('REGISTER')}
                 className="w-full border border-gray-200 hover:bg-gray-50 active:scale-[0.99] text-gray-800 py-3.5 rounded-xl font-bold text-sm transition"
@@ -301,8 +300,8 @@ export const ShopLike = () => {
 
         <div className="mt-4 flex items-center gap-3 text-[13px] text-gray-500">
           <span>계정이 기억나지 않나요?</span>
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={() => setActiveOverlay('FORGOT_PASSWORD')}
             className="font-bold underline text-gray-800 hover:text-black"
           >

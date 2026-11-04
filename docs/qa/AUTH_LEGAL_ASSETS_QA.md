@@ -55,3 +55,4 @@
 | `57_mypage_avatar_file_upload.png` | 마이페이지 프로필 수정 | 사진 업로드 버튼, 실시간 원형 미리보기 및 기본값 복원 | **정상** |
 | `58_admin_gallery_file_upload.png` | 관리자 상품 갤러리 | 파일 직접 선택, 썸네일 미리보기, 대표 이미지 토글 | **정상** |
 | `59_main_recommendations_with_all_images.png`| 메인 맞춤 추천 피드 | 18대 가방 및 전체 추천 상품의 100% 고해상도 스튜디오 룩북 로드 | **정상** |
+

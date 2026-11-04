@@ -2,30 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { ChevronLeft, Search as SearchIcon, X, ArrowUp, ArrowDown } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { ProductImage } from './ui/ProductImage';
-
-interface SearchResultItem {
-  id: string;
-  brand: string;
-  title: string;
-  price: string;
-  tag?: string;
-  category: 'bag' | 'clothing' | 'shoes' | 'jewelry' | 'watch' | 'wallet';
-}
-
-const SEARCH_CATALOG: SearchResultItem[] = [
-  { id: '1', brand: '샤넬', title: '샤넬 클래식 플랩백 흑장 체인', price: '24,500원/3일', tag: '예약 마감', category: 'bag' },
-  { id: '2', brand: '샤넬', title: '샤넬 22 미니 퀼팅 숄더 핸드백', price: '45,000원/3일', tag: '앱전용', category: 'bag' },
-  { id: '3', brand: '까르띠에', title: '탱크 머스트 워치 스몰 스틸', price: '35,000원/3일', tag: '예약 마감', category: 'watch' },
-  { id: '4', brand: '까르띠에', title: 'LOVE 브레이슬릿 클래식 옐로우골드', price: '48,000원/3일', tag: '앱전용', category: 'jewelry' },
-  { id: '5', brand: '발렌시아가', title: '블랙 르 시티 모토 스몰 숄더백', price: '18,510원/3일', tag: '예약 마감', category: 'bag' },
-  { id: '6', brand: '셀린느', title: '틴 트리옹프 샤이니 카프스킨', price: '29,000원/3일', tag: '예약 마감', category: 'bag' },
-  { id: '7', brand: '디올', title: '레이디 D-Joy 까나쥬 스몰백', price: '38,000원/3일', tag: '예약 마감', category: 'bag' },
-  { id: '8', brand: '프라다', title: '리나일론 삼각로고 남성 벨트백', price: '16,800원/3일', tag: '앱전용', category: 'bag' },
-  { id: '9', brand: '루이비통', title: '모노그램 네오노에 BB 버킷백', price: '22,000원/3일', tag: '예약 마감', category: 'bag' },
-  { id: '10', brand: '고야드', title: '생루이 PM 토트백 블랙 탠', price: '21,000원/3일', tag: '예약 마감', category: 'bag' },
-  { id: '11', brand: '구찌', title: '홀스빗 1955 미니 탑핸들백', price: '24,000원/3일', tag: '앱전용', category: 'bag' },
-  { id: '12', brand: '에르메스', title: '에블린 TPM 미니 크로스 에토프', price: '42,000원/3일', tag: '예약 마감', category: 'bag' }
-];
+import { SEARCH_CATALOG, type CatalogProduct } from '../data/catalog';
 
 export const ShopSearch = () => {
   const { activeOverlay, setActiveOverlay } = useApp();
@@ -75,7 +52,7 @@ export const ShopSearch = () => {
   const filteredResults = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return [];
-    return SEARCH_CATALOG.filter(item => 
+    return SEARCH_CATALOG.filter((item: CatalogProduct) => 
       item.brand.toLowerCase().includes(q) || 
       item.title.toLowerCase().includes(q)
     );
@@ -156,12 +133,17 @@ export const ShopSearch = () => {
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3">
-                {filteredResults.map(item => (
+                {filteredResults.map((item: CatalogProduct) => (
                   <div key={item.id} className="flex flex-col group cursor-pointer p-2 rounded-xl hover:bg-gray-50 transition">
                     <div className="relative aspect-square bg-gray-100 rounded-xl mb-2 flex items-center justify-center overflow-hidden border border-gray-100 shadow-2xs">
-                      <ProductImage src={(item as any).image} alt={item.title} category={item.category} />
+                      <ProductImage 
+                        src={item.imageUrl} 
+                        alt={item.title} 
+                        category={item.category}
+                        productId={item.id}
+                      />
                       {item.tag && (
-                        <div className="absolute bottom-0 w-full bg-black/60 text-white text-center text-[10px] py-1 font-bold z-10">
+                        <div className="absolute bottom-0 w-full bg-black/60 backdrop-blur-xs text-white text-center text-[10px] py-1 font-bold z-10">
                           {item.tag}
                         </div>
                       )}

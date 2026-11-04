@@ -58,3 +58,4 @@
 ## 4. 시각적 검증 결과
 - 스크린샷: `docs/screenshots_phase2/53_login_official_social_buttons.png`
 - 스크린샷: `docs/screenshots_phase2/53_1_login_clean_email_no_quick_test.png`
+

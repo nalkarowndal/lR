@@ -90,3 +90,4 @@ CREATE TABLE IF NOT EXISTS user_consents (
 - 스크린샷: `docs/screenshots_phase2/54_register_granular_legal_terms.png`
 - 스크린샷: `docs/screenshots_phase2/55_register_legal_terms_modal_preview.png`
 - 스크린샷: `docs/screenshots_phase2/56_settings_legal_terms_choice_modal.png`
+

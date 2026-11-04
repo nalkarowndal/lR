@@ -13,6 +13,7 @@ import {
 } from './ui/LuxuryIcons';
 import { ProductImage } from './ui/ProductImage';
 import { LegalTermsModal } from './ui/LegalTermsModal';
+import { RENT_NEW_ARRIVALS } from '../data/catalog';
 
 // ==========================================
 // 커스텀 SVG 아이콘 (lucide-react 에러 대체용)
@@ -449,20 +450,31 @@ export const ShopMain = () => {
         <h3 className="font-extrabold text-lg text-gray-900 uppercase tracking-tight">Rent New Arrivals</h3>
         <p className="text-xs text-gray-500 mb-4">매주 수요일 오전 11시 업데이트</p>
         <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
-          <div className="min-w-[140px] bg-gray-50/80 hover:bg-gray-50 p-3.5 rounded-2xl border border-gray-100 shadow-2xs flex flex-col items-center cursor-pointer transition group">
-            <span className="font-extrabold text-xs w-full text-left mb-2 text-gray-900 group-hover:text-indigo-600 transition-colors">발렌시아가</span>
-            <div className="my-3 flex items-center justify-center">
-              <LuxuryLuggageIcon className="w-12 h-12 text-neutral-700 transition-transform group-hover:scale-105" />
+          {RENT_NEW_ARRIVALS.map((arrival) => (
+            <div 
+              key={arrival.id}
+              onClick={() => setCurrentView('SHOP_CATEGORY')}
+              className="min-w-[150px] w-[150px] bg-gray-50/80 hover:bg-gray-50 p-3 rounded-2xl border border-gray-100 shadow-2xs flex flex-col cursor-pointer transition group"
+            >
+              <span className="font-extrabold text-xs w-full text-left mb-2 text-gray-900 group-hover:text-indigo-600 transition-colors">
+                {arrival.brand}
+              </span>
+              <div className="relative aspect-square w-full rounded-xl overflow-hidden border border-gray-200/60 shadow-2xs mb-2 bg-white">
+                <ProductImage 
+                  src={arrival.imageUrl} 
+                  alt={arrival.title} 
+                  category={arrival.category}
+                  productId={arrival.id}
+                />
+              </div>
+              <span className="text-[11px] text-gray-600 truncate font-medium mb-1">
+                {arrival.title}
+              </span>
+              <span className="text-pink-600 font-extrabold text-xs">
+                일 {arrival.price}부터
+              </span>
             </div>
-            <span className="text-pink-600 font-bold text-xs mt-1">일 40,600원부터</span>
-          </div>
-          <div className="min-w-[140px] bg-gray-50/80 hover:bg-gray-50 p-3.5 rounded-2xl border border-gray-100 shadow-2xs flex flex-col items-center cursor-pointer transition group">
-            <span className="font-extrabold text-xs w-full text-left mb-2 text-gray-900 group-hover:text-indigo-600 transition-colors">크리스찬 디올</span>
-            <div className="my-3 flex items-center justify-center">
-              <LuxuryJewelryIcon className="w-12 h-12 text-amber-500 transition-transform group-hover:scale-105" />
-            </div>
-            <span className="text-pink-600 font-bold text-xs mt-1">일 11,100원부터</span>
-          </div>
+          ))}
         </div>
       </section>
 

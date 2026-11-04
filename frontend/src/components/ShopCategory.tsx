@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { ChevronLeft, MessageCircle, ShoppingCart, ChevronRight, Heart } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { 
-  LuxurySneakerIcon, LuxuryJewelryIcon, LuxuryCoatIcon, 
-  BrandMonogram 
-} from './ui/LuxuryIcons';
+import { useToast } from '../context/ToastContext';
+import { BrandMonogram } from './ui/LuxuryIcons';
 import { ProductImage } from './ui/ProductImage';
+import { 
+  BRAND_PRODUCTS_MAP, 
+  CATEGORY_TOP_TILES,
+  type CatalogProduct 
+} from '../data/catalog';
 
 // 카테고리별 세부 서브카테고리 매핑
 const SUBCATEGORIES_BY_CATEGORY: Record<string, string[]> = {
@@ -19,74 +22,14 @@ const SUBCATEGORIES_BY_CATEGORY: Record<string, string[]> = {
   '화장품/향수': ['전체', '럭셔리 향수', '스킨케어', '메이크업', '바디/헤어케어', '캔들/디퓨저']
 };
 
-// 브랜드별 상품 데이터
-interface BrandProduct {
-  tag: string;
-  isExcellent: boolean;
-  title: string;
-  price: string;
-  discount: string;
-  unit: string;
-  category: 'bag' | 'clothing' | 'shoes' | 'jewelry' | 'watch' | 'wallet';
-}
-
-const BRAND_PRODUCTS_MAP: Record<string, BrandProduct[]> = {
-  '루이비통': [
-    { tag: 'N', isExcellent: false, title: '핑크 LV 에센셜 머플러', price: '15,800원', discount: '', unit: '/1일', category: 'clothing' },
-    { tag: '', isExcellent: true, title: '루이비통 M41526 모노그램 ...', price: '902,100원', discount: '7%', unit: '', category: 'bag' },
-    { tag: '', isExcellent: false, title: '블랙 앙프렝뜨 이지 파우치 온 ...', price: '17,800원', discount: '', unit: '/1일', category: 'bag' },
-    { tag: '', isExcellent: true, title: '루이비통 블랙 에삐 레더 미라...', price: '1,220,000원', discount: '', unit: '', category: 'bag' },
-    { tag: '', isExcellent: true, title: '루이비통 모노그램 NN14 이...', price: '1,480,000원', discount: '', unit: '', category: 'bag' },
-    { tag: '', isExcellent: true, title: '모노그램 네오노에 BB 버킷백', price: '1,890,000원', discount: '5%', unit: '', category: 'bag' },
-  ],
-  '스톤 아일랜드': [
-    { tag: 'N', isExcellent: true, title: '와펜 패치 소프트쉘 나일론 자켓', price: '680,000원', discount: '10%', unit: '', category: 'clothing' },
-    { tag: '', isExcellent: false, title: '크루넥 가먼트다잉 맨투맨 블랙', price: '12,500원', discount: '', unit: '/1일', category: 'clothing' },
-    { tag: '', isExcellent: true, title: '고스트피스 나일론 메탈 후드', price: '890,000원', discount: '8%', unit: '', category: 'clothing' },
-    { tag: '', isExcellent: false, title: '컴패스 로고 볼캡 블랙 프리', price: '8,000원', discount: '', unit: '/1일', category: 'clothing' },
-    { tag: '', isExcellent: true, title: '카고 조거 팬츠 슬림핏 차콜', price: '520,000원', discount: '12%', unit: '', category: 'clothing' },
-    { tag: '', isExcellent: true, title: '크링클 랩스 나일론 다운 패딩', price: '1,350,000원', discount: '15%', unit: '', category: 'clothing' },
-  ],
-  '구찌': [
-    { tag: 'N', isExcellent: false, title: 'GG 마몽 스몰 숄더백 블랙', price: '22,000원', discount: '', unit: '/1일', category: 'bag' },
-    { tag: '', isExcellent: true, title: '홀스빗 1955 미니 탑핸들백', price: '2,450,000원', discount: '8%', unit: '', category: 'bag' },
-    { tag: '', isExcellent: true, title: '재키 1961 스몰 숄더백 에토프', price: '2,890,000원', discount: '6%', unit: '', category: 'bag' },
-    { tag: '', isExcellent: false, title: '인터로킹 G 체인 크로스 파우치', price: '16,500원', discount: '', unit: '/1일', category: 'bag' },
-    { tag: '', isExcellent: true, title: 'GG 수프림 오피디아 토트백', price: '1,780,000원', discount: '9%', unit: '', category: 'bag' },
-    { tag: '', isExcellent: true, title: '디오니소스 슈퍼미니 체인백', price: '1,120,000원', discount: '', unit: '', category: 'bag' },
-  ],
-  '샤넬': [
-    { tag: 'N', isExcellent: true, title: '클래식 미디엄 캐비어 금장 플랩', price: '13,500,000원', discount: '5%', unit: '', category: 'bag' },
-    { tag: '', isExcellent: false, title: '샤넬 22 미니 핸드백 블랙 유광', price: '55,000원', discount: '', unit: '/1일', category: 'bag' },
-    { tag: '', isExcellent: true, title: '보이 샤넬 스몰 쉐브론 체인백', price: '7,900,000원', discount: '', unit: '', category: 'bag' },
-    { tag: '', isExcellent: false, title: 'CC 로고 클래식 카드홀더 캐비어', price: '9,800원', discount: '', unit: '/1일', category: 'wallet' },
-    { tag: '', isExcellent: true, title: '가브리엘 호보백 스몰 빈티지', price: '6,200,000원', discount: '7%', unit: '', category: 'bag' },
-    { tag: '', isExcellent: true, title: '코코핸들 미니 쉐브론 블랙 샴페인', price: '8,400,000원', discount: '', unit: '', category: 'bag' },
-  ],
-  'CP 컴퍼니': [
-    { tag: 'N', isExcellent: true, title: '렌즈 와펜 소프트쉘 후드 집업', price: '450,000원', discount: '14%', unit: '', category: 'clothing' },
-    { tag: '', isExcellent: false, title: '크롬-R 고글 다운 자켓 올리브', price: '18,000원', discount: '', unit: '/1일', category: 'clothing' },
-    { tag: '', isExcellent: true, title: '가먼트다잉 렌즈 카고 팬츠', price: '380,000원', discount: '11%', unit: '', category: 'clothing' },
-    { tag: '', isExcellent: false, title: '프로-텍 고글 아노락 자켓', price: '14,000원', discount: '', unit: '/1일', category: 'clothing' },
-    { tag: '', isExcellent: true, title: '다이애그널 플리스 스웻셔츠', price: '290,000원', discount: '10%', unit: '', category: 'clothing' },
-    { tag: '', isExcellent: true, title: '나일론 B 크로스바디 고글 힙색', price: '240,000원', discount: '8%', unit: '', category: 'bag' },
-  ],
-  '셀린느': [
-    { tag: 'N', isExcellent: false, title: '틴 트리옹프 샤이니 카프스킨 블랙', price: '32,000원', discount: '', unit: '/1일', category: 'bag' },
-    { tag: '', isExcellent: true, title: '트리옹프 캔버스 아바백 탄', price: '1,980,000원', discount: '6%', unit: '', category: 'bag' },
-    { tag: '', isExcellent: true, title: '클래식 박스백 미디엄 카프스킨', price: '3,800,000원', discount: '', unit: '', category: 'bag' },
-    { tag: '', isExcellent: false, title: '트리옹프 폴코 백 미니 숄더백', price: '21,000원', discount: '', unit: '/1일', category: 'bag' },
-    { tag: '', isExcellent: true, title: '러기지 나노 수리 드럼드 카프', price: '2,900,000원', discount: '7%', unit: '', category: 'bag' },
-    { tag: '', isExcellent: true, title: '카바스 트리옹프 미니 토트백', price: '1,750,000원', discount: '', unit: '', category: 'bag' },
-  ]
-};
-
 export const ShopCategory = () => {
   const { goBack, setActiveOverlay } = useApp();
+  const { showToast } = useToast();
   const [mainTab, setMainTab] = useState<'CATEGORY' | 'BRAND'>('CATEGORY');
   const [subTab, setSubTab] = useState('여성');
   const [leftActive, setLeftActive] = useState('가방/핸드백');
   const [activeBrand, setActiveBrand] = useState('루이비통');
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string>('전체');
 
   const leftCategories = ['가방/핸드백', '의류', '슈즈', '지갑', '패션잡화', '시계/액세서리', '골프', '화장품/향수'];
   const currentSubCategories = SUBCATEGORIES_BY_CATEGORY[leftActive] || SUBCATEGORIES_BY_CATEGORY['가방/핸드백'];
@@ -100,7 +43,18 @@ export const ShopCategory = () => {
     { name: '셀린느' }
   ];
 
-  const currentBrandProducts = BRAND_PRODUCTS_MAP[activeBrand] || BRAND_PRODUCTS_MAP['루이비통'];
+  const currentBrandProducts: CatalogProduct[] = BRAND_PRODUCTS_MAP[activeBrand] || BRAND_PRODUCTS_MAP['루이비통'] || [];
+
+  const handleTileClick = (targetCategory: string, tileTitle: string) => {
+    setLeftActive(targetCategory);
+    setSelectedSubCategory('전체');
+    showToast(`'${tileTitle}' 카테고리(${targetCategory})로 이동했습니다.`, 'info');
+  };
+
+  const handleSubCategoryClick = (sub: string) => {
+    setSelectedSubCategory(sub);
+    showToast(`${leftActive} > ${sub} 필터가 적용되었습니다.`, 'info');
+  };
 
   return (
     <div className="flex flex-col h-full bg-white select-none">
@@ -183,7 +137,10 @@ export const ShopCategory = () => {
                 <button
                   key={cat} 
                   type="button"
-                  onClick={() => setLeftActive(cat)}
+                  onClick={() => {
+                    setLeftActive(cat);
+                    setSelectedSubCategory('전체');
+                  }}
                   className={`w-full text-left px-4 py-3.5 text-[13px] transition-all flex items-center justify-between ${
                     leftActive === cat 
                       ? 'bg-white font-black text-black shadow-2xs border-l-3 border-black' 
@@ -197,52 +154,71 @@ export const ShopCategory = () => {
 
             {/* 우측 세부 콘텐츠 */}
             <div className="flex-1 bg-white overflow-y-auto scrollbar-hide p-4 sm:p-5">
-              {/* 상단 추천 3개 카드 (이모지 대신 세련된 벡터 일러스트) */}
+              {/* 상단 추천 3개 카드: 실사 패션 스튜디오 에셋 적용 */}
               <div className="flex justify-between gap-2.5 mb-6">
-                <div className="flex flex-col items-center gap-1.5 w-1/3 p-2 rounded-xl hover:bg-gray-50 transition cursor-pointer group">
-                  <div className="bg-gray-50 group-hover:bg-gray-100 border border-gray-100 rounded-xl aspect-square w-full flex items-center justify-center transition-colors">
-                    <LuxurySneakerIcon className="w-8 h-8 text-neutral-800 transition-transform group-hover:scale-110" />
-                  </div>
-                  <span className="text-[10px] text-center font-bold text-gray-800 break-keep leading-tight">
-                    {subTab} 오늘의 스니커즈
-                  </span>
-                </div>
-
-                <div className="flex flex-col items-center gap-1.5 w-1/3 p-2 rounded-xl hover:bg-gray-50 transition cursor-pointer group">
-                  <div className="bg-gray-50 group-hover:bg-gray-100 border border-gray-100 rounded-xl aspect-square w-full flex items-center justify-center transition-colors">
-                    <LuxuryJewelryIcon className="w-8 h-8 text-amber-500 transition-transform group-hover:scale-110" />
-                  </div>
-                  <span className="text-[10px] text-center font-bold text-gray-800 break-keep leading-tight">
-                    {subTab} 요즘 이게 잘 나갑니다
-                  </span>
-                </div>
-
-                <div className="flex flex-col items-center gap-1.5 w-1/3 p-2 rounded-xl hover:bg-gray-50 transition cursor-pointer group">
-                  <div className="bg-gray-50 group-hover:bg-gray-100 border border-gray-100 rounded-xl aspect-square w-full flex items-center justify-center transition-colors">
-                    <LuxuryCoatIcon className="w-8 h-8 text-neutral-700 transition-transform group-hover:scale-110" />
-                  </div>
-                  <span className="text-[10px] text-center font-bold text-gray-800 break-keep leading-tight">
-                    {subTab} 옷장 업데이트
-                  </span>
-                </div>
+                {CATEGORY_TOP_TILES.map((tile) => {
+                  const isActive = leftActive === tile.targetCategory;
+                  return (
+                    <div 
+                      key={tile.id}
+                      onClick={() => handleTileClick(tile.targetCategory, tile.title)}
+                      className={`flex flex-col items-center gap-1.5 w-1/3 p-1.5 rounded-xl transition cursor-pointer group ${
+                        isActive ? 'bg-gray-100/80 ring-1 ring-black/10' : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className="relative aspect-square w-full rounded-xl overflow-hidden border border-gray-200/80 shadow-2xs group-hover:shadow-xs transition-all bg-gray-100">
+                        <img 
+                          src={tile.imageUrl} 
+                          alt={tile.title}
+                          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+                        {isActive && (
+                          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-600 ring-2 ring-white" />
+                        )}
+                      </div>
+                      <span className="text-[11px] text-center font-bold text-gray-800 break-keep leading-tight group-hover:text-black">
+                        {subTab} {tile.title}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
 
               {/* 세부 카테고리 리스트 */}
               <div className="border-t border-gray-100">
-                <div className="py-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                  {leftActive} 전체 세부 카테고리
+                <div className="py-2.5 flex items-center justify-between text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                  <span>{leftActive} 전체 세부 카테고리</span>
+                  {selectedSubCategory !== '전체' && (
+                    <span className="text-blue-600 font-extrabold normal-case">
+                      선택: {selectedSubCategory}
+                    </span>
+                  )}
                 </div>
-                {currentSubCategories.map((sub, idx) => (
-                  <div 
-                    key={idx} 
-                    role="button"
-                    tabIndex={0}
-                    className="flex justify-between items-center py-3.5 border-b border-gray-50 hover:bg-gray-50/80 px-1 rounded-lg cursor-pointer transition-colors group"
-                  >
-                    <span className="text-[13px] text-gray-800 font-bold group-hover:text-black transition-colors">{sub}</span>
-                    <ChevronRight size={15} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                ))}
+                {currentSubCategories.map((sub, idx) => {
+                  const isSelected = selectedSubCategory === sub;
+                  return (
+                    <div 
+                      key={idx} 
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => handleSubCategoryClick(sub)}
+                      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleSubCategoryClick(sub)}
+                      className={`flex justify-between items-center py-3.5 border-b border-gray-50 px-2 rounded-lg cursor-pointer transition-colors group ${
+                        isSelected ? 'bg-gray-100 text-black font-black' : 'hover:bg-gray-50/80 text-gray-800 font-semibold'
+                      }`}
+                    >
+                      <span className={`text-[13px] transition-colors ${isSelected ? 'font-black text-black' : 'group-hover:text-black'}`}>
+                        {sub}
+                      </span>
+                      <ChevronRight 
+                        size={15} 
+                        className={`transition-transform ${isSelected ? 'text-black translate-x-1' : 'text-gray-400 group-hover:translate-x-0.5'}`} 
+                      />
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -252,7 +228,10 @@ export const ShopCategory = () => {
       {/* 3-B. 브랜드 뷰 */}
       {mainTab === 'BRAND' && (
         <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
-          <h2 className="font-black text-lg mb-4 text-gray-950 tracking-tight">인기 브랜드 10</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-black text-lg text-gray-950 tracking-tight">인기 브랜드 ({brands.length})</h2>
+            <span className="text-xs text-gray-400 font-medium">전체 {currentBrandProducts.length}개 상품</span>
+          </div>
           
           {/* 인기 브랜드 모노그램 칩 가로 스크롤 */}
           <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 mb-6">
@@ -274,10 +253,15 @@ export const ShopCategory = () => {
 
           {/* 선택된 브랜드 상품 그리드 (2열) */}
           <div className="grid grid-cols-2 gap-x-3 gap-y-6 mb-6">
-            {currentBrandProducts.map((item, i) => (
-              <div key={i} className="flex flex-col group cursor-pointer">
+            {currentBrandProducts.map((item) => (
+              <div key={item.id} className="flex flex-col group cursor-pointer">
                 <div className="relative aspect-square bg-gray-100 rounded-xl mb-2 flex items-center justify-center overflow-hidden border border-gray-100 shadow-2xs">
-                  <ProductImage src={(item as any).image} alt={item.title} category={item.category} />
+                  <ProductImage 
+                    src={item.imageUrl} 
+                    alt={item.title} 
+                    category={item.category}
+                    productId={item.id}
+                  />
                   <button 
                     type="button"
                     aria-label={`${item.title} 좋아요`}
@@ -313,9 +297,10 @@ export const ShopCategory = () => {
 
           <button 
             type="button"
+            onClick={() => showToast(`${activeBrand} 전용 기획전 페이지 준비 중입니다.`, 'info')}
             className="w-full border border-gray-300 hover:border-gray-400 hover:bg-gray-50 active:scale-[0.99] py-3.5 rounded-xl text-sm font-bold text-gray-800 flex justify-center items-center gap-1 mb-8 transition-all shadow-2xs"
           >
-            {activeBrand} 상품 더보기 <ChevronRight size={16}/>
+            {activeBrand} 상품 더보기 ({currentBrandProducts.length}개 상품) <ChevronRight size={16}/>
           </button>
         </div>
       )}
