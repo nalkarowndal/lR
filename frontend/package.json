@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint src",
+    "test:capture": "node scripts/capture-all.js",
     "preview": "vite preview"
   },
   "dependencies": {

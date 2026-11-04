@@ -5,6 +5,7 @@ import {
   getWorkers, createWorker,
   getMessages, createMessage
 } from '../controllers/admin.controller.js';
+import { addProductImage, updateProductImage, deleteProductImage } from '../controllers/image.controller.js';
 import { validateBody } from '../middlewares/validate.js';
 import { requireAdmin } from '../middlewares/auth.js';
 import { 
@@ -21,6 +22,11 @@ adminRouter.use(requireAdmin);
 adminRouter.get('/products', getAdminProducts);
 adminRouter.post('/products', validateBody(CreateProductSchema), createAdminProduct);
 adminRouter.delete('/products/:id', deleteAdminProduct);
+
+// Product Images Gallery Management
+adminRouter.post('/products/:id/images', addProductImage);
+adminRouter.patch('/products/:id/images/:imageId', updateProductImage);
+adminRouter.delete('/products/:id/images/:imageId', deleteProductImage);
 
 // Recruit Requests
 adminRouter.get('/recruit/requests', getRecruitRequests);

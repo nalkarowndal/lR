@@ -2,10 +2,11 @@ import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 
-// 1. 단일 AppContext 및 AppProvider 임포트
+// 1. Context Providers
 import { AppProvider, useApp } from './context/AppContext';
+import { ToastProvider } from './context/ToastContext';
 
-// 2. 컴포넌트 임포트
+// 2. Component Imports
 import { ShopMain } from './components/ShopMain';
 import { ShopCategory } from './components/ShopCategory';
 import { ShopSell } from './components/ShopSell';
@@ -13,9 +14,11 @@ import { ShopAdmin } from './components/ShopAdmin';
 import { RecruitApp } from './components/RecruitApp';
 import { ShopSearch } from './components/ShopSearch';
 import { ShopLike } from './components/ShopLike';
+import { ShopRegister } from './components/ShopRegister';
+import { ShopPasswordReset } from './components/ShopPasswordReset';
 
-// 3. 메인 라우터 (관리자 화면은 전체 화면 반응형, 쇼핑몰은 모바일 앱 비율 뷰 적용)
-const MainRouter = () => {
+// 3. Main Router
+export const MainRouter = () => {
   const { currentView } = useApp();
 
   // 관리자 화면일 때는 PC, 태블릿, 모바일 해상도에 맞춰 화면 전체(100%)를 유연하게 활용
@@ -40,6 +43,8 @@ const MainRouter = () => {
         {/* 슬라이딩 오버레이 */}
         <ShopSearch />
         <ShopLike />
+        <ShopRegister />
+        <ShopPasswordReset />
         
       </div>
     </div>
@@ -49,7 +54,9 @@ const MainRouter = () => {
 createRoot(getElementByIdRoot()).render(
   <StrictMode>
     <AppProvider>
-      <MainRouter />
+      <ToastProvider>
+        <MainRouter />
+      </ToastProvider>
     </AppProvider>
   </StrictMode>
 );

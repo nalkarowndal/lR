@@ -33,6 +33,7 @@ function initSchema(db: DatabaseSync) {
       tag TEXT,
       category TEXT NOT NULL DEFAULT 'bag',
       target_group TEXT,
+      image_url TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
   `);
@@ -106,4 +107,63 @@ function initSchema(db: DatabaseSync) {
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
   `);
+
+  // 8. Users Table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      email TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      name TEXT NOT NULL,
+      phone TEXT DEFAULT '',
+      role TEXT NOT NULL DEFAULT 'USER',
+      marketing_consent INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `);
+
+  // 9. Sessions Table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS sessions (
+      token TEXT PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      expires_at TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `);
+
+  // 10. Password Reset Tokens Table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS password_reset_tokens (
+      token TEXT PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      expires_at TEXT NOT NULL,
+      used INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `);
+
+  // 11. Product Images Table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS product_images (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+      image_path TEXT NOT NULL,
+      thumbnail_path TEXT DEFAULT '',
+      alt_text TEXT NOT NULL,
+      source_type TEXT NOT NULL DEFAULT 'ORIGINAL',
+      rights_status TEXT NOT NULL DEFAULT 'DEMO_EDITORIAL',
+      is_generated INTEGER NOT NULL DEFAULT 1,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      is_primary INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `);
+
+  // 12. Migration: Ensure products.image_url exists in existing databases
+  try {
+    db.exec(`ALTER TABLE products ADD COLUMN image_url TEXT;`);
+  } catch {
+    // Column already exists
+  }
 }

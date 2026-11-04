@@ -5,12 +5,34 @@
 
 const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:4000/api/v1';
 
+export function getAuthToken(): string | null {
+  try {
+    return localStorage.getItem('lr_token');
+  } catch {
+    return null;
+  }
+}
+
+export function setAuthToken(token: string | null): void {
+  try {
+    if (token) {
+      localStorage.setItem('lr_token', token);
+    } else {
+      localStorage.removeItem('lr_token');
+    }
+  } catch {}
+}
+
 async function fetchJson<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const headers = {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'x-user-role': 'ADMIN',
-    ...(options.headers || {})
+    ...(options.headers as Record<string, string> || {})
   };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
 
   const res = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
@@ -35,13 +57,62 @@ export const api = {
     }
   },
 
+  // Auth Endpoints
+  register: async (payload: { email: string; password: string; name: string; phone?: string; termsAgreed: boolean; marketingConsent?: boolean }) => {
+    return fetchJson<{ success: boolean; message: string; token: string; user: any }>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  login: async (payload: { email: string; password: string }) => {
+    return fetchJson<{ success: boolean; message: string; token: string; user: any }>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  getMe: async () => {
+    return fetchJson<{ success: boolean; user: any }>('/auth/me');
+  },
+
+  logout: async () => {
+    try {
+      return await fetchJson<{ success: boolean; message: string }>('/auth/logout', { method: 'POST' });
+    } finally {
+      setAuthToken(null);
+    }
+  },
+
+  forgotPassword: async (email: string) => {
+    return fetchJson<{ success: boolean; message: string; resetToken?: string }>('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email })
+    });
+  },
+
+  resetPassword: async (payload: { token: string; newPassword: string }) => {
+    return fetchJson<{ success: boolean; message: string }>('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
   // Products
   getProducts: async () => {
     return fetchJson<{ success: boolean; data: any[] }>('/products');
   },
 
+  getProductById: async (id: number) => {
+    return fetchJson<{ success: boolean; data: any }>(`/products/${id}`);
+  },
+
   getRecommendations: async (target: string) => {
     return fetchJson<{ success: boolean; data: any[] }>(`/products/recommendations?target=${encodeURIComponent(target)}`);
+  },
+
+  getProductImages: async (productId: number) => {
+    return fetchJson<{ success: boolean; count: number; data: any[] }>(`/products/${productId}/images`);
   },
 
   // Search
@@ -70,12 +141,12 @@ export const api = {
     });
   },
 
-  // Admin
+  // Admin Products & Gallery
   getAdminProducts: async () => {
     return fetchJson<{ success: boolean; data: any[] }>('/admin/products');
   },
 
-  createAdminProduct: async (product: { title: string; type: string; price: number; brand?: string; category?: string }) => {
+  createAdminProduct: async (product: { title: string; type: string; price: number; brand?: string; category?: string; image_url?: string }) => {
     return fetchJson<{ success: boolean; message: string; data: any }>('/admin/products', {
       method: 'POST',
       body: JSON.stringify(product)
@@ -88,6 +159,20 @@ export const api = {
     });
   },
 
+  addProductImage: async (productId: number, payload: { imagePath: string; altText?: string; isPrimary?: number }) => {
+    return fetchJson<{ success: boolean; message: string; data: any }>(`/admin/products/${productId}/images`, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  deleteProductImage: async (productId: number, imageId: number) => {
+    return fetchJson<{ success: boolean; message: string }>(`/admin/products/${productId}/images/${imageId}`, {
+      method: 'DELETE'
+    });
+  },
+
+  // Admin Recruit Requests
   getRecruitRequests: async () => {
     return fetchJson<{ success: boolean; data: any[] }>('/admin/recruit/requests');
   },
@@ -106,6 +191,7 @@ export const api = {
     });
   },
 
+  // Admin Workers
   getWorkers: async () => {
     return fetchJson<{ success: boolean; data: any[] }>('/admin/workers');
   },
@@ -117,6 +203,7 @@ export const api = {
     });
   },
 
+  // Admin Messages
   getMessages: async () => {
     return fetchJson<{ success: boolean; data: any[] }>('/admin/messages');
   },

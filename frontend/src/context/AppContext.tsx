@@ -1,8 +1,17 @@
 import React, { useState, useEffect, createContext, useContext, type ReactNode } from 'react';
-import { api } from '../services/api';
+import { api, setAuthToken } from '../services/api';
 
 export type ViewState = 'SHOP_MAIN' | 'SHOP_ADMIN' | 'RECRUIT_APP' | 'SHOP_CATEGORY' | 'SHOP_SELL';
 export type Role = 'STORE' | 'ADMIN';
+export type OverlayState = 'SEARCH' | 'LOGIN' | 'REGISTER' | 'FORGOT_PASSWORD' | null;
+
+export interface User {
+  id: number;
+  email: string;
+  name: string;
+  role: 'USER' | 'ADMIN';
+  phone?: string;
+}
 
 export interface RecruitRequest {
   id: number;
@@ -41,13 +50,18 @@ export interface Product {
   price: number;
   brand?: string;
   category?: string;
+  image_url?: string;
 }
 
 interface AppContextType {
   currentView: ViewState;
   setCurrentView: React.Dispatch<React.SetStateAction<ViewState>>;
-  activeOverlay: 'SEARCH' | 'LOGIN' | null;
-  setActiveOverlay: React.Dispatch<React.SetStateAction<'SEARCH' | 'LOGIN' | null>>;
+  activeOverlay: OverlayState;
+  setActiveOverlay: React.Dispatch<React.SetStateAction<OverlayState>>;
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  logoutUser: () => Promise<void>;
+  checkUserAuth: () => Promise<void>;
   role: Role;
   setRole: React.Dispatch<React.SetStateAction<Role>>;
   requests: RecruitRequest[];
@@ -66,7 +80,8 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [currentView, setCurrentView] = useState<ViewState>('SHOP_MAIN');
-  const [activeOverlay, setActiveOverlay] = useState<'SEARCH' | 'LOGIN' | null>(null);
+  const [activeOverlay, setActiveOverlay] = useState<OverlayState>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<Role>('STORE');
   const [isBackendConnected, setIsBackendConnected] = useState<boolean>(false);
 
@@ -87,6 +102,29 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     { id: 2, name: '이영희', phone: '010-8765-4321', exp: '주방 3년', checked: true },
   ]);
 
+  const checkUserAuth = async () => {
+    try {
+      const res = await api.getMe();
+      if (res?.success && res.user) {
+        setUser(res.user);
+      } else {
+        setUser(null);
+      }
+    } catch {
+      setUser(null);
+    }
+  };
+
+  const logoutUser = async () => {
+    try {
+      await api.logout();
+    } catch {
+      setAuthToken(null);
+    } finally {
+      setUser(null);
+    }
+  };
+
   // Load and synchronize data from Node.js backend
   const refreshData = async () => {
     try {
@@ -97,6 +135,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       }
       setIsBackendConnected(true);
 
+      // 0. Check Auth Session
+      await checkUserAuth();
+
       // 1. Products
       const prodsRes = await api.getProducts();
       if (prodsRes?.success && Array.isArray(prodsRes.data)) {
@@ -106,7 +147,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           type: p.type,
           price: p.price,
           brand: p.brand,
-          category: p.category
+          category: p.category,
+          image_url: p.image_url
         })));
       }
 
@@ -139,6 +181,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AppContext.Provider value={{ 
       currentView, setCurrentView, activeOverlay, setActiveOverlay,
+      user, setUser, logoutUser, checkUserAuth,
       role, setRole, requests, setRequests, messages, setMessages, 
       workerDB, setWorkerDB, products, setProducts, isBackendConnected, refreshData
     }}>

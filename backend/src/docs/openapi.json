@@ -2,8 +2,8 @@
   "openapi": "3.0.0",
   "info": {
     "title": "LuxuryRental REST API",
-    "version": "1.0.0",
-    "description": "LuxuryRental Commerce & Administration Backend API"
+    "version": "1.1.0",
+    "description": "LuxuryRental Commerce, Authentication & Administration Backend API"
   },
   "servers": [
     {
@@ -11,11 +11,133 @@
       "description": "Local Development Server"
     }
   ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "hex"
+      }
+    }
+  },
   "paths": {
     "/health": {
       "get": {
         "summary": "Health check",
         "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "summary": "Register new customer account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password", "name", "termsAgreed"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "minLength": 6 },
+                  "name": { "type": "string" },
+                  "phone": { "type": "string" },
+                  "termsAgreed": { "type": "boolean" },
+                  "marketingConsent": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User registered and session token issued" },
+          "409": { "description": "Duplicate email address" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login with email and password",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login successful with token and user object" },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Get current authenticated user session",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Current user profile" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Logout and revoke session token",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Successfully logged out" }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "summary": "Request password reset token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": { "email": { "type": "string", "format": "email" } }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Reset token generated" } }
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "summary": "Reset password using token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["token", "newPassword"],
+                "properties": {
+                  "token": { "type": "string" },
+                  "newPassword": { "type": "string", "minLength": 6 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Password updated successfully" },
+          "400": { "description": "Invalid or expired token" }
+        }
       }
     },
     "/products": {
@@ -36,6 +158,15 @@
           { "name": "target", "in": "query", "schema": { "type": "string", "example": "20대 여성" } }
         ],
         "responses": { "200": { "description": "Recommendations list" } }
+      }
+    },
+    "/products/{id}/images": {
+      "get": {
+        "summary": "Get gallery images for a specific product",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "List of product images" } }
       }
     },
     "/categories": {
@@ -59,13 +190,7 @@
         "parameters": [
           { "name": "q", "in": "query", "required": true, "schema": { "type": "string" } }
         ],
-        "responses": { "200": { "description": "Matching products" } }
-      }
-    },
-    "/search/trending": {
-      "get": {
-        "summary": "Get trending keywords and recommendations",
-        "responses": { "200": { "description": "Trending keyword list" } }
+        "responses": { "200": { "description": "Search results" } }
       }
     },
     "/sell-requests": {
@@ -92,58 +217,74 @@
     "/admin/products": {
       "get": {
         "summary": "Admin: get all products",
-        "responses": { "200": { "description": "Admin product list" } }
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "200": { "description": "Admin products list" } }
       },
       "post": {
-        "summary": "Admin: add new product",
+        "summary": "Admin: create new product",
+        "security": [{ "BearerAuth": [] }],
+        "responses": { "201": { "description": "Product created" } }
+      }
+    },
+    "/admin/products/{id}/images": {
+      "post": {
+        "summary": "Admin: upload/register product image to gallery",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["title", "type", "price"],
+                "required": ["imagePath"],
                 "properties": {
-                  "title": { "type": "string" },
-                  "type": { "type": "string", "enum": ["RENT", "BUY"] },
-                  "price": { "type": "number" },
-                  "brand": { "type": "string" },
-                  "category": { "type": "string" }
+                  "imagePath": { "type": "string" },
+                  "altText": { "type": "string" },
+                  "isPrimary": { "type": "integer", "enum": [0, 1] }
                 }
               }
             }
           }
         },
-        "responses": { "201": { "description": "Product created" } }
+        "responses": { "201": { "description": "Image registered" } }
       }
     },
     "/admin/recruit/requests": {
       "get": {
         "summary": "Admin: get recruit requests",
+        "security": [{ "BearerAuth": [] }],
         "responses": { "200": { "description": "Recruit requests list" } }
       },
       "post": {
         "summary": "Admin: create recruit request",
+        "security": [{ "BearerAuth": [] }],
         "responses": { "201": { "description": "Recruit request created" } }
       }
     },
     "/admin/workers": {
       "get": {
         "summary": "Admin: get workers database",
+        "security": [{ "BearerAuth": [] }],
         "responses": { "200": { "description": "Worker list" } }
       },
       "post": {
         "summary": "Admin: register new worker",
+        "security": [{ "BearerAuth": [] }],
         "responses": { "201": { "description": "Worker created" } }
       }
     },
     "/admin/messages": {
       "get": {
         "summary": "Admin: get communication messages",
+        "security": [{ "BearerAuth": [] }],
         "responses": { "200": { "description": "Messages list" } }
       },
       "post": {
         "summary": "Admin: send message",
+        "security": [{ "BearerAuth": [] }],
         "responses": { "201": { "description": "Message sent" } }
       }
     }

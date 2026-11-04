@@ -3,8 +3,9 @@ import { ChevronLeft, MessageCircle, ShoppingCart, ChevronRight, Heart } from 'l
 import { useApp } from '../context/AppContext';
 import { 
   LuxurySneakerIcon, LuxuryJewelryIcon, LuxuryCoatIcon, 
-  BrandMonogram, ProductVisualBadge 
+  BrandMonogram 
 } from './ui/LuxuryIcons';
+import { ProductImage } from './ui/ProductImage';
 
 // 카테고리별 세부 서브카테고리 매핑
 const SUBCATEGORIES_BY_CATEGORY: Record<string, string[]> = {
@@ -276,7 +277,7 @@ export const ShopCategory = () => {
             {currentBrandProducts.map((item, i) => (
               <div key={i} className="flex flex-col group cursor-pointer">
                 <div className="relative aspect-square bg-gray-100 rounded-xl mb-2 flex items-center justify-center overflow-hidden border border-gray-100 shadow-2xs">
-                  <ProductVisualBadge brand={activeBrand} category={item.category} />
+                  <ProductImage src={(item as any).image} alt={item.title} category={item.category} />
                   <button 
                     type="button"
                     aria-label={`${item.title} 좋아요`}

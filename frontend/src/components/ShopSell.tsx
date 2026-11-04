@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, Search, ChevronRight, Check, PlusCircle, X } from 'lucide-react';
+import { ChevronLeft, Search, ChevronRight, Check, PlusCircle, X, AlertCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 
@@ -10,6 +10,12 @@ export const ShopSell = () => {
   const [showDirectModal, setShowDirectModal] = useState(false);
   const [directBrandName, setDirectBrandName] = useState('');
   const [sellModal, setSellModal] = useState<{ isOpen: boolean; message: string }>({
+    isOpen: false,
+    message: ''
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorModal, setErrorModal] = useState<{ isOpen: boolean; message: string }>({
     isOpen: false,
     message: ''
   });
@@ -33,31 +39,47 @@ export const ShopSell = () => {
     b.ko.includes(searchQuery) || b.en.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleSelectBrand = (brand: { ko: string; en: string }) => {
+  const handleSelectBrand = async (brand: { ko: string; en: string }) => {
     setSelectedBrand(brand);
-    setSellModal({
-      isOpen: true,
-      message: `'${brand.ko} (${brand.en})' 브랜드 위탁 판매 신청이 준비되었습니다.`
-    });
-    api.createSellRequest(`${brand.ko} (${brand.en})`).catch((err) => {
-      console.warn('위탁 판매 접수 API 알림:', err);
-    });
+    setIsSubmitting(true);
+    try {
+      await api.createSellRequest(`${brand.ko} (${brand.en})`);
+      setSellModal({
+        isOpen: true,
+        message: `'${brand.ko} (${brand.en})' 브랜드 위탁 판매 신청이 정상 접수되었습니다. 전문 감정팀 검수 후 안내 연락을 드립니다.`
+      });
+    } catch (err: any) {
+      setErrorModal({
+        isOpen: true,
+        message: err.message || '판매 신청 접수 중 네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleDirectRegister = (e: React.FormEvent) => {
+  const handleDirectRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     const name = directBrandName.trim();
     if (!name) return;
     setShowDirectModal(false);
     setSelectedBrand({ ko: name, en: 'Custom' });
-    setSellModal({
-      isOpen: true,
-      message: `'${name}' 브랜드 직접 등록이 접수되었습니다.`
-    });
-    setDirectBrandName('');
-    api.createSellRequest(name).catch((err) => {
-      console.warn('브랜드 직접등록 접수 API 알림:', err);
-    });
+    setIsSubmitting(true);
+    try {
+      await api.createSellRequest(name);
+      setSellModal({
+        isOpen: true,
+        message: `'${name}' 브랜드 직접 등록이 정상 접수되었습니다. 전문 감정팀 검수 후 판매 절차가 진행됩니다.`
+      });
+      setDirectBrandName('');
+    } catch (err: any) {
+      setErrorModal({
+        isOpen: true,
+        message: err.message || '브랜드 직접 등록 접수 중 오류가 발생했습니다.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -74,6 +96,26 @@ export const ShopSell = () => {
             <button 
               type="button"
               onClick={() => setSellModal({ isOpen: false, message: '' })}
+              className="w-full bg-gray-900 hover:bg-black text-white py-3 rounded-xl font-bold text-sm transition"
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 🌟 접수 오류 모달 */}
+      {errorModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl p-6 max-w-xs w-full shadow-2xl text-center flex flex-col items-center animate-fadeIn">
+            <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mb-3">
+              <AlertCircle size={24} className="stroke-[2.5]" />
+            </div>
+            <h3 className="font-extrabold text-base text-gray-900 mb-2">접수 오류 안내</h3>
+            <p className="text-xs text-gray-600 mb-6 leading-relaxed">{errorModal.message}</p>
+            <button 
+              type="button"
+              onClick={() => setErrorModal({ isOpen: false, message: '' })}
               className="w-full bg-gray-900 hover:bg-black text-white py-3 rounded-xl font-bold text-sm transition"
             >
               확인
@@ -112,9 +154,10 @@ export const ShopSell = () => {
                 </button>
                 <button 
                   type="submit" 
-                  className="flex-1 bg-gray-900 text-white py-3 rounded-xl text-sm font-bold hover:bg-black"
+                  disabled={isSubmitting}
+                  className="flex-1 bg-gray-900 text-white py-3 rounded-xl text-sm font-bold hover:bg-black disabled:opacity-50"
                 >
-                  등록 신청
+                  {isSubmitting ? '접수 중...' : '등록 신청'}
                 </button>
               </div>
             </form>

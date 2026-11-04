@@ -7,8 +7,9 @@ import {
   LuxuryDressIcon, LuxuryBagIcon, LuxuryHandshakeIcon, LuxuryGiftIcon,
   MenuHangerIcon, MenuTagIcon, MenuClockIcon, MenuMembershipIcon,
   MenuCareIcon, MenuVipIcon, MenuBuybackIcon, MenuInviteIcon,
-  LuxuryLuggageIcon, LuxuryJewelryIcon, ProductVisualBadge
+  LuxuryLuggageIcon, LuxuryJewelryIcon
 } from './ui/LuxuryIcons';
+import { ProductImage } from './ui/ProductImage';
 
 // ==========================================
 // 커스텀 SVG 아이콘 (lucide-react 에러 대체용)
@@ -43,41 +44,42 @@ const RECOMMENDATIONS_DATA: Record<string, Array<{
   discount: string;
   tag: string;
   category: 'bag' | 'clothing' | 'shoes' | 'jewelry' | 'watch' | 'wallet';
+  image?: string;
 }>> = {
   '20대 여성': [
-    { brand: '생로랑', title: '블랙 페이던트 Le 5 A 7 호보...', price: '10,230원', original: '44,400원', discount: '77%', tag: '예약 마감', category: 'bag' },
-    { brand: '발렌시아가', title: '블랙 르 시티 모토 스몰 숄더백', price: '18,510원', original: '80,400원', discount: '77%', tag: '예약 마감', category: 'bag' },
-    { brand: '샤넬', title: '블랙 캐비어 호보 미니 토트백', price: '101,600원', original: '170,400원', discount: '41%', tag: '앱전용', category: 'bag' },
-    { brand: '샤넬', title: '블랙 클래식 플랩 흑장 체인 숄...', price: '24,500원', original: '', discount: '72%', tag: '예약 마감', category: 'bag' }
+    { brand: '생로랑', title: '블랙 페이던트 Le 5 A 7 호보...', price: '10,230원', original: '44,400원', discount: '77%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/saint_laurent_le5a7.jpg' },
+    { brand: '발렌시아가', title: '블랙 르 시티 모토 스몰 숄더백', price: '18,510원', original: '80,400원', discount: '77%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/balenciaga_le_city.jpg' },
+    { brand: '샤넬', title: '블랙 캐비어 호보 미니 토트백', price: '101,600원', original: '170,400원', discount: '41%', tag: '앱전용', category: 'bag', image: '/assets/products/bags/chanel_caviar_hobo.jpg' },
+    { brand: '샤넬', title: '블랙 클래식 플랩 흑장 체인 숄...', price: '24,500원', original: '', discount: '72%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/chanel_classic_flap.jpg' }
   ],
   '20대 남성': [
-    { brand: '메종 마르지엘라', title: '남성 5AC 블랙 크로스백 미디엄', price: '14,200원', original: '48,000원', discount: '70%', tag: '예약 마감', category: 'bag' },
-    { brand: '프라다', title: '리나일론 삼각로고 남성 벨트백', price: '16,800원', original: '56,000원', discount: '70%', tag: '앱전용', category: 'bag' },
-    { brand: '보테가 베네타', title: '카세트 인트레치아토 크로스백', price: '19,500원', original: '65,000원', discount: '70%', tag: '예약 마감', category: 'bag' },
-    { brand: '아미', title: '하트 로고 크루넥 남성 니트', price: '11,000원', original: '38,000원', discount: '71%', tag: '예약 마감', category: 'clothing' }
+    { brand: '메종 마르지엘라', title: '남성 5AC 블랙 크로스백 미디엄', price: '14,200원', original: '48,000원', discount: '70%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/maison_margiela_5ac.jpg' },
+    { brand: '프라다', title: '리나일론 삼각로고 남성 벨트백', price: '16,800원', original: '56,000원', discount: '70%', tag: '앱전용', category: 'bag', image: '/assets/products/bags/prada_renylon_belt.jpg' },
+    { brand: '보테가 베네타', title: '카세트 인트레치아토 크로스백', price: '19,500원', original: '65,000원', discount: '70%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/bottega_cassette.jpg' },
+    { brand: '아미', title: '하트 로고 크루넥 남성 니트', price: '11,000원', original: '38,000원', discount: '71%', tag: '예약 마감', category: 'clothing', image: '/assets/products/clothing/ami_heart_knit.jpg' }
   ],
   '30대 여성': [
-    { brand: '샤넬', title: '샤넬 22 미니 퀼팅 숄더 핸드백', price: '45,000원', original: '150,000원', discount: '70%', tag: '앱전용', category: 'bag' },
-    { brand: '에르메스', title: '에블린 TPM 미니 크로스 에토프', price: '42,000원', original: '120,000원', discount: '65%', tag: '예약 마감', category: 'bag' },
-    { brand: '셀린느', title: '틴 트리옹프 샤이니 카프스킨', price: '29,000원', original: '98,000원', discount: '70%', tag: '예약 마감', category: 'bag' },
-    { brand: '크리스찬 디올', title: '레이디 D-Joy 까나쥬 스몰백', price: '38,000원', original: '130,000원', discount: '71%', tag: '예약 마감', category: 'bag' }
+    { brand: '샤넬', title: '샤넬 22 미니 퀼팅 숄더 핸드백', price: '45,000원', original: '150,000원', discount: '70%', tag: '앱전용', category: 'bag', image: '/assets/products/bags/chanel_22_mini.jpg' },
+    { brand: '에르메스', title: '에블린 TPM 미니 크로스 에토프', price: '42,000원', original: '120,000원', discount: '65%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/hermes_evelyne_tpm.jpg' },
+    { brand: '셀린느', title: '틴 트리옹프 샤이니 카프스킨', price: '29,000원', original: '98,000원', discount: '70%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/celine_triomphe.jpg' },
+    { brand: '크리스찬 디올', title: '레이디 D-Joy 까나쥬 스몰백', price: '38,000원', original: '130,000원', discount: '71%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/dior_lady_djoy.jpg' }
   ],
   '30대 남성': [
-    { brand: '톰브라운', title: '삼선 그로그랭 페블 레더 클러치', price: '13,500원', original: '45,000원', discount: '70%', tag: '예약 마감', category: 'bag' },
-    { brand: '구찌', title: 'GG 수프림 캔버스 슬링 메신저백', price: '15,000원', original: '50,000원', discount: '70%', tag: '앱전용', category: 'bag' },
-    { brand: '롤렉스', title: '오이스터 서브마리너 블랙 데이트', price: '85,000원', original: '250,000원', discount: '66%', tag: '예약 마감', category: 'watch' },
-    { brand: '생로랑', title: '시티 나일론 블랙 백팩 클래식', price: '16,000원', original: '55,000원', discount: '71%', tag: '예약 마감', category: 'bag' }
+    { brand: '톰브라운', title: '삼선 그로그랭 페블 레더 클러치', price: '13,500원', original: '45,000원', discount: '70%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/thombrowne_clutch.jpg' },
+    { brand: '구찌', title: 'GG 수프림 캔버스 슬링 메신저백', price: '15,000원', original: '50,000원', discount: '70%', tag: '앱전용', category: 'bag', image: '/assets/products/bags/gucci_gg_supreme.jpg' },
+    { brand: '롤렉스', title: '오이스터 서브마리너 블랙 데이트', price: '85,000원', original: '250,000원', discount: '66%', tag: '예약 마감', category: 'watch', image: '/assets/products/watches/rolex_submariner.jpg' },
+    { brand: '생로랑', title: '시티 나일론 블랙 백팩 클래식', price: '16,000원', original: '55,000원', discount: '71%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/saint_laurent_backpack.jpg' }
   ],
   '40대 여성': [
-    { brand: '에르메스', title: '버킨 25 토고 골드 하드웨어', price: '115,000원', original: '350,000원', discount: '67%', tag: '예약 마감', category: 'bag' },
-    { brand: '루이비통', title: '카푸신 BB 블랙 토뤼옹 핸드백', price: '39,000원', original: '130,000원', discount: '70%', tag: '앱전용', category: 'bag' },
-    { brand: '샤넬', title: '클래식 미디엄 캐비어 금장 플랩', price: '58,000원', original: '190,000원', discount: '69%', tag: '예약 마감', category: 'bag' },
-    { brand: '반클리프 아펠', title: '빈티지 알함브라 펜던트 옐로골드', price: '28,000원', original: '85,000원', discount: '67%', tag: '예약 마감', category: 'jewelry' }
+    { brand: '에르메스', title: '버킨 25 토고 골드 하드웨어', price: '115,000원', original: '350,000원', discount: '67%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/hermes_birkin_25.jpg' },
+    { brand: '루이비통', title: '카푸신 BB 블랙 토뤼옹 핸드백', price: '39,000원', original: '130,000원', discount: '70%', tag: '앱전용', category: 'bag', image: '/assets/products/bags/louisvuitton_capucines_bb.jpg' },
+    { brand: '샤넬', title: '클래식 미디엄 캐비어 금장 플랩', price: '58,000원', original: '190,000원', discount: '69%', tag: '예약 마감', category: 'bag', image: '/assets/products/bags/chanel_classic_medium.jpg' },
+    { brand: '반클리프 아펠', title: '빈티지 알함브라 펜던트 옐로골드', price: '28,000원', original: '85,000원', discount: '67%', tag: '예약 마감', category: 'jewelry', image: '/assets/products/jewelry/vancleef_alhambra.jpg' }
   ]
 };
 
 export const ShopMain = () => {
-  const { setCurrentView, setActiveOverlay } = useApp();
+  const { setCurrentView, setActiveOverlay, user, logoutUser } = useApp();
   const [activeTab, setActiveTab] = useState('20대 여성');
 
   const currentRecommendList = RECOMMENDATIONS_DATA[activeTab] || RECOMMENDATIONS_DATA['20대 여성'];
@@ -153,16 +155,39 @@ export const ShopMain = () => {
 
       {/* 2. 상단 로그인 인사말 & 간편 로그인 */}
       <section className="p-5 bg-white mb-2 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
-        <h2 className="text-xl font-extrabold text-gray-900 leading-snug mb-4 tracking-tight">
-          어서오세요, <span className="text-orange-500 font-black">로그인</span> 후<br/>리본즈를 이용해보세요
-        </h2>
-        <button 
-          type="button"
-          onClick={() => setActiveOverlay('LOGIN')} 
-          className="w-full bg-gray-900 hover:bg-black active:scale-[0.99] text-white font-bold py-3.5 rounded-xl mb-6 shadow-sm transition-all"
-        >
-          간편 로그인하기
-        </button>
+        {user ? (
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md tracking-tight">
+                {user.role === 'ADMIN' ? '👑 관리자' : '💎 VIP 프리미엄 회원'}
+              </span>
+              <button 
+                type="button"
+                onClick={logoutUser}
+                className="text-xs font-bold text-gray-500 hover:text-black border border-gray-200 px-2.5 py-1 rounded-lg transition"
+              >
+                로그아웃
+              </button>
+            </div>
+            <h2 className="text-xl font-extrabold text-gray-900 leading-snug tracking-tight">
+              반갑습니다, <span className="text-indigo-600 font-black">{user.name}</span>님!<br/>
+              오늘도 특별한 명품을 만나보세요
+            </h2>
+          </div>
+        ) : (
+          <div>
+            <h2 className="text-xl font-extrabold text-gray-900 leading-snug mb-4 tracking-tight">
+              어서오세요, <span className="text-orange-500 font-black">로그인</span> 후<br/>리본즈를 이용해보세요
+            </h2>
+            <button 
+              type="button"
+              onClick={() => setActiveOverlay('LOGIN')} 
+              className="w-full bg-gray-900 hover:bg-black active:scale-[0.99] text-white font-bold py-3.5 rounded-xl mb-6 shadow-sm transition-all"
+            >
+              간편 로그인하기
+            </button>
+          </div>
+        )}
 
         {/* 렌트하기 / 구매하기 / 판매하기 액션 카드 */}
         <div className="space-y-3 mb-6">
@@ -227,7 +252,13 @@ export const ShopMain = () => {
         </div>
 
         {/* 회원가입 이벤트 배너 카드 */}
-        <div className="bg-gradient-to-r from-gray-900 via-zinc-900 to-indigo-950 text-white p-5 rounded-2xl flex justify-between items-center shadow-md mb-6 relative overflow-hidden">
+        <div 
+          onClick={() => setActiveOverlay('REGISTER')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setActiveOverlay('REGISTER')}
+          className="bg-gradient-to-r from-gray-900 via-zinc-900 to-indigo-950 text-white p-5 rounded-2xl flex justify-between items-center shadow-md mb-6 relative overflow-hidden cursor-pointer hover:opacity-95 active:scale-[0.99] transition"
+        >
           <div className="relative z-10">
             <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded font-bold tracking-wider">EVENT</span>
             <h4 className="font-extrabold text-lg mt-1 tracking-tight">회원가입 이벤트</h4>
@@ -323,7 +354,7 @@ export const ShopMain = () => {
           {currentRecommendList.map((item, i) => (
             <div key={i} className="flex flex-col group cursor-pointer">
               <div className="relative aspect-square bg-gray-100 rounded-xl mb-2 flex items-center justify-center overflow-hidden border border-gray-100 shadow-2xs">
-                <ProductVisualBadge brand={item.brand} category={item.category} />
+                <ProductImage src={item.image} alt={item.title} category={item.category} />
                 <button 
                   type="button"
                   aria-label={`${item.title} 좋아요`}

@@ -30,6 +30,13 @@ export const ShopAdmin = () => {
     exp: '매장 관리 1년'
   });
 
+  // 상품 갤러리 관리 모달 상태
+  const [galleryProduct, setGalleryProduct] = useState<any | null>(null);
+  const [productImages, setProductImages] = useState<any[]>([]);
+  const [newImagePath, setNewImagePath] = useState('');
+  const [newImageAlt, setNewImageAlt] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+
   const showAlert = (title: string, message: string, onConfirm?: () => void) => {
     setModal({ isOpen: true, title, message, onConfirm });
   };
@@ -45,11 +52,58 @@ export const ShopAdmin = () => {
       if (e.key === 'Escape') {
         if (modal.isOpen) closeModal();
         if (showWorkerModal) setShowWorkerModal(false);
+        if (galleryProduct) setGalleryProduct(null);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [modal.isOpen, showWorkerModal, closeModal]);
+  }, [modal.isOpen, showWorkerModal, galleryProduct, closeModal]);
+
+  const openGalleryModal = async (prod: any) => {
+    setGalleryProduct(prod);
+    try {
+      const res = await api.getProductImages(prod.id);
+      if (res?.success) {
+        setProductImages(res.data);
+      }
+    } catch (err) {
+      console.warn('갤러리 로드 알림:', err);
+    }
+  };
+
+  const handleAddImage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!galleryProduct || !newImagePath.trim()) return;
+    setIsUploading(true);
+    try {
+      const res = await api.addProductImage(galleryProduct.id, {
+        imagePath: newImagePath.trim(),
+        altText: newImageAlt.trim() || galleryProduct.title,
+        isPrimary: productImages.length === 0 ? 1 : 0
+      });
+      if (res?.success) {
+        setProductImages(prev => [...prev, res.data]);
+        setNewImagePath('');
+        setNewImageAlt('');
+        showAlert('이미지 등록 완료', '상품 이미지가 정상 등록되었습니다.');
+      }
+    } catch (err: any) {
+      showAlert('등록 실패', err.message || '이미지 등록 실패');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleDeleteImage = async (imageId: number) => {
+    if (!galleryProduct) return;
+    try {
+      await api.deleteProductImage(galleryProduct.id, imageId);
+      setProductImages(prev => prev.filter(img => img.id !== imageId));
+      showAlert('삭제 완료', '이미지가 삭제되었습니다.');
+    } catch (err: any) {
+      showAlert('삭제 실패', err.message || '이미지 삭제 실패');
+    }
+  };
 
   const [inputMsg, setInputMsg] = useState('');
   const [newReq, setNewReq] = useState({ storeName: '강남본점', date: '', section: '홀 서빙', time: '10:00 - 15:00', breakTime: '30분', required: 1, partner: '' });
@@ -289,17 +343,114 @@ export const ShopAdmin = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {products.map(p => (
-                    <div key={p.id} className="bg-white/5 border border-white/10 p-5 rounded-2xl flex justify-between items-center backdrop-blur-md hover:border-white/25 transition">
-                      <div>
-                        <span className="text-[10px] bg-white/10 text-gray-200 font-bold px-2.5 py-1 rounded-md mr-2">[{p.type}]</span>
-                        <span className="font-bold text-white text-sm">{p.title}</span>
+                    <div key={p.id} className="bg-white/5 border border-white/10 p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 backdrop-blur-md hover:border-white/25 transition">
+                      <div className="flex items-center gap-3">
+                        {p.image_url ? (
+                          <img src={p.image_url} alt={p.title} className="w-10 h-10 rounded-lg object-cover bg-black/40 border border-white/10 shrink-0" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-gray-400 shrink-0">
+                            <i className="fa-regular fa-image"></i>
+                          </div>
+                        )}
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] bg-white/10 text-gray-200 font-bold px-2 py-0.5 rounded-md">[{p.type}]</span>
+                            <span className="font-bold text-white text-sm">{p.title}</span>
+                          </div>
+                          <span className="font-black text-white text-sm mt-0.5 block">{p.price.toLocaleString()}원</span>
+                        </div>
                       </div>
-                      <span className="font-black text-white text-base">{p.price.toLocaleString()}원</span>
+                      <button 
+                        type="button"
+                        onClick={() => openGalleryModal(p)}
+                        className="text-xs bg-white/10 hover:bg-white/20 text-white font-bold px-3 py-1.5 rounded-lg border border-white/10 transition flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <i className="fa-solid fa-images"></i> 갤러리 관리
+                      </button>
                     </div>
                   ))}
                 </div>
               )}
             </div>
+
+            {/* 🌟 상품 이미지 갤러리 관리 모달 */}
+            {galleryProduct && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+                <div className="bg-slate-900 border border-white/15 rounded-3xl p-6 max-w-lg w-full shadow-2xl text-white animate-scaleUp">
+                  <div className="flex justify-between items-center pb-4 border-b border-white/10 mb-4">
+                    <div>
+                      <span className="text-[10px] text-gray-400">상품 ID #{galleryProduct.id}</span>
+                      <h3 className="font-black text-base text-white">{galleryProduct.title} 갤러리</h3>
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={() => setGalleryProduct(null)} 
+                      className="text-gray-400 hover:text-white p-1"
+                    >
+                      <i className="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                  </div>
+
+                  {/* Image List */}
+                  <div className="mb-5 max-h-56 overflow-y-auto space-y-2 pr-1">
+                    {productImages.length === 0 ? (
+                      <div className="py-8 text-center border border-dashed border-white/10 rounded-xl text-xs text-gray-400">
+                        등록된 갤러리 이미지가 없습니다. 아래에서 이미지를 추가하세요.
+                      </div>
+                    ) : (
+                      productImages.map(img => (
+                        <div key={img.id} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+                          <div className="flex items-center gap-3">
+                            <img src={img.image_path} alt={img.alt_text} className="w-12 h-12 rounded-lg object-cover bg-black" />
+                            <div>
+                              <p className="text-xs font-bold text-white truncate max-w-[200px]">{img.alt_text}</p>
+                              <span className="text-[10px] text-gray-400 font-mono truncate max-w-[200px] block">{img.image_path}</span>
+                              {img.is_primary === 1 && (
+                                <span className="text-[9px] bg-indigo-500 text-white px-1.5 py-0.5 rounded font-black">대표 이미지</span>
+                              )}
+                            </div>
+                          </div>
+                          <button 
+                            type="button" 
+                            onClick={() => handleDeleteImage(img.id)}
+                            className="text-rose-400 hover:text-rose-300 p-1.5 rounded-lg hover:bg-white/5 text-xs font-bold"
+                          >
+                            삭제
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Add Image Form */}
+                  <form onSubmit={handleAddImage} className="space-y-3 pt-3 border-t border-white/10">
+                    <h4 className="text-xs font-bold text-gray-300">새 이미지 등록</h4>
+                    <input 
+                      type="text" 
+                      value={newImagePath} 
+                      onChange={e => setNewImagePath(e.target.value)} 
+                      placeholder="이미지 파일 경로 (예: /assets/products/bags/sample.jpg)" 
+                      required 
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-white/30"
+                    />
+                    <input 
+                      type="text" 
+                      value={newImageAlt} 
+                      onChange={e => setNewImageAlt(e.target.value)} 
+                      placeholder="대체 텍스트 (예: 정면 룩북 사진)" 
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-white/30"
+                    />
+                    <button 
+                      type="submit" 
+                      disabled={isUploading}
+                      className="w-full bg-white text-black hover:bg-gray-200 py-3 rounded-xl font-black text-xs transition disabled:opacity-50"
+                    >
+                      {isUploading ? '등록 처리 중...' : '이미지 추가 등록'}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

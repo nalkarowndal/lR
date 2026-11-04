@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { ChevronLeft, Search as SearchIcon, X, ArrowUp, ArrowDown } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { ProductVisualBadge } from './ui/LuxuryIcons';
+import { ProductImage } from './ui/ProductImage';
 
 interface SearchResultItem {
   id: string;
@@ -159,7 +159,7 @@ export const ShopSearch = () => {
                 {filteredResults.map(item => (
                   <div key={item.id} className="flex flex-col group cursor-pointer p-2 rounded-xl hover:bg-gray-50 transition">
                     <div className="relative aspect-square bg-gray-100 rounded-xl mb-2 flex items-center justify-center overflow-hidden border border-gray-100 shadow-2xs">
-                      <ProductVisualBadge brand={item.brand} category={item.category} />
+                      <ProductImage src={(item as any).image} alt={item.title} category={item.category} />
                       {item.tag && (
                         <div className="absolute bottom-0 w-full bg-black/60 text-white text-center text-[10px] py-1 font-bold z-10">
                           {item.tag}
