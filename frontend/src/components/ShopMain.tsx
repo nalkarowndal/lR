@@ -83,7 +83,7 @@ const RECOMMENDATIONS_DATA: Record<string, Array<{
 };
 
 export const ShopMain = () => {
-  const { setCurrentView, navigateTo, setActiveOverlay, user, logoutUser } = useApp();
+  const { setCurrentView, navigateTo, setActiveOverlay, user, logoutUser, favorites, toggleFavorite } = useApp();
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState('20대 여성');
   const [serviceInfoModal, setServiceInfoModal] = useState<{ title: string; desc: string } | null>(null);
@@ -406,42 +406,63 @@ export const ShopMain = () => {
           ))}
         </div>
         <div className="grid grid-cols-2 gap-3">
-          {currentRecommendList.map((item, i) => (
-            <div key={i} className="flex flex-col group cursor-pointer">
-              <div className="relative aspect-square bg-gray-100 rounded-xl mb-2 flex items-center justify-center overflow-hidden border border-gray-100 shadow-2xs">
-                <ProductImage src={item.image} alt={item.title} category={item.category} />
-                <button
-                  type="button"
-                  aria-label={`${item.title} 좋아요`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveOverlay('LOGIN');
-                  }}
-                  className="absolute top-2 right-2 p-1.5 rounded-full bg-white/70 backdrop-blur-md text-gray-400 hover:text-red-500 hover:bg-white transition shadow-xs z-10"
-                >
-                  <Heart size={16} />
-                </button>
-                {item.tag === '예약 마감' && (
-                  <div className="absolute bottom-0 w-full bg-black/60 backdrop-blur-xs text-white text-center text-[10px] py-1 font-bold z-10 tracking-wider">
-                    예약 마감
-                  </div>
-                )}
-                {item.tag === '앱전용' && (
-                  <div className="absolute top-2 left-2 bg-indigo-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-sm z-10 tracking-wider shadow-xs">
-                    앱전용
-                  </div>
-                )}
+          {currentRecommendList.map((item, i) => {
+            const pseudoId = 100 + i;
+            const isFav = favorites.includes(pseudoId);
+            return (
+              <div 
+                key={i} 
+                onClick={() => {
+                  showToast(`'${item.brand} ${item.title}' 상품 상세 화면으로 이동합니다.`, 'info');
+                  setCurrentView('SHOP_CATEGORY');
+                }}
+                className="flex flex-col group cursor-pointer"
+              >
+                <div className="relative aspect-square bg-gray-100 rounded-xl mb-2 flex items-center justify-center overflow-hidden border border-gray-100 shadow-2xs">
+                  <ProductImage src={item.image} alt={item.title} category={item.category} />
+                  <button
+                    type="button"
+                    aria-label={`${item.title} 좋아요`}
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      if (!user) {
+                        showToast('좋아요를 저장하려면 먼저 로그인해주세요.', 'info');
+                        setActiveOverlay('LOGIN');
+                      } else {
+                        const isNowFav = await toggleFavorite(pseudoId);
+                        showToast(isNowFav ? `'${item.title}' 관심 상품에 추가되었습니다.` : `'${item.title}' 관심 상품에서 해제되었습니다.`, 'info');
+                      }
+                    }}
+                    className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-md text-gray-400 hover:text-red-500 hover:bg-white transition shadow-xs z-10"
+                  >
+                    <Heart 
+                      size={16} 
+                      fill={isFav ? '#EF4444' : 'none'}
+                      className={isFav ? 'text-red-500' : 'text-gray-400'}
+                    />
+                  </button>
+                  {item.tag === '예약 마감' && (
+                    <div className="absolute bottom-0 w-full bg-black/60 backdrop-blur-xs text-white text-center text-[10px] py-1 font-bold z-10 tracking-wider">
+                      예약 마감
+                    </div>
+                  )}
+                  {item.tag === '앱전용' && (
+                    <div className="absolute top-2 left-2 bg-indigo-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-sm z-10 tracking-wider shadow-xs">
+                      앱전용
+                    </div>
+                  )}
+                </div>
+                <span className="font-extrabold text-xs text-gray-900 group-hover:text-indigo-600 transition-colors">{item.brand}</span>
+                <span className="text-[11px] text-gray-600 truncate">{item.title}</span>
+                <div className="mt-1 flex items-baseline gap-1">
+                  {item.discount && <span className="text-red-500 font-extrabold text-sm">{item.discount}</span>}
+                  <span className="font-extrabold text-sm text-gray-950">{item.price}</span>
+                  <span className="text-[10px] text-gray-400">/3일</span>
+                </div>
+                {item.original && <span className="text-[10px] text-gray-400 line-through">{item.original}</span>}
               </div>
-              <span className="font-extrabold text-xs text-gray-900 group-hover:text-indigo-600 transition-colors">{item.brand}</span>
-              <span className="text-[11px] text-gray-600 truncate">{item.title}</span>
-              <div className="mt-1 flex items-baseline gap-1">
-                {item.discount && <span className="text-red-500 font-extrabold text-sm">{item.discount}</span>}
-                <span className="font-extrabold text-sm text-gray-950">{item.price}</span>
-                <span className="text-[10px] text-gray-400">/3일</span>
-              </div>
-              {item.original && <span className="text-[10px] text-gray-400 line-through">{item.original}</span>}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

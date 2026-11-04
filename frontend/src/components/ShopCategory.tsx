@@ -23,7 +23,7 @@ const SUBCATEGORIES_BY_CATEGORY: Record<string, string[]> = {
 };
 
 export const ShopCategory = () => {
-  const { goBack, setActiveOverlay } = useApp();
+  const { goBack, setActiveOverlay, user, favorites, toggleFavorite } = useApp();
   const { showToast } = useToast();
   const [mainTab, setMainTab] = useState<'CATEGORY' | 'BRAND'>('CATEGORY');
   const [subTab, setSubTab] = useState('여성');
@@ -253,46 +253,64 @@ export const ShopCategory = () => {
 
           {/* 선택된 브랜드 상품 그리드 (2열) */}
           <div className="grid grid-cols-2 gap-x-3 gap-y-6 mb-6">
-            {currentBrandProducts.map((item) => (
-              <div key={item.id} className="flex flex-col group cursor-pointer">
-                <div className="relative aspect-square bg-gray-100 rounded-xl mb-2 flex items-center justify-center overflow-hidden border border-gray-100 shadow-2xs">
-                  <ProductImage 
-                    src={item.imageUrl} 
-                    alt={item.title} 
-                    category={item.category}
-                    productId={item.id}
-                  />
-                  <button 
-                    type="button"
-                    aria-label={`${item.title} 좋아요`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveOverlay('LOGIN');
-                    }}
-                    className="absolute top-2 right-2 p-1.5 rounded-full bg-white/70 backdrop-blur-md text-gray-400 hover:text-red-500 hover:bg-white transition shadow-xs z-10"
-                  >
-                    <Heart size={16}/>
-                  </button>
-                  {item.tag === 'N' && (
-                    <div className="absolute bottom-2 left-2 bg-black text-white text-[9px] font-black w-4 h-4 flex justify-center items-center rounded-xs z-10 shadow-xs">
-                      N
-                    </div>
-                  )}
-                  {item.isExcellent && (
-                    <div className="absolute top-2 left-2 bg-emerald-100 text-emerald-800 text-[9px] font-black px-1.5 py-0.5 rounded-xs z-10 shadow-2xs">
-                      EXCELLENT
-                    </div>
-                  )}
+            {currentBrandProducts.map((item) => {
+              const numericId = parseInt(String(item.id).replace(/\D/g, ''), 10) || 1000;
+              const isFav = favorites.includes(numericId);
+              return (
+                <div 
+                  key={item.id} 
+                  onClick={() => showToast(`'${item.brand} ${item.title}' 렌탈 상세 페이지 준비 중입니다.`, 'info')}
+                  className="flex flex-col group cursor-pointer"
+                >
+                  <div className="relative aspect-square bg-gray-100 rounded-xl mb-2 flex items-center justify-center overflow-hidden border border-gray-100 shadow-2xs">
+                    <ProductImage 
+                      src={item.imageUrl} 
+                      alt={item.title} 
+                      category={item.category}
+                      productId={item.id}
+                    />
+                    <button 
+                      type="button"
+                      aria-label={`${item.title} 좋아요`}
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        if (!user) {
+                          showToast('좋아요를 저장하려면 로그인이 필요합니다.', 'info');
+                          setActiveOverlay('LOGIN');
+                        } else {
+                          const isNowFav = await toggleFavorite(numericId);
+                          showToast(isNowFav ? `'${item.title}' 관심 상품에 추가되었습니다.` : `'${item.title}' 관심 상품에서 삭제되었습니다.`, 'info');
+                        }
+                      }}
+                      className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-md text-gray-400 hover:text-red-500 hover:bg-white transition shadow-xs z-10"
+                    >
+                      <Heart 
+                        size={16}
+                        fill={isFav ? '#EF4444' : 'none'}
+                        className={isFav ? 'text-red-500' : 'text-gray-400'}
+                      />
+                    </button>
+                    {item.tag === 'N' && (
+                      <div className="absolute bottom-2 left-2 bg-black text-white text-[9px] font-black w-4 h-4 flex justify-center items-center rounded-xs z-10 shadow-xs">
+                        N
+                      </div>
+                    )}
+                    {item.isExcellent && (
+                      <div className="absolute top-2 left-2 bg-emerald-100 text-emerald-800 text-[9px] font-black px-1.5 py-0.5 rounded-xs z-10 shadow-2xs">
+                        EXCELLENT
+                      </div>
+                    )}
+                  </div>
+                  <span className="font-black text-xs text-gray-900 group-hover:text-[#B49A67] transition-colors">{activeBrand}</span>
+                  <span className="text-[11px] text-gray-600 truncate">{item.title}</span>
+                  <div className="mt-1 flex items-baseline gap-1">
+                    {item.discount && <span className="text-teal-600 font-extrabold text-sm">{item.discount}</span>}
+                    <span className="font-extrabold text-sm text-gray-950">{item.price}</span>
+                    <span className="text-[10px] text-gray-400">/일</span>
+                  </div>
                 </div>
-                <span className="font-black text-xs text-gray-900 group-hover:text-[#B49A67] transition-colors">{activeBrand}</span>
-                <span className="text-[11px] text-gray-600 truncate">{item.title}</span>
-                <div className="mt-1 flex items-baseline gap-1">
-                  {item.discount && <span className="text-teal-600 font-extrabold text-sm">{item.discount}</span>}
-                  <span className="font-extrabold text-sm text-gray-950">{item.price}</span>
-                  {item.unit && <span className="text-[10px] text-gray-400">{item.unit}</span>}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <button 

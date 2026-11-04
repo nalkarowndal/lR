@@ -9,6 +9,7 @@ import { Modal } from './ui/Modal';
 import { ConfirmDialog } from './ui/ConfirmDialog';
 import { api } from '../services/api';
 import { LegalTermsModal } from './ui/LegalTermsModal';
+import { LuxuryCrownIcon } from './ui/LuxuryIcons';
 
 export const ShopSettings: React.FC = () => {
   const { 
@@ -34,8 +35,12 @@ export const ShopSettings: React.FC = () => {
 
   const handleToggle = async (key: keyof typeof userSettings) => {
     const nextVal = !userSettings[key];
-    await updateUserSettings({ [key]: nextVal });
-    showToast('설정이 성공적으로 저장되었습니다.', 'info');
+    try {
+      await updateUserSettings({ [key]: nextVal });
+      showToast('설정이 성공적으로 저장되었습니다.', 'info');
+    } catch (err: any) {
+      showToast('설정 저장 실패: ' + (err?.message || '네트워크 오류'), 'error');
+    }
   };
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
@@ -106,12 +111,19 @@ export const ShopSettings: React.FC = () => {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-gray-950 text-base">{user.name}</span>
-                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 ${
                     user.role === 'ADMIN'
                       ? 'bg-amber-100 text-amber-800 border border-amber-200'
                       : 'bg-gray-100 text-gray-700'
                   }`}>
-                    {user.role === 'ADMIN' ? '👑 관리자' : '일반회원'}
+                    {user.role === 'ADMIN' ? (
+                      <>
+                        <LuxuryCrownIcon className="w-3.5 h-3.5 inline-block text-amber-700" />
+                        <span>관리자</span>
+                      </>
+                    ) : (
+                      '일반회원'
+                    )}
                   </span>
                 </div>
                 <p className="text-xs text-gray-500 mt-0.5">{user.email}</p>

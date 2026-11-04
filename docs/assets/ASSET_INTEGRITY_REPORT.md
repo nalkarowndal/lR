@@ -3,7 +3,7 @@
 > [!IMPORTANT]
 > **평가 기준 분리 알림**: 이전 보고서의 58/58 PASS는 단순 파일 존재 및 디코딩 무결성 지표였습니다. 본 보고서부터는 **파일 무결성(Integrity)**과 **스튜디오 실사 품질(Photoreal Quality)**을 엄격히 분리하여 보고합니다.
 
-- **Generated At**: 2026-11-04T05:32:04.829Z
+- **Generated At**: 2026-11-04T06:44:10.821Z
 - **Total Catalog Assets**: 58
 - **1. File Integrity (파일 존재 및 정상 로딩)**: **58 / 58 (100% PASS)**
 - **2. Photoreal Quality (실사 스튜디오 사진 승인)**: **15 / 58 (APPROVED_PHOTOREAL)**

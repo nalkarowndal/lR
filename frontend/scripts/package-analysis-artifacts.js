@@ -12,32 +12,41 @@ fs.mkdirSync(artifactsDir, { recursive: true });
 
 const phases = [
   {
-    name: 'phase1_asset_audit',
+    name: 'security',
+    files: [
+      { src: 'docs/analysis/SECURITY_AUDIT.md', dest: 'SECURITY_AUDIT.md' },
+      { src: 'docs/qa/SECURITY_QA.md', dest: 'SECURITY_QA.md' }
+    ]
+  },
+  {
+    name: 'api-db',
+    files: [
+      { src: 'docs/analysis/API_DB_AUDIT.md', dest: 'API_DB_AUDIT.md' },
+      { src: 'docs/qa/API_DB_QA.md', dest: 'API_DB_QA.md' }
+    ]
+  },
+  {
+    name: 'assets',
     files: [
       { src: 'docs/assets/IMAGE_INVENTORY.md', dest: 'IMAGE_INVENTORY.md' },
-      { src: 'docs/assets/IMAGE_RIGHTS_REGISTER.md', dest: 'IMAGE_RIGHTS_REGISTER.md' }
-    ]
-  },
-  {
-    name: 'phase2_asset_generation',
-    files: [
-      { src: 'docs/assets/ASSET_GENERATION_REPORT.md', dest: 'ASSET_GENERATION_REPORT.md' },
+      { src: 'docs/assets/IMAGE_RIGHTS_REGISTER.md', dest: 'IMAGE_RIGHTS_REGISTER.md' },
       { src: 'docs/assets/ASSET_INTEGRITY_REPORT.md', dest: 'ASSET_INTEGRITY_REPORT.md' },
-      { src: 'docs/analysis/PRODUCT_IMAGE_ROOT_CAUSE.md', dest: 'PRODUCT_IMAGE_ROOT_CAUSE.md' }
+      { src: 'docs/assets/ASSET_GENERATION_REPORT.md', dest: 'ASSET_GENERATION_REPORT.md' }
     ]
   },
   {
-    name: 'phase3_icon_design',
+    name: 'ui-ux',
     files: [
+      { src: 'docs/analysis/UI_UX_AUDIT.md', dest: 'UI_UX_AUDIT.md' },
       { src: 'docs/design/DESIGN_SYSTEM.md', dest: 'DESIGN_SYSTEM.md' }
     ]
   },
   {
-    name: 'phase5_visual_qa',
+    name: 'final-qa',
     files: [
-      { src: 'docs/qa/UI_VISUAL_QA.md', dest: 'UI_VISUAL_QA.md' },
-      { src: 'docs/qa/CATEGORY_IMAGE_QA.md', dest: 'CATEGORY_IMAGE_QA.md' },
-      { src: 'docs/qa/visual_qa_results.json', dest: 'visual_qa_results.json' }
+      { src: 'docs/analysis/FULL_SYSTEM_AUDIT.md', dest: 'FULL_SYSTEM_AUDIT.md' },
+      { src: 'docs/qa/FINAL_QA_REPORT.md', dest: 'FINAL_QA_REPORT.md' },
+      { src: 'docs/FINAL_IMPROVEMENT_REPORT.md', dest: 'FINAL_IMPROVEMENT_REPORT.md' }
     ]
   }
 ];

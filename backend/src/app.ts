@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import path from 'path';
+import fs from 'fs';
 import { config } from './config/env.js';
 import { apiRouter } from './routes/index.js';
 import { errorHandler } from './middlewares/errorHandler.js';
@@ -8,7 +10,10 @@ import { errorHandler } from './middlewares/errorHandler.js';
 export const app = express();
 
 // Security Middlewares
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' }
+}));
+
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || config.clientOrigins.includes(origin) || config.nodeEnv === 'development') {
@@ -20,9 +25,23 @@ app.use(cors({
   credentials: true
 }));
 
-// Body Parsers
-app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+// Body Parsers: Support image upload payloads up to 10MB
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Static Assets Serving for product images and uploads
+const possibleAssetPaths = [
+  path.resolve(process.cwd(), '..', 'frontend', 'public', 'assets'),
+  path.resolve(process.cwd(), 'public', 'assets'),
+  path.resolve(process.cwd(), 'frontend', 'public', 'assets')
+];
+
+for (const p of possibleAssetPaths) {
+  if (fs.existsSync(p)) {
+    app.use('/assets', express.static(p));
+    break;
+  }
+}
 
 // Request logger in dev
 if (config.nodeEnv === 'development') {

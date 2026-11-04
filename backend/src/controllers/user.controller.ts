@@ -1,4 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
+import fs from 'fs';
+import path from 'path';
 import { getDatabase } from '../db/database.js';
 import { hashPassword, verifyPassword } from '../utils/crypto.js';
 import { z } from 'zod';
@@ -67,10 +69,10 @@ export function getMyProfile(req: Request, res: Response, next: NextFunction) {
       SELECT count(*) as count FROM favorites WHERE user_id = ?
     `).get(req.user.id) as any)?.count || 0;
 
-    // Count sell requests
+    // Count sell requests (strictly filtered by authenticated user_id)
     const sellCount = (db.prepare(`
-      SELECT count(*) as count FROM sell_requests WHERE user_id = ? OR user_name = ?
-    `).get(req.user.id, userRow.name) as any)?.count || 0;
+      SELECT count(*) as count FROM sell_requests WHERE user_id = ?
+    `).get(req.user.id) as any)?.count || 0;
 
     return res.json({
       success: true,
@@ -379,16 +381,103 @@ export function getMySellRequests(req: Request, res: Response, next: NextFunctio
     }
 
     const db = getDatabase();
+    // Strictly filter by authenticated user_id to prevent IDOR and user data mingling
     const rows = db.prepare(`
-      SELECT id, brand_name, user_name, status, created_at
+      SELECT id, brand_name, status, created_at
       FROM sell_requests
-      WHERE user_id = ? OR user_name = ?
+      WHERE user_id = ?
       ORDER BY id DESC
-    `).all(req.user.id, req.user.name);
+    `).all(req.user.id);
 
     return res.json({
       success: true,
       sellRequests: rows
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * POST /api/v1/users/me/avatar
+ * Real binary/base64 avatar image upload with magic bytes verification.
+ */
+export function uploadMyAvatar(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
+    }
+
+    const { fileData } = req.body;
+    if (!fileData || typeof fileData !== 'string') {
+      return res.status(400).json({ success: false, error: '유효한 이미지 데이터가 필요합니다.' });
+    }
+
+    const base64Data = fileData.replace(/^data:image\/\w+;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
+
+    // Max size: 3MB
+    if (buffer.length > 3 * 1024 * 1024) {
+      return res.status(400).json({ success: false, error: '프로필 사진은 최대 3MB까지 등록 가능합니다.' });
+    }
+
+    // Magic Bytes verification
+    let ext = '';
+    if (buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF) {
+      ext = 'jpg';
+    } else if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47) {
+      ext = 'png';
+    } else if (buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46 &&
+               buffer[8] === 0x57 && buffer[9] === 0x45 && buffer[10] === 0x42 && buffer[11] === 0x50) {
+      ext = 'webp';
+    } else {
+      return res.status(400).json({
+        success: false,
+        error: '지원되지 않는 이미지 형식입니다. JPEG, PNG, WebP 형식의 사진만 업로드 가능합니다.'
+      });
+    }
+
+    const avatarDir = path.resolve(process.cwd(), '..', 'frontend', 'public', 'assets', 'uploads', 'avatars');
+    if (!fs.existsSync(avatarDir)) {
+      fs.mkdirSync(avatarDir, { recursive: true });
+    }
+
+    const filename = `avatar_${req.user.id}_${Date.now()}.${ext}`;
+    const fullPath = path.join(avatarDir, filename);
+    fs.writeFileSync(fullPath, buffer);
+
+    const relativeUrl = `/assets/uploads/avatars/${filename}`;
+
+    const db = getDatabase();
+    db.prepare('UPDATE users SET avatar_url = ? WHERE id = ?').run(relativeUrl, req.user.id);
+
+    return res.json({
+      success: true,
+      message: '프로필 사진이 성공적으로 저장되었습니다.',
+      avatar_url: relativeUrl
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * DELETE /api/v1/users/me/avatar
+ * Restore default avatar.
+ */
+export function deleteMyAvatar(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
+    }
+
+    const db = getDatabase();
+    db.prepare("UPDATE users SET avatar_url = '' WHERE id = ?").run(req.user.id);
+
+    return res.json({
+      success: true,
+      message: '기본 프로필 사진으로 복원되었습니다.',
+      avatar_url: ''
     });
   } catch (err) {
     next(err);

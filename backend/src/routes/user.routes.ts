@@ -9,7 +9,9 @@ import {
   getMyFavorites,
   addFavorite,
   removeFavorite,
-  getMySellRequests
+  getMySellRequests,
+  uploadMyAvatar,
+  deleteMyAvatar
 } from '../controllers/user.controller.js';
 
 const router = Router();
@@ -26,6 +28,8 @@ router.get('/me/favorites', getMyFavorites);
 router.post('/me/favorites/:productId', addFavorite);
 router.delete('/me/favorites/:productId', removeFavorite);
 router.get('/me/sell-requests', getMySellRequests);
+router.post('/me/avatar', uploadMyAvatar);
+router.delete('/me/avatar', deleteMyAvatar);
 
 export default router;
 

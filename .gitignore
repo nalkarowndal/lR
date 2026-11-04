@@ -33,5 +33,5 @@ Thumbs.db
 *.db
 
 # Analysis temporary zips and backups
-artifacts/analysis/*.zip
+artifacts/analysis/
 artifacts/backups/

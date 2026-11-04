@@ -551,6 +551,150 @@ test('Backend Health & API Endpoints Suite', async (t) => {
     });
   });
 
+  // ==========================================
+  // [P0 SECURITY & IDOR ISOLATION SUITE]
+  // ==========================================
+  await t.test('GET /sell-requests blocks unauthenticated public access with 401', async () => {
+    const res = await fetch(`${baseUrl}/sell-requests`);
+    assert.equal(res.status, 401);
+  });
+
+  await t.test('GET /admin/sell-requests strictly requires ADMIN role', async () => {
+    const custRes = await fetch(`${baseUrl}/admin/sell-requests`, {
+      headers: { 'Authorization': `Bearer ${customerToken}` }
+    });
+    assert.equal(custRes.status, 403);
+
+    const adminRes = await fetch(`${baseUrl}/admin/sell-requests`, {
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    const adminData = await adminRes.json();
+    assert.equal(adminRes.status, 200);
+    assert.equal(adminData.success, true);
+    assert.ok(Array.isArray(adminData.data));
+  });
+
+  await t.test('P0 Isolation: User A cannot see User B sell requests even with identical homonym name', async () => {
+    // 1. Customer (User A: name '김명품') creates sell request
+    const postA = await fetch(`${baseUrl}/sell-requests`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${customerToken}`
+      },
+      body: JSON.stringify({ brandName: '디올 레이디백', userName: '김명품' })
+    });
+    assert.equal(postA.status, 201);
+
+    // 2. User A can view their request
+    const getA = await fetch(`${baseUrl}/users/me/sell-requests`, {
+      headers: { 'Authorization': `Bearer ${customerToken}` }
+    });
+    const dataA = await getA.json();
+    assert.equal(getA.status, 200);
+    assert.ok(dataA.sellRequests.some(r => r.brand_name === '디올 레이디백'));
+
+    // 3. Register User B with identical homonym name '김명품'
+    const userBEmail = `homonym_${Date.now()}@test.com`;
+    const regB = await fetch(`${baseUrl}/auth/register`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        email: userBEmail,
+        password: 'password1234!',
+        name: '김명품', // Same name, different user_id!
+        phone: '010-9999-0000',
+        termsAgreed: true,
+        privacyAgreed: true
+      })
+    });
+    const dataBReg = await regB.json();
+    assert.equal(regB.status, 201);
+    const tokenB = dataBReg.token;
+
+    // 4. User B queries their sell requests: MUST NOT see User A's requests!
+    const getB = await fetch(`${baseUrl}/users/me/sell-requests`, {
+      headers: { 'Authorization': `Bearer ${tokenB}` }
+    });
+    const dataB = await getB.json();
+    assert.equal(getB.status, 200);
+    assert.equal(dataB.sellRequests.length, 0); // Strict zero leakage!
+  });
+
+  // ==========================================
+  // [AVATAR & REAL IMAGE UPLOAD SUITE]
+  // ==========================================
+  await t.test('POST /users/me/avatar validates magic bytes and uploads profile picture', async () => {
+    // 1. Valid 1x1 JPEG magic bytes in base64: FF D8 FF E0 ...
+    const validJpegBase64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=';
+    const uploadRes = await fetch(`${baseUrl}/users/me/avatar`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${customerToken}`
+      },
+      body: JSON.stringify({ fileData: validJpegBase64 })
+    });
+    const uploadData = await uploadRes.json();
+    assert.equal(uploadRes.status, 200);
+    assert.equal(uploadData.success, true);
+    assert.ok(uploadData.avatar_url.startsWith('/assets/uploads/avatars/'));
+
+    // Verify /users/me returns updated avatar
+    const meRes = await fetch(`${baseUrl}/users/me`, {
+      headers: { 'Authorization': `Bearer ${customerToken}` }
+    });
+    const meData = await meRes.json();
+    assert.equal(meData.profile.avatar_url, uploadData.avatar_url);
+
+    // 2. Reject non-image text with 400
+    const fakeData = Buffer.from('this is plain text not image').toString('base64');
+    const failRes = await fetch(`${baseUrl}/users/me/avatar`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${customerToken}`
+      },
+      body: JSON.stringify({ fileData: fakeData })
+    });
+    assert.equal(failRes.status, 400);
+
+    // 3. Reset avatar with DELETE
+    const delRes = await fetch(`${baseUrl}/users/me/avatar`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${customerToken}` }
+    });
+    const delData = await delRes.json();
+    assert.equal(delRes.status, 200);
+    assert.equal(delData.avatar_url, '');
+  });
+
+  await t.test('POST /admin/products/:id/images accepts real base64 fileData with magic bytes', async () => {
+    const validPngBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    const uploadRes = await fetch(`${baseUrl}/admin/products/1/images`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
+      },
+      body: JSON.stringify({
+        fileData: validPngBase64,
+        altText: '생로랑 르 5 아 7 실사 업로드',
+        isPrimary: 0
+      })
+    });
+    const data = await uploadRes.json();
+    assert.equal(uploadRes.status, 201);
+    assert.equal(data.success, true);
+    assert.ok(data.data.image_path.startsWith('/assets/uploads/products/'));
+
+    // Cleanup created test image
+    await fetch(`${baseUrl}/admin/products/1/images/${data.data.id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+  });
+
   await t.test('Server teardown', async () => {
     await new Promise((resolve) => server.close(resolve));
     assert.ok(true);

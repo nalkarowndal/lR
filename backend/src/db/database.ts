@@ -13,6 +13,12 @@ export function getDatabase(): DatabaseSync {
     }
 
     dbInstance = new DatabaseSync(config.databasePath);
+    // Enforce SQLite Foreign Key constraints
+    dbInstance.exec('PRAGMA foreign_keys = ON;');
+    const violations = (dbInstance.prepare('PRAGMA foreign_key_check;').all?.() || []) as any[];
+    if (violations.length > 0) {
+      console.warn('[Database] Initial foreign key violations detected:', violations.length);
+    }
     initSchema(dbInstance);
   }
   return dbInstance;

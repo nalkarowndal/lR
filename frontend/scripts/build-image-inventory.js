@@ -123,3 +123,4 @@ rightsMd += `| \`categories/*\` | AI Image Generator (Gemini Flash Image Studio)
 
 fs.writeFileSync(path.join(docsAssetsDir, 'IMAGE_RIGHTS_REGISTER.md'), rightsMd, 'utf-8');
 console.log(`[RIGHTS REGISTER WRITTEN] docs/assets/IMAGE_RIGHTS_REGISTER.md`);
+

@@ -119,6 +119,19 @@ export const api = {
     });
   },
 
+  uploadMyAvatar: async (fileData: string) => {
+    return fetchJson<{ success: boolean; message: string; avatar_url: string }>('/users/me/avatar', {
+      method: 'POST',
+      body: JSON.stringify({ fileData })
+    });
+  },
+
+  deleteMyAvatar: async () => {
+    return fetchJson<{ success: boolean; message: string; avatar_url: string }>('/users/me/avatar', {
+      method: 'DELETE'
+    });
+  },
+
   changeMyPassword: async (payload: { currentPassword: string; newPassword: string }) => {
     return fetchJson<{ success: boolean; message: string }>('/users/me/password', {
       method: 'PATCH',
@@ -218,10 +231,21 @@ export const api = {
     });
   },
 
-  addProductImage: async (productId: number, payload: { imagePath: string; altText?: string; isPrimary?: number }) => {
+  addProductImage: async (productId: number, payload: { imagePath?: string; fileData?: string; altText?: string; isPrimary?: number }) => {
     return fetchJson<{ success: boolean; message: string; data: any }>(`/admin/products/${productId}/images`, {
       method: 'POST',
       body: JSON.stringify(payload)
+    });
+  },
+
+  getAdminSellRequests: async () => {
+    return fetchJson<{ success: boolean; count: number; data: any[] }>('/admin/sell-requests');
+  },
+
+  updateAdminSellRequest: async (id: number, status: string) => {
+    return fetchJson<{ success: boolean; message: string }>(`/admin/sell-requests/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status })
     });
   },
 

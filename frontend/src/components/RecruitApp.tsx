@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { 
-  Send, Upload, FileText
+  Send, Upload, FileText, CheckCircle2, AlertCircle, Info
 } from 'lucide-react';
 
 export const RecruitApp = () => {
@@ -25,85 +25,137 @@ export const RecruitApp = () => {
   const [inputMsg, setInputMsg] = useState('');
   const [newReq, setNewReq] = useState({ storeName: '강남본점', date: '', section: '홀 서빙', time: '10:00 - 15:00', breakTime: '30분', required: 1, partner: '' });
 
+  const [noticeModal, setNoticeModal] = useState<{ isOpen: boolean; title: string; message: string; type?: 'info' | 'success' }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info'
+  });
+
+  const showNotice = (title: string, message: string, type: 'info' | 'success' = 'info') => {
+    setNoticeModal({ isOpen: true, title, message, type });
+  };
+
   const handleAddRequest = (e: React.FormEvent) => {
     e.preventDefault();
     setRequests([...requests, { id: Date.now(), ...newReq, hired: 0, status: '채용중' }]);
-    alert('구인 요청이 즉시 접수되었습니다.');
+    showNotice('구인 요청 등록 안내', '구인 요청이 시뮬레이션 대시보드에 정상 등록되었습니다.', 'success');
     setActiveTab('dashboard');
   };
 
   const handleSendMessage = () => {
     if (!inputMsg.trim()) return;
-    setMessages([...messages, { id: Date.now(), sender: role === 'ADMIN' ? '담당자' : '매장', text: inputMsg, time: '방금', isMine: true }]);
+    setMessages([...messages, { id: Date.now(), sender: '나 (매장)', text: inputMsg, time: '방금', isMine: true }]);
     setInputMsg('');
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-50 relative w-full">
-      {/* 상단 서브 네비게이션 탭 */}
-      <div className="flex bg-white border-b border-gray-200 shadow-sm overflow-x-auto">
+    <div className="min-h-screen bg-gray-50 flex flex-col font-sans pb-16">
+      {/* 🌟 통합 안내 모달 */}
+      {noticeModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center flex flex-col items-center animate-fadeIn">
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
+              noticeModal.type === 'success' ? 'bg-emerald-50 text-emerald-600' : 'bg-indigo-50 text-indigo-600'
+            }`}>
+              {noticeModal.type === 'success' ? <CheckCircle2 size={24} /> : <Info size={24} />}
+            </div>
+            <h3 className="font-extrabold text-base text-gray-900 mb-2">{noticeModal.title}</h3>
+            <p className="text-xs text-gray-600 mb-6 leading-relaxed whitespace-pre-line">{noticeModal.message}</p>
+            <button 
+              type="button"
+              onClick={() => setNoticeModal({ isOpen: false, title: '', message: '' })}
+              className="w-full bg-gray-900 hover:bg-black text-white py-3 rounded-xl font-bold text-xs transition active:scale-95"
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 헤더 */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10 px-4 py-3 flex justify-between items-center shadow-xs">
+        <div>
+          <h1 className="font-black text-lg text-gray-900 tracking-tight flex items-center gap-1.5">
+            <span className="text-indigo-600">LUXURY</span> RECRUIT
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-600 border border-indigo-100">DEMO</span>
+          </h1>
+          <p className="text-[11px] text-gray-500">매장 인력 긴급 구인 및 현장 충원 관리 시스템</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1 rounded-full border border-indigo-100">
+            {role === 'STORE' ? '매장 매니저 모드' : '총괄 관리자 모드'}
+          </span>
+        </div>
+      </header>
+
+      {/* 탭 내비게이션 */}
+      <div className="bg-white border-b border-gray-200 px-4 flex gap-6 text-sm font-semibold text-gray-500 overflow-x-auto scrollbar-hide">
         <button 
           onClick={() => setActiveTab('dashboard')} 
-          className={`flex-1 min-w-[80px] py-3 text-xs sm:text-sm font-bold border-b-2 transition text-center ${activeTab === 'dashboard' ? 'border-indigo-600 text-indigo-600 bg-indigo-50/30' : 'border-transparent text-gray-500'}`}
+          className={`py-3 border-b-2 whitespace-nowrap ${activeTab === 'dashboard' ? 'border-indigo-600 text-indigo-600 font-bold' : 'border-transparent hover:text-gray-900'}`}
         >
-          📊 현황
+          실시간 현황
         </button>
         {role === 'STORE' && (
           <button 
             onClick={() => setActiveTab('request')} 
-            className={`flex-1 min-w-[80px] py-3 text-xs sm:text-sm font-bold border-b-2 transition text-center ${activeTab === 'request' ? 'border-indigo-600 text-indigo-600 bg-indigo-50/30' : 'border-transparent text-gray-500'}`}
+            className={`py-3 border-b-2 whitespace-nowrap ${activeTab === 'request' ? 'border-indigo-600 text-indigo-600 font-bold' : 'border-transparent hover:text-gray-900'}`}
           >
-            ➕ 요청작성
+            구인 요청 등록
           </button>
         )}
         <button 
           onClick={() => setActiveTab('workers')} 
-          className={`flex-1 min-w-[80px] py-3 text-xs sm:text-sm font-bold border-b-2 transition text-center ${activeTab === 'workers' ? 'border-indigo-600 text-indigo-600 bg-indigo-50/30' : 'border-transparent text-gray-500'}`}
+          className={`py-3 border-b-2 whitespace-nowrap ${activeTab === 'workers' ? 'border-indigo-600 text-indigo-600 font-bold' : 'border-transparent hover:text-gray-900'}`}
         >
-          👥 근무자DB
+          근무자 인재풀
         </button>
         <button 
           onClick={() => setActiveTab('chat')} 
-          className={`flex-1 min-w-[80px] py-3 text-xs sm:text-sm font-bold border-b-2 transition text-center ${activeTab === 'chat' ? 'border-indigo-600 text-indigo-600 bg-indigo-50/30' : 'border-transparent text-gray-500'}`}
+          className={`py-3 border-b-2 whitespace-nowrap ${activeTab === 'chat' ? 'border-indigo-600 text-indigo-600 font-bold' : 'border-transparent hover:text-gray-900'}`}
         >
-          💬 채팅·소통
+          실시간 소통
         </button>
       </div>
 
-      {/* 본문 스크롤 영역 */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+      {/* 본문 콘텐츠 */}
+      <main className="p-4 max-w-4xl mx-auto w-full flex-1">
         
-        {/* 현황 대시보드 탭 */}
+        {/* 실시간 현황 탭 */}
         {activeTab === 'dashboard' && (
-          <div className="space-y-4 max-w-4xl mx-auto w-full">
-            {role === 'ADMIN' && (
-              <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <div>
-                  <h3 className="font-bold text-indigo-900 text-sm">담당자 전용 엑셀 업로드 도구</h3>
-                  <p className="text-xs text-indigo-700">엑셀 파일을 업로드하여 35개 매장의 구인 현황을 일괄 반영할 수 있습니다.</p>
-                </div>
-                <button onClick={() => alert('엑셀 파일 업로드 창이 열립니다.')} className="bg-indigo-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-1.5 shadow hover:bg-indigo-700">
-                  <Upload size={14} /> 엑셀 구인현황 업로드
-                </button>
+          <div className="space-y-4">
+            <div className="bg-indigo-50/60 border border-indigo-100 rounded-2xl p-4 flex items-center justify-between">
+              <div>
+                <h2 className="font-extrabold text-sm text-gray-900">당일 현장 인력 충원 현황</h2>
+                <p className="text-xs text-gray-500 mt-0.5">매장별 실시간 구인 요청 건을 모니터링하고 배치합니다.</p>
               </div>
-            )}
+              {role === 'STORE' && (
+                <button 
+                  onClick={() => setActiveTab('request')}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-xs transition"
+                >
+                  + 긴급 구인 요청
+                </button>
+              )}
+            </div>
 
             <div className="grid grid-cols-3 gap-3">
-              <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm text-center">
+              <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs text-center">
                 <span className="text-xs text-gray-400 font-semibold">총 구인 요청</span>
                 <p className="text-xl sm:text-2xl font-black text-gray-900 mt-1">{requests.length} 건</p>
               </div>
-              <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm text-center">
+              <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs text-center">
                 <span className="text-xs text-gray-400 font-semibold">진행중 (채용중)</span>
                 <p className="text-xl sm:text-2xl font-black text-orange-500 mt-1">{requests.filter(r => r.status === '채용중').length} 건</p>
               </div>
-              <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm text-center">
+              <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs text-center">
                 <span className="text-xs text-gray-400 font-semibold">충원 완료</span>
                 <p className="text-xl sm:text-2xl font-black text-green-600 mt-1">{requests.filter(r => r.hired >= r.required).length} 건</p>
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-xs">
               <h3 className="font-bold text-sm sm:text-base text-gray-900 mb-4 flex items-center gap-2">
                 <FileText size={18} className="text-indigo-600" /> 
                 {role === 'STORE' ? '우리 매장 구인 신청 및 충원 현황 명단' : '전체 35개 매장 구인 요청 실시간 접수 리스트'}
@@ -127,11 +179,17 @@ export const RecruitApp = () => {
                         <span className="font-black text-sm text-indigo-600">{req.hired} / {req.required} 명</span>
                       </div>
                       {role === 'ADMIN' ? (
-                        <button onClick={() => alert('채용 결과 등록 모달이 열립니다.')} className="bg-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow">
+                        <button 
+                          onClick={() => showNotice('채용 결과 처리 안내', '채용 심사 및 합격 통보 기능은 관리자 콘솔 연동 모듈에서 지원됩니다.', 'info')} 
+                          className="bg-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-xs"
+                        >
                           채용 결과 등록
                         </button>
                       ) : (
-                        <button onClick={() => alert('미충원 TO 변경 요청이 전송되었습니다.')} className="bg-white border border-gray-300 text-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-gray-100">
+                        <button 
+                          onClick={() => showNotice('TO 변경 요청 안내', '미충원 인원 TO 변경 요청이 관리자 전용 대시보드로 전달되었습니다.', 'success')} 
+                          className="bg-white border border-gray-300 text-gray-700 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-gray-100"
+                        >
                           TO 변경요청
                         </button>
                       )}
@@ -145,7 +203,7 @@ export const RecruitApp = () => {
 
         {/* 구인 요청 작성 탭 */}
         {activeTab === 'request' && role === 'STORE' && (
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm max-w-2xl mx-auto w-full">
+          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-xs max-w-2xl mx-auto w-full">
             <h3 className="font-bold text-base text-gray-900 mb-1">신규 구인 요청 작성</h3>
             <p className="text-xs text-gray-500 mb-6">날짜, 근무시간, 파트 및 필요 인원을 선택하여 입력하면 담당자 화면에 즉시 접수됩니다.</p>
             <form onSubmit={handleAddRequest} className="space-y-4">
@@ -192,7 +250,7 @@ export const RecruitApp = () => {
                   <input type="text" value={newReq.partner} onChange={e => setNewReq({...newReq, partner: e.target.value})} placeholder="추천 지인 이름" className="w-full border border-gray-300 rounded-xl p-3 text-sm" />
                 </div>
               </div>
-              <button type="submit" className="w-full bg-indigo-600 text-white font-bold py-3.5 rounded-xl shadow hover:bg-indigo-700 mt-4">
+              <button type="submit" className="w-full bg-indigo-600 text-white font-bold py-3.5 rounded-xl shadow-xs hover:bg-indigo-700 mt-4 transition active:scale-95">
                 구인 요청 즉시 등록
               </button>
             </form>
@@ -202,19 +260,25 @@ export const RecruitApp = () => {
         {/* 근무자 DB 탭 */}
         {activeTab === 'workers' && (
           <div className="space-y-4 max-w-4xl mx-auto w-full">
-            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center">
+            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-xs flex justify-between items-center">
               <div>
                 <h3 className="font-bold text-base text-gray-900">근무자 DB 관리</h3>
                 <p className="text-xs text-gray-500">인재 풀을 관리하고 선별된 인원에게 단체 문자를 발송합니다.</p>
               </div>
-              <button onClick={() => alert('신규 근무자 등록 모달이 열립니다.')} className="bg-indigo-600 text-white text-xs font-bold px-4 py-2 rounded-xl shadow">
+              <button 
+                onClick={() => showNotice('근무자 등록 안내', '신규 근무자 등록은 ShopAdmin 관리자 모드에서 데이터베이스와 직접 동기화됩니다.', 'info')} 
+                className="bg-indigo-600 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs hover:bg-indigo-700 transition"
+              >
                 + 근무자 등록
               </button>
             </div>
-            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-3">
+            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-xs space-y-3">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs font-bold text-gray-500">등록된 인재 ({workers.length}명)</span>
-                <button onClick={() => alert('단체 문자가 발송되었습니다.')} className="text-xs bg-gray-900 text-white font-bold px-3 py-1.5 rounded-lg flex items-center gap-1">
+                <button 
+                  onClick={() => showNotice('단체 문자 발송 안내', `선택된 ${workers.length}명의 인재에게 매장 구인 안내 메시지가 시뮬레이션 발송되었습니다.`, 'success')} 
+                  className="text-xs bg-gray-900 text-white font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 hover:bg-black transition"
+                >
                   <Send size={12} /> 선택 대상 단체 문자 발송
                 </button>
               </div>
@@ -236,10 +300,10 @@ export const RecruitApp = () => {
 
         {/* 실시간 채팅 탭 */}
         {activeTab === 'chat' && (
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col h-[500px] max-w-4xl mx-auto w-full overflow-hidden">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-xs flex flex-col h-[500px] max-w-4xl mx-auto w-full overflow-hidden">
             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
               <span className="font-bold text-sm text-gray-800">실시간 소통 채널</span>
-              <span className="text-xs text-green-600 font-bold">● 연결됨</span>
+              <span className="text-xs text-emerald-600 font-bold">● 연결됨</span>
             </div>
             <div className="flex-1 p-4 overflow-y-auto space-y-3">
               {messages.map(m => (
@@ -254,20 +318,20 @@ export const RecruitApp = () => {
             <div className="p-3 border-t border-gray-100 flex gap-2">
               <input 
                 type="text" 
-                value={inputMsg} 
-                onChange={e => setInputMsg(e.target.value)} 
+                value={inputMsg}
+                onChange={e => setInputMsg(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
-                placeholder="메시지를 입력하세요..." 
-                className="flex-1 border border-gray-300 rounded-xl px-4 py-2 text-xs outline-none"
+                placeholder="채널 메시지를 입력하세요..." 
+                className="flex-1 border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:border-indigo-600"
               />
-              <button onClick={handleSendMessage} className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold flex items-center gap-1 text-xs">
-                <Send size={14} /> 전송
+              <button onClick={handleSendMessage} className="bg-indigo-600 text-white p-2 rounded-xl">
+                <Send size={18} />
               </button>
             </div>
           </div>
         )}
 
-      </div>
+      </main>
     </div>
   );
 };

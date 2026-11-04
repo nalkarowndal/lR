@@ -98,7 +98,7 @@ export function seedDatabase() {
   const products = [
     { brand: '생로랑', title: '르 5 아 7 숄더백 블랙', type: 'RENT', price: 29000, orig: 35000, disc: '17%', unit: '1일', tag: '신규등록', cat: 'bag', target: '20대 여성', img: '/assets/products/bags/saint_laurent_le5a7.jpg' },
     { brand: '발렌시아가', title: '르 시티 미디엄 숄더백 블랙', type: 'RENT', price: 34000, orig: 42000, disc: '19%', unit: '1일', tag: '인기상품', cat: 'bag', target: '20대 여성', img: '/assets/products/bags/balenciaga_le_city.jpg' },
-    { brand: '샤넬', title: '캐비어 호보백 화이트', type: 'RENT', price: 49000, orig: 58000, disc: '15%', unit: '1일', tag: '프리미엄', cat: 'bag', target: '30대 여성', img: '/assets/products/bags/chanel_caviar_hobo.jpg' },
+    { brand: '샤넬', title: '캐비어 호보백 화이트', type: 'RENT', price: 49000, orig: 58000, disc: '15%', unit: '1일', tag: '프리미엄', cat: 'bag', target: '20대 여성', img: '/assets/products/bags/chanel_caviar_hobo.jpg' },
     { brand: '샤넬', title: '클래식 플랩백 블랙 은장', type: 'RENT', price: 55000, orig: 65000, disc: '15%', unit: '1일', tag: '마감임박', cat: 'bag', target: '30대 여성', img: '/assets/products/bags/chanel_classic_flap.jpg' },
     { brand: '에르메스', title: '버킨 25 골드 토고 레더', type: 'RENT', price: 89000, orig: 110000, disc: '19%', unit: '1일', tag: '최고급', cat: 'bag', target: '40대 여성', img: '/assets/products/bags/hermes_birkin_25.jpg' },
     { brand: '루이비통', title: '스피디 반둘리에 25 모노그램', type: 'RENT', price: 25000, orig: 32000, disc: '21%', unit: '1일', tag: '추천', cat: 'bag', target: '20대 여성', img: '/assets/products/bags/louisvuitton_speedy.jpg' },

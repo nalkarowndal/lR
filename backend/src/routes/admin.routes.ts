@@ -3,7 +3,8 @@ import {
   getAdminProducts, createAdminProduct, deleteAdminProduct,
   getRecruitRequests, createRecruitRequest, updateRecruitRequest,
   getWorkers, createWorker,
-  getMessages, createMessage
+  getMessages, createMessage,
+  getAdminSellRequests, updateAdminSellRequest
 } from '../controllers/admin.controller.js';
 import { addProductImage, updateProductImage, deleteProductImage } from '../controllers/image.controller.js';
 import { validateBody } from '../middlewares/validate.js';
@@ -40,3 +41,7 @@ adminRouter.post('/workers', validateBody(CreateWorkerSchema), createWorker);
 // Messages
 adminRouter.get('/messages', getMessages);
 adminRouter.post('/messages', validateBody(CreateMessageSchema), createMessage);
+
+// Sell Requests Management
+adminRouter.get('/sell-requests', getAdminSellRequests);
+adminRouter.patch('/sell-requests/:id', updateAdminSellRequest);

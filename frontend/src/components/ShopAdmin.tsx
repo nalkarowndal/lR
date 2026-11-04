@@ -12,9 +12,11 @@ export const ShopAdmin = () => {
     isBackendConnected
   } = useApp();
 
-  const [mainTab, setMainTab] = useState<'SHOP' | 'RECRUIT'>('RECRUIT');
+  const [mainTab, setMainTab] = useState<'SHOP' | 'RECRUIT' | 'SELL_REQUESTS'>('RECRUIT');
   const [role, setRole] = useState<'STORE' | 'ADMIN'>('STORE');
   const [recruitTab, setRecruitTab] = useState<'dashboard' | 'request' | 'workers' | 'chat'>('dashboard');
+  const [adminSellRequests, setAdminSellRequests] = useState<any[]>([]);
+  const [isLoadingSells, setIsLoadingSells] = useState(false);
 
   // 글래스모피즘 커스텀 팝업 상태 관리
   const [modal, setModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm?: () => void }>({
@@ -105,16 +107,20 @@ export const ShopAdmin = () => {
     if (!galleryProduct || !newImagePath.trim()) return;
     setIsUploading(true);
     try {
+      const isBase64 = newImagePath.startsWith('data:image/');
       const res = await api.addProductImage(galleryProduct.id, {
-        imagePath: newImagePath.trim(),
+        imagePath: isBase64 ? undefined : newImagePath.trim(),
+        fileData: isBase64 ? newImagePath.trim() : undefined,
         altText: newImageAlt.trim() || galleryProduct.title,
         isPrimary: productImages.length === 0 ? 1 : 0
       });
-      if (res?.success) {
+      if (res?.success && res.data) {
         setProductImages(prev => [...prev, res.data]);
         setNewImagePath('');
         setNewImageAlt('');
-        showAlert('이미지 등록 완료', '상품 이미지가 정상 등록되었습니다.');
+        showAlert('이미지 등록 완료', '상품 실사 이미지가 서버에 정상 업로드 및 등록되었습니다.');
+      } else {
+        throw new Error(res?.message || '이미지 등록 실패');
       }
     } catch (err: any) {
       showAlert('등록 실패', err.message || '이미지 등록 실패');
@@ -137,50 +143,54 @@ export const ShopAdmin = () => {
   const [inputMsg, setInputMsg] = useState('');
   const [newReq, setNewReq] = useState({ storeName: '강남본점', date: '', section: '홀 서빙', time: '10:00 - 15:00', breakTime: '30분', required: 1, partner: '' });
 
-  // 신규 상품 등록 및 API 연동 (서버 응답 확인 후 확정)
+  // 신규 상품 등록 및 API 연동 (서버 실제 저장 검증 후 화면 반영)
   const handleAddProduct = async () => {
     try {
       const res = await api.createAdminProduct({ 
-        title: '프리미엄 렌탈 상품', 
+        title: '프리미엄 렌탈 신규 상품', 
         type: 'RENT', 
-        price: 50000 
+        price: 55000,
+        brand: 'LUXURY',
+        category: 'bag'
       });
       if (res?.success && res.data) {
         setProducts(prev => [...prev, {
           id: res.data.id || Date.now(),
-          title: res.data.title || '프리미엄 렌탈 상품',
+          title: res.data.title || '프리미엄 렌탈 신규 상품',
           type: res.data.type || 'RENT',
-          price: res.data.price || 50000,
+          price: res.data.price || 55000,
           brand: res.data.brand || 'LUXURY',
           category: res.data.category || 'bag',
           image_url: res.data.image_url
         }]);
-        showAlert('상품 등록 완료', '새로운 렌탈 상품이 성공적으로 등록되었습니다.');
+        showAlert('상품 등록 완료', '신규 상품이 데이터베이스에 정상 등록되었습니다.');
       } else {
-        const item = { id: Date.now(), title: '프리미엄 렌탈 상품', type: 'RENT' as const, price: 50000 };
-        setProducts(prev => [...prev, item]);
-        showAlert('상품 등록 완료', '새로운 렌탈 상품이 등록되었습니다.');
+        throw new Error(res?.message || '상품 등록에 실패했습니다.');
       }
-    } catch (err) {
-      console.warn('API 연동 실패 fallback 처리:', err);
-      const item = { id: Date.now(), title: '프리미엄 렌탈 상품', type: 'RENT' as const, price: 50000 };
-      setProducts(prev => [...prev, item]);
-      showAlert('상품 등록 완료', '새로운 렌탈 상품이 등록되었습니다.');
+    } catch (err: any) {
+      console.error('[Admin] Product creation failed:', err);
+      showAlert('등록 실패', err.message || '서버 상품 등록 중 오류가 발생했습니다.');
     }
   };
 
   const handleAddRequest = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newReqItem = { id: Date.now(), ...newReq, hired: 0, status: '채용중' as const };
-    setRequests(prev => [...prev, newReqItem]);
-    showAlert('구인 요청 접수', '구인 요청이 담당자 화면에 즉시 접수되었습니다.', () => setRecruitTab('dashboard'));
     try {
       const res = await api.createRecruitRequest(newReq);
-      if (res?.data?.id) {
-        setRequests(prev => prev.map(r => r.id === newReqItem.id ? { ...r, id: res.data.id } : r));
+      if (res?.success && res.data) {
+        setRequests(prev => [...prev, {
+          id: res.data.id,
+          ...newReq,
+          hired: 0,
+          status: '채용중' as const
+        }]);
+        showAlert('구인 요청 접수 완료', '구인 요청이 데이터베이스에 정상 접수되었습니다.', () => setRecruitTab('dashboard'));
+      } else {
+        throw new Error(res?.message || '구인 요청 등록에 실패했습니다.');
       }
-    } catch (err) {
-      console.warn('API 연동 알림:', err);
+    } catch (err: any) {
+      console.error('[Admin] Recruit request failed:', err);
+      showAlert('접수 실패', err.message || '서버 구인 요청 저장 중 오류가 발생했습니다.');
     }
   };
 
@@ -188,13 +198,23 @@ export const ShopAdmin = () => {
     if (!inputMsg.trim()) return;
     const sender = role === 'ADMIN' ? '담당자' : '매장';
     const text = inputMsg.trim();
-    const newMsgItem = { id: Date.now(), sender, text, time: '방금', isMine: true };
-    setMessages(prev => [...prev, newMsgItem]);
-    setInputMsg('');
     try {
-      await api.createMessage({ sender, text, isMine: true });
-    } catch (err) {
-      console.warn('API 연동 알림:', err);
+      const res = await api.createMessage({ sender, text, isMine: true });
+      if (res?.success && res.data) {
+        setMessages(prev => [...prev, {
+          id: res.data.id,
+          sender: res.data.sender,
+          text: res.data.text,
+          time: res.data.time,
+          isMine: true
+        }]);
+        setInputMsg('');
+      } else {
+        throw new Error((res as any)?.message || '메시지 전송 실패');
+      }
+    } catch (err: any) {
+      console.error('[Admin] Message send failed:', err);
+      showAlert('전송 실패', err.message || '메시지 전송 중 오류가 발생했습니다.');
     }
   };
 
@@ -205,21 +225,63 @@ export const ShopAdmin = () => {
   const handleAddWorkerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newWorkerForm.name.trim()) return;
-    const newWorker = {
-      id: Date.now(),
-      name: newWorkerForm.name.trim(),
-      phone: newWorkerForm.phone.trim() || '010-0000-0000',
-      exp: newWorkerForm.exp.trim() || '신규',
-      checked: true
-    };
-    setWorkers(prev => [...prev, newWorker]);
-    setShowWorkerModal(false);
-    setNewWorkerForm({ name: '', phone: '', exp: '매장 관리 1년' });
-    showAlert('근무자 등록 완료', '신규 근무자 정보가 성공적으로 데이터베이스에 등록되었습니다.');
     try {
-      await api.createWorker({ name: newWorker.name, phone: newWorker.phone, exp: newWorker.exp });
-    } catch (err) {
-      console.warn('API 연동 알림:', err);
+      const res = await api.createWorker({ 
+        name: newWorkerForm.name.trim(), 
+        phone: newWorkerForm.phone.trim() || '010-0000-0000', 
+        exp: newWorkerForm.exp.trim() || '신규' 
+      });
+      if (res?.success && res.data) {
+        setWorkers(prev => [...prev, {
+          id: res.data.id,
+          name: res.data.name,
+          phone: res.data.phone,
+          exp: res.data.exp,
+          checked: true
+        }]);
+        setShowWorkerModal(false);
+        setNewWorkerForm({ name: '', phone: '', exp: '매장 관리 1년' });
+        showAlert('근무자 등록 완료', '신규 근무자 정보가 데이터베이스에 성공적으로 등록되었습니다.');
+      } else {
+        throw new Error(res?.message || '근무자 등록에 실패했습니다.');
+      }
+    } catch (err: any) {
+      console.error('[Admin] Worker registration failed:', err);
+      showAlert('등록 실패', err.message || '근무자 정보를 서버에 저장하지 못했습니다.');
+    }
+  };
+
+  const loadAdminSellRequests = React.useCallback(async () => {
+    try {
+      setIsLoadingSells(true);
+      const res = await api.getAdminSellRequests();
+      if (res?.success && Array.isArray(res.data)) {
+        setAdminSellRequests(res.data);
+      }
+    } catch (err: any) {
+      console.warn('[Admin] Failed to load sell requests:', err);
+    } finally {
+      setIsLoadingSells(false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (mainTab === 'SELL_REQUESTS') {
+      loadAdminSellRequests();
+    }
+  }, [mainTab, loadAdminSellRequests]);
+
+  const handleUpdateSellStatus = async (id: number, nextStatus: string) => {
+    try {
+      const res = await api.updateAdminSellRequest(id, nextStatus);
+      if (res?.success) {
+        setAdminSellRequests(prev => prev.map(s => s.id === id ? { ...s, status: nextStatus } : s));
+        showAlert('상태 변경 완료', `신청 건의 상태가 '${nextStatus}'(으)로 변경되었습니다.`);
+      } else {
+        throw new Error(res?.message || '상태 변경 실패');
+      }
+    } catch (err: any) {
+      showAlert('변경 실패', err?.message || '상태 변경 중 오류가 발생했습니다.');
     }
   };
 
@@ -347,6 +409,15 @@ export const ShopAdmin = () => {
                 }`}
               >
                 <i className="fa-solid fa-user-tie mr-1.5"></i> 구인/채용 관리
+              </button>
+              <button 
+                type="button"
+                onClick={() => setMainTab('SELL_REQUESTS')} 
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  mainTab === 'SELL_REQUESTS' ? 'bg-white text-black shadow-md' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <i className="fa-solid fa-handshake mr-1.5"></i> 위탁 판매 관리
               </button>
             </div>
 
@@ -866,6 +937,93 @@ export const ShopAdmin = () => {
               )}
 
             </div>
+          </div>
+        )}
+
+        {/* [C] 위탁 판매 접수 관리 시스템 */}
+        {mainTab === 'SELL_REQUESTS' && (
+          <div className="backdrop-blur-xl bg-white/[0.03] border border-white/10 rounded-3xl shadow-2xl p-8 flex flex-col flex-1">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-6 border-b border-white/10">
+              <div>
+                <h3 className="font-extrabold text-white text-xl tracking-tight flex items-center gap-2">
+                  <i className="fa-solid fa-handshake text-indigo-400"></i>
+                  고객 위탁 판매 신청 관리 ({adminSellRequests.length}건)
+                </h3>
+                <p className="text-xs text-gray-400 mt-1">고객이 신청한 브랜드 명품 위탁 판매 건을 검수하고 감정 상태를 변경합니다.</p>
+              </div>
+              <button 
+                type="button"
+                onClick={loadAdminSellRequests}
+                className="text-xs bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2.5 rounded-xl border border-white/10 transition flex items-center gap-2"
+              >
+                <i className={`fa-solid fa-rotate-right ${isLoadingSells ? 'animate-spin' : ''}`}></i> 새로고침
+              </button>
+            </div>
+
+            {isLoadingSells ? (
+              <div className="py-20 text-center text-sm text-gray-400">위탁 판매 신청 내역을 불러오는 중...</div>
+            ) : adminSellRequests.length === 0 ? (
+              <div className="py-24 text-center border border-dashed border-white/10 rounded-2xl text-gray-400">
+                <i className="fa-solid fa-inbox text-3xl mb-3 block text-gray-500"></i>
+                접수된 위탁 판매 신청 내역이 없습니다.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs text-gray-200">
+                  <thead className="bg-white/5 border-b border-white/10 text-gray-400 uppercase font-mono text-[11px]">
+                    <tr>
+                      <th className="py-3 px-4">접수번호</th>
+                      <th className="py-3 px-4">신청 브랜드</th>
+                      <th className="py-3 px-4">신청 고객</th>
+                      <th className="py-3 px-4">연락처 / 이메일</th>
+                      <th className="py-3 px-4">접수일시</th>
+                      <th className="py-3 px-4">현재 상태</th>
+                      <th className="py-3 px-4 text-right">상태 관리</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {adminSellRequests.map(item => (
+                      <tr key={item.id} className="hover:bg-white/[0.02] transition">
+                        <td className="py-4 px-4 font-mono text-gray-400">#{item.id}</td>
+                        <td className="py-4 px-4 font-bold text-white text-sm">{item.brand_name}</td>
+                        <td className="py-4 px-4 font-semibold text-gray-300">{item.user_name || '고객'}</td>
+                        <td className="py-4 px-4 text-gray-400">
+                          <div>{item.user_phone || '-'}</div>
+                          <div className="text-[10px] text-gray-500">{item.user_email || ''}</div>
+                        </td>
+                        <td className="py-4 px-4 font-mono text-gray-400 text-[11px]">{item.created_at}</td>
+                        <td className="py-4 px-4">
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-black ${
+                            item.status === '승인완료' || item.status === '판매승인'
+                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                              : item.status === '검수중' || item.status === '전문감정중'
+                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                              : item.status === '반려'
+                              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                              : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
+                          }`}>
+                            {item.status}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4 text-right space-x-1.5">
+                          <select 
+                            value={item.status}
+                            onChange={(e) => handleUpdateSellStatus(item.id, e.target.value)}
+                            className="bg-black/40 border border-white/20 rounded-lg px-2.5 py-1 text-xs text-white outline-none cursor-pointer"
+                          >
+                            <option value="접수완료" className="bg-zinc-900 text-white">접수완료</option>
+                            <option value="검수중" className="bg-zinc-900 text-white">검수중</option>
+                            <option value="전문감정중" className="bg-zinc-900 text-white">전문감정중</option>
+                            <option value="판매승인" className="bg-zinc-900 text-white">판매승인</option>
+                            <option value="반려" className="bg-zinc-900 text-white">반려</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 

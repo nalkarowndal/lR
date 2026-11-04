@@ -208,3 +208,37 @@ export function createMessage(req: Request, res: Response, next: NextFunction) {
     next(err);
   }
 }
+
+// 5. Admin Sell Requests
+export function getAdminSellRequests(_req: Request, res: Response, next: NextFunction) {
+  try {
+    const db = getDatabase();
+    const rows = db.prepare(`
+      SELECT s.id, s.user_id, s.brand_name, s.user_name, s.status, s.created_at,
+             u.email as user_email, u.phone as user_phone
+      FROM sell_requests s
+      LEFT JOIN users u ON u.id = s.user_id
+      ORDER BY s.id DESC
+    `).all();
+    res.json({ success: true, count: rows.length, data: rows });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export function updateAdminSellRequest(req: Request, res: Response, next: NextFunction) {
+  try {
+    const db = getDatabase();
+    const id = Number(req.params.id);
+    const { status } = req.body;
+    if (!status) {
+      return res.status(400).json({ success: false, error: '상태 값이 필요합니다.' });
+    }
+
+    db.prepare('UPDATE sell_requests SET status = ? WHERE id = ?').run(status, id);
+    res.json({ success: true, message: '판매 신청 상태가 성공적으로 변경되었습니다.' });
+  } catch (err) {
+    next(err);
+  }
+}
+

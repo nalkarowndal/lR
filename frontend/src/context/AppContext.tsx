@@ -232,12 +232,19 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateUserSettings = async (newSettings: Partial<UserSettings>) => {
+    const previous = { ...userSettings };
     setUserSettings(prev => ({ ...prev, ...newSettings }));
     if (user) {
       try {
-        await api.updateMySettings(newSettings);
+        const res = await api.updateMySettings(newSettings);
+        if (res?.success && res.settings) {
+          setUserSettings(res.settings);
+        }
       } catch (err) {
         console.warn('[AppContext] Failed to persist user settings:', err);
+        // Rollback to previous state on persistence failure
+        setUserSettings(previous);
+        throw err;
       }
     }
   };

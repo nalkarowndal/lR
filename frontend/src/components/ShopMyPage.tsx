@@ -90,6 +90,7 @@ export const ShopMyPage: React.FC = () => {
 
   const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
     setEditError('');
 
     if (!editName.trim()) {
@@ -99,10 +100,23 @@ export const ShopMyPage: React.FC = () => {
 
     try {
       setIsSavingProfile(true);
+      let finalAvatarUrl = editAvatar.trim();
+
+      // If user selected a new file (data:image base64), upload real file to backend storage
+      if (editAvatar.startsWith('data:image/')) {
+        const uploadRes = await api.uploadMyAvatar(editAvatar);
+        if (uploadRes?.success && uploadRes.avatar_url) {
+          finalAvatarUrl = uploadRes.avatar_url;
+        }
+      } else if (!editAvatar.trim() && user.avatar_url) {
+        await api.deleteMyAvatar();
+        finalAvatarUrl = '';
+      }
+
       const res = await api.updateMyProfile({
         name: editName.trim(),
         phone: editPhone.trim(),
-        avatar_url: editAvatar.trim()
+        avatar_url: finalAvatarUrl
       });
 
       if (res?.success && res.profile) {

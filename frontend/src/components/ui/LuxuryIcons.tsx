@@ -439,3 +439,41 @@ export const ProductVisualBadge = ({
     </div>
   );
 };
+
+/**
+ * 관리자 공식 엠블럼 (Luxury Regal Crown Engraving)
+ * 정교한 5개 첨탑, 샴페인 골드 & 앤틱 브라스 각인 아치 및 펄 피니얼
+ */
+export const LuxuryCrownIcon: React.FC<EngravedIconProps> = ({ className = "w-4 h-4" }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="crownGold" x1="4" y1="4" x2="20" y2="20" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#DFCA8D" />
+        <stop offset="45%" stopColor="#B49A67" />
+        <stop offset="100%" stopColor="#8C734B" />
+      </linearGradient>
+    </defs>
+    {/* Base Band with Inset Jewel Etchings */}
+    <path d="M4 17.5C4 16.95 4.45 16.5 5 16.5H19C19.55 16.5 20 16.95 20 17.5V18.5C20 19.05 19.55 19.5 19 19.5H5C4.45 19.5 4 19.05 4 18.5V17.5Z" 
+      fill="url(#crownGold)" stroke="#7D653E" strokeWidth="0.6" />
+    <circle cx="8" cy="18" r="0.8" fill="#FFFFFF" />
+    <circle cx="12" cy="18" r="0.9" fill="#FFFFFF" />
+    <circle cx="16" cy="18" r="0.8" fill="#FFFFFF" />
+
+    {/* Crown Spikes and Diadem Silhouette */}
+    <path d="M4.5 16.5L3.5 8.5L8.5 12.5L12 5.5L15.5 12.5L20.5 8.5L19.5 16.5H4.5Z" 
+      fill="url(#crownGold)" stroke="#7D653E" strokeWidth="0.8" strokeLinejoin="round" />
+
+    {/* Inner Chiseled Relief Lines */}
+    <path d="M12 7.5L10 13H14L12 7.5Z" fill="#F4E8C1" fillOpacity="0.4" />
+    <path d="M8.5 13.5L5.8 10L6.5 16H9.5L8.5 13.5Z" fill="#7D653E" fillOpacity="0.15" />
+    <path d="M15.5 13.5L18.2 10L17.5 16H14.5L15.5 13.5Z" fill="#7D653E" fillOpacity="0.15" />
+
+    {/* Pearl Finials on Spikes */}
+    <circle cx="3.5" cy="8.5" r="1.2" fill="#FFFDF8" stroke="#B49A67" strokeWidth="0.5" />
+    <circle cx="8.5" cy="12.5" r="1" fill="#FFFDF8" stroke="#B49A67" strokeWidth="0.5" />
+    <circle cx="12" cy="5.5" r="1.5" fill="#FFFDF8" stroke="#B49A67" strokeWidth="0.6" />
+    <circle cx="15.5" cy="12.5" r="1" fill="#FFFDF8" stroke="#B49A67" strokeWidth="0.5" />
+    <circle cx="20.5" cy="8.5" r="1.2" fill="#FFFDF8" stroke="#B49A67" strokeWidth="0.5" />
+  </svg>
+);

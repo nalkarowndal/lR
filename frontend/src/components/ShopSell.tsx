@@ -9,6 +9,10 @@ export const ShopSell = () => {
   const [selectedBrand, setSelectedBrand] = useState<{ ko: string; en: string } | null>(null);
   const [showDirectModal, setShowDirectModal] = useState(false);
   const [directBrandName, setDirectBrandName] = useState('');
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; brand: { ko: string; en: string } | null }>({
+    isOpen: false,
+    brand: null
+  });
   const [sellModal, setSellModal] = useState<{ isOpen: boolean; message: string }>({
     isOpen: false,
     message: ''
@@ -39,8 +43,15 @@ export const ShopSell = () => {
     b.ko.includes(searchQuery) || b.en.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleSelectBrand = async (brand: { ko: string; en: string }) => {
+  const handleSelectBrand = (brand: { ko: string; en: string }) => {
     setSelectedBrand(brand);
+    setConfirmModal({ isOpen: true, brand });
+  };
+
+  const handleConfirmSell = async () => {
+    if (!confirmModal.brand) return;
+    const brand = confirmModal.brand;
+    setConfirmModal({ isOpen: false, brand: null });
     setIsSubmitting(true);
     try {
       await api.createSellRequest(`${brand.ko} (${brand.en})`);
@@ -84,6 +95,49 @@ export const ShopSell = () => {
 
   return (
     <div className="flex flex-col h-full bg-white select-none relative">
+      {/* 🌟 판매 신청 사전 확인 모달 */}
+      {confirmModal.isOpen && confirmModal.brand && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl p-6 max-w-xs w-full shadow-2xl text-center flex flex-col items-center animate-fadeIn">
+            <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mb-3">
+              <AlertCircle size={24} />
+            </div>
+            <h3 className="font-extrabold text-base text-gray-900 mb-1">위탁 판매 신청 확인</h3>
+            <p className="text-xs text-gray-500 mb-4">
+              선택하신 <span className="font-bold text-gray-900">'{confirmModal.brand.ko} ({confirmModal.brand.en})'</span> 브랜드의 명품 위탁 판매를 접수하시겠습니까?
+            </p>
+            <div className="w-full bg-gray-50 rounded-xl p-3 text-left text-[11px] text-gray-600 space-y-1 mb-5">
+              <div className="flex items-center gap-1.5 font-bold text-gray-800">
+                <Check size={12} className="text-emerald-600" /> 감정팀 무료 방문·택배 수거
+              </div>
+              <div className="flex items-center gap-1.5 font-bold text-gray-800">
+                <Check size={12} className="text-emerald-600" /> 공인 명품 감정원 정품 인증
+              </div>
+              <div className="flex items-center gap-1.5 font-bold text-gray-800">
+                <Check size={12} className="text-emerald-600" /> 월간 렌탈 정산 수익 보장
+              </div>
+            </div>
+            <div className="flex gap-2 w-full">
+              <button 
+                type="button"
+                onClick={() => setConfirmModal({ isOpen: false, brand: null })}
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-xs transition"
+              >
+                취소
+              </button>
+              <button 
+                type="button"
+                disabled={isSubmitting}
+                onClick={handleConfirmSell}
+                className="flex-1 bg-gray-950 hover:bg-black text-white py-3 rounded-xl font-bold text-xs transition disabled:opacity-50"
+              >
+                {isSubmitting ? '접수중...' : '신청하기'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 🌟 판매 신청 확인 모달 */}
       {sellModal.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">

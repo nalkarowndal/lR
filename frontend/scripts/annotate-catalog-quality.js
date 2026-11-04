@@ -86,3 +86,4 @@ code = code.replace(/imageUrl:\s*['"]([^'"]+)['"],\s*imageStatus:\s*['"]READY['"
 
 fs.writeFileSync(catalogPath, code, 'utf-8');
 console.log('[CATALOG] Successfully annotated all products with asset quality metadata.');
+
