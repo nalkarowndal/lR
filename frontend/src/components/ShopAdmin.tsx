@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
+import { api } from '../services/api';
 
 export const ShopAdmin = () => {
-  const { setCurrentView, products, setProducts } = useApp();
+  const { 
+    setCurrentView, products, setProducts, 
+    requests, setRequests, 
+    messages, setMessages, 
+    workerDB: workers, setWorkerDB: setWorkers,
+    isBackendConnected
+  } = useApp();
+
   const [mainTab, setMainTab] = useState<'SHOP' | 'RECRUIT'>('RECRUIT');
-  
   const [role, setRole] = useState<'STORE' | 'ADMIN'>('STORE');
   const [recruitTab, setRecruitTab] = useState<'dashboard' | 'request' | 'workers' | 'chat'>('dashboard');
 
@@ -44,61 +51,76 @@ export const ShopAdmin = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [modal.isOpen, showWorkerModal, closeModal]);
 
-  const [requests, setRequests] = useState([
-    { id: 1, storeName: '강남본점', date: '2026-10-31', section: '홀 서빙', time: '10:00 - 15:00', breakTime: '30분', required: 2, hired: 1, status: '채용중', partner: '' },
-    { id: 2, storeName: '홍대점', date: '2026-11-01', section: '카운터', time: '12:00 - 20:00', breakTime: '60분', required: 1, hired: 0, status: '채용중', partner: '김지인' }
-  ]);
-
-  const [workers, setWorkers] = useState([
-    { id: 1, name: '김철수', phone: '010-1234-5678', exp: '홀 서빙 1년', checked: true },
-    { id: 2, name: '이영희', phone: '010-8765-4321', exp: '카운터 2년', checked: true }
-  ]);
-
-  const [messages, setMessages] = useState([
-    { id: 1, sender: '강남본점', text: '오늘 저녁 타임 구인 급합니다!', time: '10:30 AM', isMine: false }
-  ]);
-
   const [inputMsg, setInputMsg] = useState('');
   const [newReq, setNewReq] = useState({ storeName: '강남본점', date: '', section: '홀 서빙', time: '10:00 - 15:00', breakTime: '30분', required: 1, partner: '' });
 
-  // 신규 상품 즉시 등록 및 팝업 (기존 capture-all.js 호환)
-  const handleAddProduct = () => {
-    setProducts([...products, { id: Date.now(), title: '프리미엄 렌탈 상품', type: 'RENT', price: 50000 }]);
+  // 신규 상품 즉시 등록 및 API 연동 (기존 capture-all.js 호환)
+  const handleAddProduct = async () => {
+    const item = { id: Date.now(), title: '프리미엄 렌탈 상품', type: 'RENT' as const, price: 50000 };
+    setProducts(prev => [...prev, item]);
     showAlert('상품 등록 완료', '새로운 렌탈 상품이 성공적으로 등록되었습니다.');
+    try {
+      const res = await api.createAdminProduct({ title: item.title, type: item.type, price: item.price });
+      if (res?.data?.id) {
+        setProducts(prev => prev.map(p => p.id === item.id ? { ...p, id: res.data.id } : p));
+      }
+    } catch (err) {
+      console.warn('API 연동 알림:', err);
+    }
   };
 
-  const handleAddRequest = (e: React.FormEvent) => {
+  const handleAddRequest = async (e: React.FormEvent) => {
     e.preventDefault();
-    setRequests([...requests, { id: Date.now(), ...newReq, hired: 0, status: '채용중' }]);
+    const newReqItem = { id: Date.now(), ...newReq, hired: 0, status: '채용중' as const };
+    setRequests(prev => [...prev, newReqItem]);
     showAlert('구인 요청 접수', '구인 요청이 담당자 화면에 즉시 접수되었습니다.', () => setRecruitTab('dashboard'));
+    try {
+      const res = await api.createRecruitRequest(newReq);
+      if (res?.data?.id) {
+        setRequests(prev => prev.map(r => r.id === newReqItem.id ? { ...r, id: res.data.id } : r));
+      }
+    } catch (err) {
+      console.warn('API 연동 알림:', err);
+    }
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!inputMsg.trim()) return;
-    setMessages([...messages, { id: Date.now(), sender: role === 'ADMIN' ? '담당자' : '매장', text: inputMsg.trim(), time: '방금', isMine: true }]);
+    const sender = role === 'ADMIN' ? '담당자' : '매장';
+    const text = inputMsg.trim();
+    const newMsgItem = { id: Date.now(), sender, text, time: '방금', isMine: true };
+    setMessages(prev => [...prev, newMsgItem]);
     setInputMsg('');
+    try {
+      await api.createMessage({ sender, text, isMine: true });
+    } catch (err) {
+      console.warn('API 연동 알림:', err);
+    }
   };
 
   const toggleWorkerCheck = (id: number) => {
-    setWorkers(workers.map(w => w.id === id ? { ...w, checked: !w.checked } : w));
+    setWorkers(prev => prev.map(w => w.id === id ? { ...w, checked: !w.checked } : w));
   };
 
-  const handleAddWorkerSubmit = (e: React.FormEvent) => {
+  const handleAddWorkerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newWorkerForm.name.trim()) return;
-    setWorkers([
-      ...workers,
-      {
-        id: Date.now(),
-        name: newWorkerForm.name.trim(),
-        phone: newWorkerForm.phone.trim() || '010-0000-0000',
-        exp: newWorkerForm.exp.trim() || '신규',
-        checked: true
-      }
-    ]);
+    const newWorker = {
+      id: Date.now(),
+      name: newWorkerForm.name.trim(),
+      phone: newWorkerForm.phone.trim() || '010-0000-0000',
+      exp: newWorkerForm.exp.trim() || '신규',
+      checked: true
+    };
+    setWorkers(prev => [...prev, newWorker]);
     setShowWorkerModal(false);
     setNewWorkerForm({ name: '', phone: '', exp: '매장 관리 1년' });
     showAlert('근무자 등록 완료', '신규 근무자 정보가 성공적으로 데이터베이스에 등록되었습니다.');
+    try {
+      await api.createWorker({ name: newWorker.name, phone: newWorker.phone, exp: newWorker.exp });
+    } catch (err) {
+      console.warn('API 연동 알림:', err);
+    }
   };
 
   const selectedWorkersCount = workers.filter(w => w.checked).length;
@@ -194,7 +216,14 @@ export const ShopAdmin = () => {
               <i className="fa-solid fa-shield-halved text-base"></i>
             </div>
             <div>
-              <h1 className="font-black text-lg tracking-tight text-white">LUXURY RENTAL</h1>
+              <div className="flex items-center gap-2">
+                <h1 className="font-black text-lg tracking-tight text-white">LUXURY RENTAL</h1>
+                {isBackendConnected && (
+                  <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold">
+                    API 연동됨
+                  </span>
+                )}
+              </div>
               <p className="text-[11px] text-gray-400 font-medium">통합 관리자 센터</p>
             </div>
           </div>

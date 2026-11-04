@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronLeft, Search, ChevronRight, Check, PlusCircle, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { api } from '../services/api';
 
 export const ShopSell = () => {
   const { setCurrentView } = useApp();
@@ -38,18 +39,25 @@ export const ShopSell = () => {
       isOpen: true,
       message: `'${brand.ko} (${brand.en})' 브랜드 위탁 판매 신청이 준비되었습니다.`
     });
+    api.createSellRequest(`${brand.ko} (${brand.en})`).catch((err) => {
+      console.warn('위탁 판매 접수 API 알림:', err);
+    });
   };
 
   const handleDirectRegister = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!directBrandName.trim()) return;
+    const name = directBrandName.trim();
+    if (!name) return;
     setShowDirectModal(false);
-    setSelectedBrand({ ko: directBrandName.trim(), en: 'Custom' });
+    setSelectedBrand({ ko: name, en: 'Custom' });
     setSellModal({
       isOpen: true,
-      message: `'${directBrandName.trim()}' 브랜드 직접 등록이 접수되었습니다.`
+      message: `'${name}' 브랜드 직접 등록이 접수되었습니다.`
     });
     setDirectBrandName('');
+    api.createSellRequest(name).catch((err) => {
+      console.warn('브랜드 직접등록 접수 API 알림:', err);
+    });
   };
 
   return (
