@@ -1,0 +1,151 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "LuxuryRental REST API",
+    "version": "1.0.0",
+    "description": "LuxuryRental Commerce & Administration Backend API"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000/api/v1",
+      "description": "Local Development Server"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/products": {
+      "get": {
+        "summary": "Get product list with optional filters",
+        "parameters": [
+          { "name": "brand", "in": "query", "schema": { "type": "string" } },
+          { "name": "category", "in": "query", "schema": { "type": "string" } },
+          { "name": "type", "in": "query", "schema": { "type": "string", "enum": ["RENT", "BUY"] } }
+        ],
+        "responses": { "200": { "description": "List of products" } }
+      }
+    },
+    "/products/recommendations": {
+      "get": {
+        "summary": "Get personalized recommendations by age and gender",
+        "parameters": [
+          { "name": "target", "in": "query", "schema": { "type": "string", "example": "20대 여성" } }
+        ],
+        "responses": { "200": { "description": "Recommendations list" } }
+      }
+    },
+    "/categories": {
+      "get": {
+        "summary": "Get all categories and subcategories",
+        "responses": { "200": { "description": "Category tree" } }
+      }
+    },
+    "/categories/brands": {
+      "get": {
+        "summary": "Get luxury brands list",
+        "parameters": [
+          { "name": "popular", "in": "query", "schema": { "type": "boolean" } }
+        ],
+        "responses": { "200": { "description": "Brand list" } }
+      }
+    },
+    "/search": {
+      "get": {
+        "summary": "Search products by keyword",
+        "parameters": [
+          { "name": "q", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "Matching products" } }
+      }
+    },
+    "/search/trending": {
+      "get": {
+        "summary": "Get trending keywords and recommendations",
+        "responses": { "200": { "description": "Trending keyword list" } }
+      }
+    },
+    "/sell-requests": {
+      "post": {
+        "summary": "Submit consignment sell request",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["brandName"],
+                "properties": {
+                  "brandName": { "type": "string" },
+                  "userName": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Request submitted" } }
+      }
+    },
+    "/admin/products": {
+      "get": {
+        "summary": "Admin: get all products",
+        "responses": { "200": { "description": "Admin product list" } }
+      },
+      "post": {
+        "summary": "Admin: add new product",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["title", "type", "price"],
+                "properties": {
+                  "title": { "type": "string" },
+                  "type": { "type": "string", "enum": ["RENT", "BUY"] },
+                  "price": { "type": "number" },
+                  "brand": { "type": "string" },
+                  "category": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Product created" } }
+      }
+    },
+    "/admin/recruit/requests": {
+      "get": {
+        "summary": "Admin: get recruit requests",
+        "responses": { "200": { "description": "Recruit requests list" } }
+      },
+      "post": {
+        "summary": "Admin: create recruit request",
+        "responses": { "201": { "description": "Recruit request created" } }
+      }
+    },
+    "/admin/workers": {
+      "get": {
+        "summary": "Admin: get workers database",
+        "responses": { "200": { "description": "Worker list" } }
+      },
+      "post": {
+        "summary": "Admin: register new worker",
+        "responses": { "201": { "description": "Worker created" } }
+      }
+    },
+    "/admin/messages": {
+      "get": {
+        "summary": "Admin: get communication messages",
+        "responses": { "200": { "description": "Messages list" } }
+      },
+      "post": {
+        "summary": "Admin: send message",
+        "responses": { "201": { "description": "Message sent" } }
+      }
+    }
+  }
+}
