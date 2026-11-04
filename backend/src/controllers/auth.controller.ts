@@ -34,6 +34,22 @@ export function register(req: Request, res: Response, next: NextFunction) {
 
     const userId = Number(result.lastInsertRowid);
 
+    // 2.1 Record audit trail in user_consents
+    try {
+      const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0] || req.ip || req.socket?.remoteAddress || '';
+      const userAgent = (req.headers['user-agent'] as string) || '';
+      const insertConsent = db.prepare(`
+        INSERT INTO user_consents (user_id, doc_type, version, agreed, ip_address, user_agent)
+        VALUES (?, ?, 'v2.1', ?, ?, ?)
+      `);
+
+      insertConsent.run(userId, 'TERMS_OF_SERVICE', 1, ip, userAgent);
+      insertConsent.run(userId, 'PRIVACY_COLLECTION', 1, ip, userAgent);
+      insertConsent.run(userId, 'MARKETING_CONSENT', validated.marketingConsent ? 1 : 0, ip, userAgent);
+    } catch (auditErr) {
+      console.warn('[Audit] Failed to log initial consent:', auditErr);
+    }
+
     // 3. Create initial session token
     const token = generateSessionToken();
     db.prepare(`

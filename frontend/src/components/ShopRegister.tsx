@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Eye, EyeOff, Check, AlertCircle } from 'lucide-react';
+import { ChevronLeft, Eye, EyeOff, Check, AlertCircle, ChevronRight, CheckSquare, Square } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { api, setAuthToken } from '../services/api';
+import { LegalTermsModal } from './ui/LegalTermsModal';
 
 export const ShopRegister = () => {
   const { activeOverlay, setActiveOverlay, setUser } = useApp();
@@ -16,18 +17,53 @@ export const ShopRegister = () => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [termsAgreed, setTermsAgreed] = useState(false);
+
+  // Granular Terms Consent State
+  const [serviceTermsAgreed, setServiceTermsAgreed] = useState(false);
+  const [privacyPolicyAgreed, setPrivacyPolicyAgreed] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
+
+  // Modal viewer state
+  const [activeLegalDoc, setActiveLegalDoc] = useState<'TERMS_OF_SERVICE' | 'PRIVACY_COLLECTION' | 'PRIVACY_POLICY' | 'MARKETING_CONSENT' | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successRegistered, setSuccessRegistered] = useState(false);
 
+  const allAgreed = serviceTermsAgreed && privacyPolicyAgreed && marketingConsent;
+
+  const handleToggleAll = () => {
+    if (allAgreed) {
+      setServiceTermsAgreed(false);
+      setPrivacyPolicyAgreed(false);
+      setMarketingConsent(false);
+    } else {
+      setServiceTermsAgreed(true);
+      setPrivacyPolicyAgreed(true);
+      setMarketingConsent(true);
+    }
+  };
+
+  const handleModalAgree = (docType: string) => {
+    if (docType === 'TERMS_OF_SERVICE') {
+      setServiceTermsAgreed(true);
+    } else if (docType === 'PRIVACY_COLLECTION' || docType === 'PRIVACY_POLICY') {
+      setPrivacyPolicyAgreed(true);
+    } else if (docType === 'MARKETING_CONSENT') {
+      setMarketingConsent(true);
+    }
+    showToast('약관 내용 확인 및 동의 처리가 완료되었습니다.', 'success');
+  };
+
   useEffect(() => {
     if (isOpen) {
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
-          setActiveOverlay(null);
+          if (activeLegalDoc) {
+            setActiveLegalDoc(null);
+          } else {
+            setActiveOverlay(null);
+          }
         }
       };
       window.addEventListener('keydown', handleKeyDown);
@@ -36,8 +72,9 @@ export const ShopRegister = () => {
       setErrorMsg('');
       setIsLoading(false);
       setSuccessRegistered(false);
+      setActiveLegalDoc(null);
     }
-  }, [isOpen, setActiveOverlay]);
+  }, [isOpen, setActiveOverlay, activeLegalDoc]);
 
   // Password strength check
   const hasMinLen = password.length >= 6;
@@ -48,8 +85,8 @@ export const ShopRegister = () => {
     e.preventDefault();
     setErrorMsg('');
 
-    if (!termsAgreed) {
-      setErrorMsg('필수 이용약관 및 개인정보 수집에 동의해주세요.');
+    if (!serviceTermsAgreed || !privacyPolicyAgreed) {
+      setErrorMsg('필수 항목([필수] 서비스 이용약관, [필수] 개인정보 수집 및 이용)에 모두 동의해주세요.');
       return;
     }
 
@@ -71,6 +108,8 @@ export const ShopRegister = () => {
         name: name.trim(),
         phone: phone.trim(),
         termsAgreed: true,
+        serviceTermsAgreed: true,
+        privacyPolicyAgreed: true,
         marketingConsent
       });
 
@@ -78,7 +117,7 @@ export const ShopRegister = () => {
         setSuccessRegistered(true);
         setAuthToken(res.token);
         setUser(res.user);
-        showToast('회원가입이 완료되었습니다. 첫 렌트 할인 혜택이 적용됩니다!', 'success');
+        showToast('회원가입이 완료되었습니다. 첫 렌트 70% 할인 혜택이 적용됩니다!', 'success');
 
         setTimeout(() => {
           setActiveOverlay(null);
@@ -230,32 +269,97 @@ export const ShopRegister = () => {
             )}
           </div>
 
-          {/* Terms Agreement */}
-          <div className="pt-3 pb-2 border-t border-gray-100 space-y-2">
-            <label className="flex items-start gap-2.5 cursor-pointer">
-              <input 
-                type="checkbox"
-                checked={termsAgreed}
-                onChange={(e) => setTermsAgreed(e.target.checked)}
-                className="w-4 h-4 mt-0.5 accent-black rounded"
-                required
-              />
-              <span className="text-xs text-gray-700 leading-snug">
-                <span className="text-indigo-600 font-bold">[필수]</span> 이용약관 및 개인정보 수집·이용 동의
-              </span>
-            </label>
+          {/* Granular Legal Terms Agreement Section */}
+          <div className="pt-4 pb-2 border-t border-gray-100">
+            {/* 전체 동의 버튼 */}
+            <div 
+              onClick={handleToggleAll}
+              className="p-3.5 rounded-xl bg-gray-50 hover:bg-gray-100/80 cursor-pointer flex items-center justify-between border border-gray-200/70 transition mb-3"
+            >
+              <div className="flex items-center gap-2.5">
+                {allAgreed ? (
+                  <CheckSquare size={19} className="text-black" />
+                ) : (
+                  <Square size={19} className="text-gray-400" />
+                )}
+                <span className="text-xs font-black text-gray-900">
+                  모든 약관에 전체 동의합니다
+                </span>
+              </div>
+              <span className="text-[11px] text-gray-400">선택 포함</span>
+            </div>
 
-            <label className="flex items-start gap-2.5 cursor-pointer">
-              <input 
-                type="checkbox"
-                checked={marketingConsent}
-                onChange={(e) => setMarketingConsent(e.target.checked)}
-                className="w-4 h-4 mt-0.5 accent-black rounded"
-              />
-              <span className="text-xs text-gray-500 leading-snug">
-                [선택] 이벤트 할인 혜택 및 신상품 입고 알림 수신 동의
-              </span>
-            </label>
+            {/* 개별 약관 목록 */}
+            <div className="space-y-2.5 px-1">
+              {/* 1. 서비스 이용약관 (필수) */}
+              <div className="flex items-center justify-between text-xs">
+                <label className="flex items-center gap-2 cursor-pointer flex-1">
+                  <input 
+                    type="checkbox"
+                    checked={serviceTermsAgreed}
+                    onChange={(e) => setServiceTermsAgreed(e.target.checked)}
+                    className="w-4 h-4 accent-black rounded"
+                  />
+                  <span className="text-gray-700">
+                    <span className="text-rose-600 font-bold">[필수]</span> 서비스 이용약관 동의
+                  </span>
+                </label>
+                <button 
+                  type="button"
+                  onClick={() => setActiveLegalDoc('TERMS_OF_SERVICE')}
+                  className="text-[11px] text-gray-400 hover:text-black underline flex items-center gap-0.5 ml-2"
+                >
+                  <span>내용 보기</span>
+                  <ChevronRight size={12} />
+                </button>
+              </div>
+
+              {/* 2. 개인정보 수집 및 이용 (필수) */}
+              <div className="flex items-center justify-between text-xs">
+                <label className="flex items-center gap-2 cursor-pointer flex-1">
+                  <input 
+                    type="checkbox"
+                    checked={privacyPolicyAgreed}
+                    onChange={(e) => setPrivacyPolicyAgreed(e.target.checked)}
+                    className="w-4 h-4 accent-black rounded"
+                  />
+                  <span className="text-gray-700">
+                    <span className="text-rose-600 font-bold">[필수]</span> 개인정보 수집 및 이용 동의
+                  </span>
+                </label>
+                <button 
+                  type="button"
+                  onClick={() => setActiveLegalDoc('PRIVACY_COLLECTION')}
+                  className="text-[11px] text-gray-400 hover:text-black underline flex items-center gap-0.5 ml-2"
+                >
+                  <span>내용 보기</span>
+                  <ChevronRight size={12} />
+                </button>
+              </div>
+
+              {/* 3. 마케팅 정보 수신 (선택) */}
+              <div className="flex items-center justify-between text-xs">
+                <label className="flex items-center gap-2 cursor-pointer flex-1">
+                  <input 
+                    type="checkbox"
+                    checked={marketingConsent}
+                    onChange={(e) => setMarketingConsent(e.target.checked)}
+                    className="w-4 h-4 accent-black rounded"
+                  />
+                  <span className="text-gray-600">
+                    <span className="text-gray-400 font-semibold">[선택]</span> 혜택·이벤트 및 신상품 알림 수신
+                  </span>
+                </label>
+                <button 
+                  type="button"
+                  onClick={() => setActiveLegalDoc('MARKETING_CONSENT')}
+                  className="text-[11px] text-gray-400 hover:text-black underline flex items-center gap-0.5 ml-2"
+                >
+                  <span>내용 보기</span>
+                  <ChevronRight size={12} />
+                </button>
+              </div>
+            </div>
           </div>
 
           <button 
@@ -266,7 +370,7 @@ export const ShopRegister = () => {
             {isLoading ? (
               <span className="animate-pulse">가입 처리 중...</span>
             ) : (
-              <span>가입 완료하고 혜택 받기</span>
+              <span>가입 완료하고 70% 할인 받기</span>
             )}
           </button>
         </form>
@@ -284,6 +388,14 @@ export const ShopRegister = () => {
           </p>
         </div>
       </div>
+
+      {/* Reusable Legal Document Detail Modal */}
+      <LegalTermsModal 
+        isOpen={!!activeLegalDoc}
+        docType={activeLegalDoc}
+        onClose={() => setActiveLegalDoc(null)}
+        onAgree={handleModalAgree}
+      />
     </div>
   );
 };

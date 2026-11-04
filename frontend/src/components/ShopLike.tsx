@@ -3,6 +3,12 @@ import { ChevronLeft, Mail, CheckCircle2, Eye, EyeOff, AlertCircle } from 'lucid
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { api, setAuthToken } from '../services/api';
+import { 
+  KakaoOfficialSymbol, 
+  AppleOfficialSymbol, 
+  NaverOfficialSymbol, 
+  PaycoOfficialSymbol 
+} from './ui/AuthSymbols';
 
 export const ShopLike = () => {
   const { activeOverlay, setActiveOverlay, setUser } = useApp();
@@ -50,6 +56,12 @@ export const ShopLike = () => {
       const res = await api.login({ email: email.trim(), password });
       if (res?.success) {
         setAuthToken(res.token);
+        if (!rememberMe) {
+          // If rememberMe is false, clear on unload
+          window.sessionStorage.setItem('lr_session_only', '1');
+        } else {
+          window.sessionStorage.removeItem('lr_session_only');
+        }
         setUser(res.user);
         setLoginSuccess(true);
         showToast(`${res.user.name}님, 환영합니다!`, 'success');
@@ -68,19 +80,11 @@ export const ShopLike = () => {
 
   // 소셜 간편 로그인 안내 (공식 연동 준비 상태 명시)
   const handleSocialLogin = (provider: string) => {
-    showToast(`${provider} 간편 로그인은 현재 연동 준비 중입니다. 이메일 로그인을 이용해주세요.`, 'info');
-  };
-
-  const handleFillDemo = (type: 'ADMIN' | 'USER') => {
-    if (type === 'ADMIN') {
-      setEmail('admin@luxuryrental.com');
-      setPassword('admin1234!');
-      showToast('최고관리자(ADMIN) 테스트 계정 정보가 입력되었습니다.', 'info');
-    } else {
-      setEmail('customer@luxuryrental.com');
-      setPassword('luxury1234!');
-      showToast('일반회원(USER) 테스트 계정 정보가 입력되었습니다.', 'info');
-    }
+    setLoggingInProvider(provider);
+    setTimeout(() => {
+      setLoggingInProvider(null);
+      showToast(`${provider} 간편 로그인은 정식 서비스 런칭 시 오픈 예정입니다. 이메일 로그인을 이용해주세요.`, 'info');
+    }, 450);
   };
 
   return (
@@ -157,82 +161,71 @@ export const ShopLike = () => {
 
         {loginType === 'SOCIAL' ? (
           <div className="w-full max-w-sm flex flex-col items-center animate-fadeIn">
+            {/* Kakao Official Button */}
             <button 
               type="button"
               onClick={() => handleSocialLogin('카카오')}
               disabled={!!loggingInProvider}
-              className="w-full bg-[#FEE500] hover:bg-[#FADA0A] active:scale-[0.99] text-black text-[15px] font-extrabold py-3.5 rounded-xl flex items-center justify-center gap-2 mb-3 shadow-xs transition-all disabled:opacity-50"
+              className="w-full bg-[#FEE500] hover:bg-[#FADA0A] active:scale-[0.99] text-black text-[15px] font-extrabold py-3.5 rounded-xl flex items-center justify-center gap-2.5 mb-3 shadow-xs transition-all disabled:opacity-50"
             >
+              <KakaoOfficialSymbol className="w-5 h-5 shrink-0" />
               {loggingInProvider === '카카오' ? (
-                <span className="inline-block animate-pulse">카카오 로그인 진행중...</span>
+                <span className="inline-block animate-pulse">카카오 로그인 연결 중...</span>
               ) : (
                 '카카오로 3초만에 계속하기'
               )}
             </button>
 
+            {/* Apple Official Button */}
             <button 
               type="button"
               onClick={() => handleSocialLogin('Apple')}
               disabled={!!loggingInProvider}
-              className="w-full bg-white hover:bg-gray-50 active:scale-[0.99] border border-gray-900 text-black text-[15px] font-extrabold py-3.5 rounded-xl flex items-center justify-center gap-2 mb-6 shadow-xs transition-all disabled:opacity-50"
+              className="w-full bg-white hover:bg-gray-50 active:scale-[0.99] border border-gray-900 text-black text-[15px] font-extrabold py-3.5 rounded-xl flex items-center justify-center gap-2.5 mb-6 shadow-xs transition-all disabled:opacity-50"
             >
+              <AppleOfficialSymbol className="w-4 h-4 shrink-0" />
               {loggingInProvider === 'Apple' ? (
-                <span className="inline-block animate-pulse">Apple 로그인 진행중...</span>
+                <span className="inline-block animate-pulse">Apple 로그인 연결 중...</span>
               ) : (
                 'APPLE로 계속하기'
               )}
             </button>
 
-            <div className="flex gap-5 mb-8">
+            {/* Sub Social Row: Naver, PAYCO, Email Switch */}
+            <div className="flex items-center gap-5 mb-8">
               <button 
                 type="button"
                 aria-label="네이버 로그인"
+                title="네이버로 계속하기"
                 onClick={() => handleSocialLogin('네이버')}
-                className="w-12 h-12 bg-[#03C75A] hover:opacity-90 active:scale-95 rounded-full flex items-center justify-center text-white font-black text-xl shadow-xs transition"
+                disabled={!!loggingInProvider}
+                className="w-12 h-12 bg-[#03C75A] hover:bg-[#02b350] active:scale-95 rounded-full flex items-center justify-center text-white shadow-xs transition disabled:opacity-50"
               >
-                N
+                <NaverOfficialSymbol className="w-4 h-4" />
               </button>
               <button 
                 type="button"
                 aria-label="페이코 로그인"
+                title="PAYCO로 계속하기"
                 onClick={() => handleSocialLogin('페이코')}
-                className="w-12 h-12 bg-[#EA3323] hover:opacity-90 active:scale-95 rounded-full flex items-center justify-center text-white font-black text-xl shadow-xs transition"
+                disabled={!!loggingInProvider}
+                className="w-12 h-12 bg-[#EA3323] hover:bg-[#d82a1b] active:scale-95 rounded-full flex items-center justify-center text-white shadow-xs transition disabled:opacity-50"
               >
-                P
+                <PaycoOfficialSymbol className="w-5 h-5" />
               </button>
               <button 
                 type="button"
                 aria-label="이메일 로그인 전환"
+                title="이메일 로그인"
                 onClick={() => setLoginType('EMAIL')}
-                className="w-12 h-12 bg-[#4C51F7] hover:opacity-90 active:scale-95 rounded-full flex items-center justify-center text-white shadow-xs transition"
+                className="w-12 h-12 bg-[#4C51F7] hover:bg-[#3d42e0] active:scale-95 rounded-full flex items-center justify-center text-white shadow-xs transition"
               >
-                <Mail size={22} />
+                <Mail size={20} />
               </button>
             </div>
           </div>
         ) : (
           <form onSubmit={handleEmailLogin} className="w-full max-w-sm space-y-3.5 mb-6 animate-fadeIn">
-            {/* 🌟 개발/시연용 빠른 계정 입력 배너 */}
-            <div className="bg-gray-50 border border-gray-200/80 rounded-xl p-2.5 flex items-center justify-between text-xs">
-              <span className="text-[11px] font-bold text-gray-500">빠른 테스트:</span>
-              <div className="flex gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => handleFillDemo('ADMIN')}
-                  className="px-2 py-1 bg-white hover:bg-gray-100 text-gray-900 border border-gray-200 rounded-md font-bold text-[10px] transition"
-                >
-                  👑 관리자
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleFillDemo('USER')}
-                  className="px-2 py-1 bg-white hover:bg-gray-100 text-gray-900 border border-gray-200 rounded-md font-bold text-[10px] transition"
-                >
-                  일반회원
-                </button>
-              </div>
-            </div>
-
             <div>
               <input 
                 type="email"
@@ -263,7 +256,7 @@ export const ShopLike = () => {
             </div>
 
             <div className="flex items-center justify-between text-xs pt-1 pb-1">
-              <label className="flex items-center gap-2 cursor-pointer text-gray-600 font-medium">
+              <label className="flex items-center gap-2 cursor-pointer text-gray-600 font-medium select-none">
                 <input 
                   type="checkbox"
                   checked={rememberMe}

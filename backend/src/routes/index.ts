@@ -7,6 +7,7 @@ import { categoryRouter } from './category.routes.js';
 import { searchRouter } from './search.routes.js';
 import { sellRouter } from './sell.routes.js';
 import { adminRouter } from './admin.routes.js';
+import { legalRouter } from './legal.routes.js';
 
 export const apiRouter = Router();
 
@@ -21,6 +22,7 @@ apiRouter.get('/health', (_req, res) => {
 // 3. Domain routes
 apiRouter.use('/auth', authRouter);
 apiRouter.use('/users', userRouter);
+apiRouter.use('/legal', legalRouter);
 apiRouter.use('/products', productRouter);
 apiRouter.use('/categories', categoryRouter);
 apiRouter.use('/search', searchRouter);

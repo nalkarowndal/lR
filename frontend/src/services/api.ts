@@ -58,7 +58,16 @@ export const api = {
   },
 
   // Auth Endpoints
-  register: async (payload: { email: string; password: string; name: string; phone?: string; termsAgreed: boolean; marketingConsent?: boolean }) => {
+  register: async (payload: { 
+    email: string; 
+    password: string; 
+    name: string; 
+    phone?: string; 
+    termsAgreed?: boolean;
+    serviceTermsAgreed?: boolean;
+    privacyPolicyAgreed?: boolean;
+    marketingConsent?: boolean 
+  }) => {
     return fetchJson<{ success: boolean; message: string; token: string; user: any }>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(payload)
@@ -262,6 +271,26 @@ export const api = {
     return fetchJson<{ success: boolean; data: any }>('/admin/messages', {
       method: 'POST',
       body: JSON.stringify(msg)
+    });
+  },
+
+  // Legal Documents & Consents
+  getLegalDocuments: async () => {
+    return fetchJson<{ success: boolean; data: any[] }>('/legal');
+  },
+
+  getLegalDocument: async (docType: string) => {
+    return fetchJson<{ success: boolean; data: any }>(`/legal/${docType}`);
+  },
+
+  getUserConsents: async () => {
+    return fetchJson<{ success: boolean; data: any[] }>('/legal/user/consents');
+  },
+
+  updateUserConsent: async (docType: string, agreed: boolean) => {
+    return fetchJson<{ success: boolean; message: string; consent: any }>('/legal/user/consents', {
+      method: 'PUT',
+      body: JSON.stringify({ docType, agreed })
     });
   }
 };

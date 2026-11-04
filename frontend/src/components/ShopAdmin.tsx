@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 
@@ -37,6 +37,34 @@ export const ShopAdmin = () => {
   const [newImagePath, setNewImagePath] = useState('');
   const [newImageAlt, setNewImageAlt] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [isNewPrimary, setIsNewPrimary] = useState(false);
+  const adminFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleGalleryFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      showAlert('파일 형식 오류', '이미지 파일만 등록 가능합니다.');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      showAlert('용량 초과', '이미지 파일은 최대 5MB까지 등록 가능합니다.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setNewImagePath(reader.result);
+        if (!newImageAlt && galleryProduct) {
+          setNewImageAlt(`${galleryProduct.brand || ''} ${galleryProduct.title} 추가 룩북`);
+        }
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const showAlert = (title: string, message: string, onConfirm?: () => void) => {
     setModal({ isOpen: true, title, message, onConfirm });
@@ -442,12 +470,46 @@ export const ShopAdmin = () => {
 
                   {/* Add Image Form */}
                   <form onSubmit={handleAddImage} className="space-y-3 pt-3 border-t border-white/10">
-                    <h4 className="text-xs font-bold text-gray-300">새 이미지 등록</h4>
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-bold text-gray-300">새 이미지 등록</h4>
+                      <input 
+                        type="file" 
+                        ref={adminFileInputRef} 
+                        onChange={handleGalleryFileChange} 
+                        accept="image/png, image/jpeg, image/webp" 
+                        className="hidden" 
+                      />
+                      <button 
+                        type="button" 
+                        onClick={() => adminFileInputRef.current?.click()}
+                        className="px-3 py-1 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-[11px] font-bold text-white transition flex items-center gap-1.5"
+                      >
+                        📁 파일에서 선택
+                      </button>
+                    </div>
+
+                    {newImagePath && (
+                      <div className="flex items-center gap-3 p-2 bg-white/5 border border-white/10 rounded-xl">
+                        <img src={newImagePath} alt="등록 미리보기" className="w-12 h-12 object-cover rounded-lg border border-white/20 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[11px] text-gray-200 font-bold truncate">등록 대기 이미지 선택됨</p>
+                          <p className="text-[10px] text-gray-400 truncate">{newImagePath.slice(0, 40)}...</p>
+                        </div>
+                        <button 
+                          type="button"
+                          onClick={() => setNewImagePath('')}
+                          className="text-xs text-rose-400 hover:text-rose-300 px-2 py-1"
+                        >
+                          취소
+                        </button>
+                      </div>
+                    )}
+
                     <input 
                       type="text" 
                       value={newImagePath} 
                       onChange={e => setNewImagePath(e.target.value)} 
-                      placeholder="이미지 파일 경로 (예: /assets/products/bags/sample.jpg)" 
+                      placeholder="이미지 파일 경로 또는 URL (예: /assets/products/bags/sample.jpg)" 
                       required 
                       className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-white/30"
                     />
@@ -458,10 +520,21 @@ export const ShopAdmin = () => {
                       placeholder="대체 텍스트 (예: 정면 룩북 사진)" 
                       className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-white/30"
                     />
+
+                    <label className="flex items-center gap-2 cursor-pointer text-xs text-gray-300">
+                      <input 
+                        type="checkbox" 
+                        checked={isNewPrimary} 
+                        onChange={e => setIsNewPrimary(e.target.checked)} 
+                        className="rounded accent-white" 
+                      />
+                      <span>대표 이미지로 설정</span>
+                    </label>
+
                     <button 
                       type="submit" 
                       disabled={isUploading}
-                      className="w-full bg-white text-black hover:bg-gray-200 py-3 rounded-xl font-black text-xs transition disabled:opacity-50"
+                      className="w-full bg-white text-black hover:bg-gray-200 py-3 rounded-xl font-black text-xs transition disabled:opacity-50 shadow-sm"
                     >
                       {isUploading ? '등록 처리 중...' : '이미지 추가 등록'}
                     </button>

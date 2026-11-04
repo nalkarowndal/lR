@@ -24,3 +24,4 @@ export const AnimatedView: React.FC<AnimatedViewProps> = ({ children, viewKey, c
     </div>
   );
 };
+

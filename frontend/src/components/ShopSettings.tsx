@@ -8,6 +8,7 @@ import { useToast } from '../context/ToastContext';
 import { Modal } from './ui/Modal';
 import { ConfirmDialog } from './ui/ConfirmDialog';
 import { api } from '../services/api';
+import { LegalTermsModal } from './ui/LegalTermsModal';
 
 export const ShopSettings: React.FC = () => {
   const { 
@@ -21,6 +22,7 @@ export const ShopSettings: React.FC = () => {
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const [showCustomerCenterModal, setShowCustomerCenterModal] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
+  const [activeLegalDoc, setActiveLegalDoc] = useState<'TERMS_OF_SERVICE' | 'PRIVACY_POLICY' | null>(null);
   const [showFaqModal, setShowFaqModal] = useState(false);
 
   // Password change state
@@ -538,20 +540,54 @@ export const ShopSettings: React.FC = () => {
         onClose={() => setShowTermsModal(false)}
         title="이용약관 및 방침"
       >
-        <div className="space-y-3 text-xs text-gray-600 max-h-[60vh] overflow-y-auto leading-relaxed pr-1">
-          <h3 className="font-bold text-gray-900 text-xs">제1조 (목적)</h3>
-          <p>본 약관은 (주)럭셔리렌탈이 운영하는 명품 렌탈 및 커머스 플랫폼 서비스의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
-          <h3 className="font-bold text-gray-900 text-xs">제2조 (개인정보 보호)</h3>
-          <p>회사는 이용자의 개인정보 수집 시 서비스 제공을 위하여 필요한 최소한의 대상을 수집하며, 관계 법령이 정하는 바에 따라 철저히 보호합니다.</p>
+        <div className="space-y-3 text-xs text-gray-600 leading-relaxed pr-1">
+          <p className="text-gray-500 mb-2">확인하실 약관 및 정책 문서를 선택해주세요.</p>
+          <button
+            type="button"
+            onClick={() => {
+              setShowTermsModal(false);
+              setActiveLegalDoc('TERMS_OF_SERVICE');
+            }}
+            className="w-full p-3.5 bg-gray-50 hover:bg-gray-100 rounded-xl flex items-center justify-between text-left border border-gray-200/70 transition"
+          >
+            <div>
+              <h4 className="font-bold text-gray-900 text-xs">서비스 이용약관 (v2.1)</h4>
+              <p className="text-[11px] text-gray-500">명품 렌트, 구매 및 판매 기본 규정</p>
+            </div>
+            <ChevronRight size={16} className="text-gray-400" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setShowTermsModal(false);
+              setActiveLegalDoc('PRIVACY_POLICY');
+            }}
+            className="w-full p-3.5 bg-gray-50 hover:bg-gray-100 rounded-xl flex items-center justify-between text-left border border-gray-200/70 transition"
+          >
+            <div>
+              <h4 className="font-bold text-gray-900 text-xs">개인정보 처리방침 (v2.1)</h4>
+              <p className="text-[11px] text-gray-500">개인정보 보호 및 안전성 조치</p>
+            </div>
+            <ChevronRight size={16} className="text-gray-400" />
+          </button>
+
           <button
             type="button"
             onClick={() => setShowTermsModal(false)}
             className="w-full py-2.5 bg-black text-white rounded-xl font-bold text-xs hover:bg-gray-800 transition mt-2"
           >
-            확인 완료
+            닫기
           </button>
         </div>
       </Modal>
+
+      {/* 5.1 상세 전문 뷰어 모달 */}
+      <LegalTermsModal
+        isOpen={!!activeLegalDoc}
+        docType={activeLegalDoc}
+        onClose={() => setActiveLegalDoc(null)}
+      />
 
       {/* 6. 회원탈퇴 안내 모달 */}
       <Modal

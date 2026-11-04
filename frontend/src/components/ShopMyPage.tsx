@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   ArrowLeft, Settings, Heart, ShoppingBag, Clock, PackageCheck, 
-  Edit3, ShieldCheck, UserCheck, AlertCircle, Sparkles
+  Edit3, ShieldCheck, UserCheck, AlertCircle, Sparkles, UploadCloud, RotateCcw
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
@@ -27,6 +27,32 @@ export const ShopMyPage: React.FC = () => {
   const [editAvatar, setEditAvatar] = useState('');
   const [editError, setEditError] = useState('');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setEditError('이미지 파일(JPG, PNG, WEBP 등)만 등록 가능합니다.');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      setEditError('이미지 파일 크기는 최대 2MB까지 등록 가능합니다.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setEditAvatar(reader.result);
+        setEditError('');
+        showToast('프로필 사진이 로컬에서 선택되었습니다.', 'info');
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Filter favorited products
   const favoritedProducts = products.filter(p => favorites.includes(p.id));
@@ -445,15 +471,61 @@ export const ShopMyPage: React.FC = () => {
             />
           </div>
 
+          {/* 프로필 이미지 선택 및 미리보기 */}
           <div>
-            <label className="block text-xs font-bold text-gray-700 mb-1">프로필 이미지 URL (선택)</label>
-            <input
-              type="url"
-              value={editAvatar}
-              onChange={e => setEditAvatar(e.target.value)}
-              placeholder="https://example.com/avatar.jpg"
-              className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-black"
-            />
+            <label className="block text-xs font-bold text-gray-700 mb-2">프로필 사진</label>
+            <div className="flex items-center gap-4 p-3 bg-gray-50 border border-gray-200/80 rounded-2xl">
+              <div className="relative w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center border-2 border-white shadow-sm shrink-0">
+                {editAvatar ? (
+                  <img src={editAvatar} alt="미리보기" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="font-bold text-lg text-gray-500">
+                    {editName ? editName.slice(0, 1).toUpperCase() : 'U'}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex-1 space-y-1.5">
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={handleAvatarFileChange} 
+                  accept="image/png, image/jpeg, image/webp" 
+                  className="hidden" 
+                />
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-3 py-1.5 bg-black hover:bg-gray-800 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-xs"
+                  >
+                    <UploadCloud size={14} />
+                    <span>사진 업로드</span>
+                  </button>
+                  {editAvatar && (
+                    <button
+                      type="button"
+                      onClick={() => setEditAvatar('')}
+                      className="px-2.5 py-1.5 border border-gray-300 hover:bg-gray-200/70 text-gray-700 rounded-lg text-xs font-medium transition flex items-center gap-1"
+                    >
+                      <RotateCcw size={12} />
+                      <span>기본값</span>
+                    </button>
+                  )}
+                </div>
+                <p className="text-[10px] text-gray-400">JPG, PNG, WEBP 최대 2MB</p>
+              </div>
+            </div>
+
+            <div className="mt-2.5">
+              <input
+                type="text"
+                value={editAvatar}
+                onChange={e => setEditAvatar(e.target.value)}
+                placeholder="또는 이미지 URL 직접 입력 (선택)"
+                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black"
+              />
+            </div>
           </div>
 
           <div className="flex gap-2 pt-2">

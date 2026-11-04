@@ -71,3 +71,4 @@ export const ProtectedAdminView: React.FC<ProtectedAdminViewProps> = ({ children
 
   return <>{children}</>;
 };
+

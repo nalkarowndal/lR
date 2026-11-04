@@ -83,3 +83,30 @@
 | `44_admin_shop_add_product_modal.png` | '신규 상품 등록' 버튼 클릭 시 등록 완료 글래스모피즘 모달 | 1920x1080 Desktop |
 | `45_admin_shop_product_added_list.png` | 신규 렌탈 상품 카드(프리미엄 렌탈 상품)가 추가된 관리 리스트 | 1920x1080 Desktop |
 | `46_admin_return_to_app.png` | '앱으로 돌아가기' 버튼 클릭 후 쇼핑몰 메인 화면으로 복귀 | 1920x1080 Desktop |
+
+---
+
+## 7. 공통 설정 및 마이페이지 시스템 (`docs/screenshots_phase2/`)
+| 파일명 | 설명 | 해상도/뷰 |
+| :--- | :--- | :--- |
+| `47_settings_page_unauthenticated.png` | 비로그인 상태에서 톱니바퀴 클릭 시 공통 설정 페이지 | 1440x950 Desktop |
+| `48_mypage_unauthenticated_login_prompt.png` | 비로그인 상태에서 하단 바 마이페이지 접근 시 로그인 안내 모달 | 1440x950 Desktop |
+| `49_settings_page_user_authenticated.png` | 일반 회원(USER) 로그인 상태의 공통 설정 페이지 (관리자 카드 미노출) | 1440x950 Desktop |
+| `50_mypage_user_authenticated.png` | 일반 회원 마이페이지: 프로필, 찜 목록 그리드, 판매 신청 내역 | 1440x950 Desktop |
+| `51_settings_page_admin_with_dashboard_card.png` | 최고관리자(ADMIN) 설정 페이지: 상단 관리자 대시보드 진입 카드 노출 | 1440x950 Desktop |
+| `52_mypage_admin_authenticated.png` | 최고관리자 마이페이지: ADMIN 뱃지 및 관리 권한 표시 | 1440x950 Desktop |
+
+---
+
+## 8. 공식 소셜 인증, 세부 약관 시스템 및 룩북 에셋 (`docs/screenshots_phase2/`)
+| 파일명 | 설명 | 해상도/뷰 |
+| :--- | :--- | :--- |
+| `53_login_official_social_buttons.png` | 카카오/Apple/네이버/PAYCO 공식 브랜드 로고 및 벡터 아이콘 적용 | 1440x950 Desktop |
+| `53_1_login_clean_email_no_quick_test.png` | 이메일 로그인 탭: '빠른 테스트' 배너 및 하드코딩 계정 버튼 완전 제거 | 1440x950 Desktop |
+| `54_register_granular_legal_terms.png` | 회원가입 폼: [전체 동의], [필수] 2종, [선택] 1종 및 [내용 보기] 버튼 | 1440x950 Desktop |
+| `55_register_legal_terms_modal_preview.png` | 이용약관 상세 전문 뷰어 모달 (v2.1, 시행일, 조항 스크롤 및 동의 완료 액션) | 1440x950 Desktop |
+| `56_settings_legal_terms_choice_modal.png` | 설정 페이지 약관 선택 모달: 서비스 이용약관 및 개인정보처리방침 선택 | 1440x950 Desktop |
+| `57_mypage_avatar_file_upload.png` | 마이페이지 프로필 수정 모달: 사진 파일 선택, 실시간 미리보기 및 기본값 복원 | 1440x950 Desktop |
+| `58_admin_gallery_file_upload.png` | 관리자 상품 갤러리 모달: 파일 직접 선택, 썸네일 미리보기, 대표 이미지 토글 | 1440x950 Desktop |
+| `59_main_recommendations_with_all_images.png` | 메인 맞춤 추천 피드: 18대 가방 및 전체 추천 상품의 100% 고해상도 스튜디오 룩북 로드 | 1440x950 Desktop |
+

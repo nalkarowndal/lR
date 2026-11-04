@@ -12,6 +12,7 @@ import {
   LuxuryLuggageIcon, LuxuryJewelryIcon
 } from './ui/LuxuryIcons';
 import { ProductImage } from './ui/ProductImage';
+import { LegalTermsModal } from './ui/LegalTermsModal';
 
 // ==========================================
 // 커스텀 SVG 아이콘 (lucide-react 에러 대체용)
@@ -85,6 +86,7 @@ export const ShopMain = () => {
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState('20대 여성');
   const [serviceInfoModal, setServiceInfoModal] = useState<{ title: string; desc: string } | null>(null);
+  const [activeLegalDoc, setActiveLegalDoc] = useState<'TERMS_OF_SERVICE' | 'PRIVACY_POLICY' | null>(null);
 
   const currentRecommendList = RECOMMENDATIONS_DATA[activeTab] || RECOMMENDATIONS_DATA['20대 여성'];
 
@@ -476,12 +478,48 @@ export const ShopMain = () => {
 
         <footer className="text-xs text-gray-500 border-t border-gray-100 pt-6">
           <div className="flex flex-wrap gap-x-4 gap-y-2 mb-6 font-semibold">
-            <span className="hover:text-black cursor-pointer">고객센터</span>
-            <span className="hover:text-black cursor-pointer">정책안내</span>
-            <span className="hover:text-black cursor-pointer">이용약관</span>
-            <span className="font-extrabold text-gray-800 hover:text-black cursor-pointer">개인정보처리방침</span>
-            <span className="hover:text-black cursor-pointer">입점신청</span>
-            <span className="hover:text-black cursor-pointer">제휴문의</span>
+            <span 
+              onClick={() => setServiceInfoModal({
+                title: 'LUXURYRENTAL 고객센터 안내',
+                desc: '운영시간: 평일 10:00 - 18:00 (점심시간 12:30 - 13:30 / 주말 및 공휴일 휴무)\n전화 문의: 1544-0000\n이메일 문의: support@luxuryrental.com\n카카오톡 채널: @럭셔리렌탈'
+              })}
+              className="hover:text-black cursor-pointer"
+            >
+              고객센터
+            </span>
+            <span 
+              onClick={() => setServiceInfoModal({
+                title: 'LUXURYRENTAL 정책 안내',
+                desc: '럭셔리렌탈은 100% 정품 인증 검수를 거친 정품만을 대여 및 판매하며, 가품 판정 시 200% 보상 제도를 운영하고 있습니다. 일상적인 경미 스크래치는 무상 케어 보증이 적용됩니다.'
+              })}
+              className="hover:text-black cursor-pointer"
+            >
+              정책안내
+            </span>
+            <span 
+              onClick={() => setActiveLegalDoc('TERMS_OF_SERVICE')}
+              className="hover:text-black cursor-pointer"
+            >
+              이용약관
+            </span>
+            <span 
+              onClick={() => setActiveLegalDoc('PRIVACY_POLICY')}
+              className="font-extrabold text-gray-800 hover:text-black cursor-pointer"
+            >
+              개인정보처리방침
+            </span>
+            <span 
+              onClick={() => showToast('입점 제휴 문의는 support@luxuryrental.com 으로 사업자등록증과 브랜드 소개서를 보내주세요.', 'info')}
+              className="hover:text-black cursor-pointer"
+            >
+              입점신청
+            </span>
+            <span 
+              onClick={() => showToast('마케팅 및 파트너십 문의는 contact@luxuryrental.com 으로 접수해주세요.', 'info')}
+              className="hover:text-black cursor-pointer"
+            >
+              제휴문의
+            </span>
           </div>
 
           <div className="flex justify-between items-center mb-6">
@@ -601,6 +639,13 @@ export const ShopMain = () => {
           </div>
         </div>
       </Modal>
+
+      {/* 9. 이용약관 및 개인정보처리방침 공통 모달 */}
+      <LegalTermsModal
+        isOpen={!!activeLegalDoc}
+        docType={activeLegalDoc}
+        onClose={() => setActiveLegalDoc(null)}
+      />
     </div>
   );
 };

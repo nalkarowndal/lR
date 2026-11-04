@@ -28,3 +28,4 @@ router.delete('/me/favorites/:productId', removeFavorite);
 router.get('/me/sell-requests', getMySellRequests);
 
 export default router;
+
