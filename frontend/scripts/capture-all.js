@@ -171,8 +171,8 @@ async function run() {
   });
   await sleep(400);
 
-  // 바텀 네비게이션 '마이럭셔리렌탈' 클릭으로 로그인 진입
-  await clickByText('span', '마이럭셔리렌탈');
+  // 바텀 네비게이션 '마이페이지'/'마이럭셔리렌탈' 클릭으로 로그인 진입
+  const myPageClicked = (await clickByText('span', '마이럭셔리렌탈')) || (await clickByText('span', '마이페이지'));
   await sleep(400);
   await page.screenshot({ path: path.join(outputDir, '17_login_overlay_from_bottom_mypage.png') });
 
@@ -262,11 +262,32 @@ async function run() {
   // 데스크탑 고해상도 해상도로 확장
   await page.setViewport({ width: 1920, height: 1080 });
   
-  // 관리센터 진입 (헤더의 톱니바퀴 아이콘 클릭)
+  // 관리자 세션 토큰 주입 (ProtectedAdminView 보안 가드 통과)
+  await page.evaluate(async () => {
+    try {
+      const res = await fetch('http://127.0.0.1:4000/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'admin@luxuryrental.com', password: 'admin1234!' })
+      });
+      const data = await res.json();
+      if (data.token) {
+        localStorage.setItem('lr_token', data.token);
+      }
+    } catch (e) {}
+  });
+  await page.reload({ waitUntil: 'networkidle0' });
+  await sleep(600);
+
+  // 헤더의 톱니바퀴 아이콘 클릭 -> 공통 설정 페이지 진입
   await page.evaluate(() => {
     const adminBtn = document.querySelector('button > svg.lucide-settings')?.parentElement;
     if (adminBtn) adminBtn.click();
   });
+  await sleep(400);
+
+  // 관리자 설정 페이지에서 '관리자 대시보드 진입' 버튼 클릭!
+  await clickByText('button', '진입');
   await sleep(600);
   await page.screenshot({ path: path.join(outputDir, '31_admin_recruit_dashboard_store.png') });
 

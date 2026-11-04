@@ -36,3 +36,4 @@ frontend/public/assets/
 ├── banners/            # 메인 기획전 및 회원가입 프로모션 배너
 └── placeholders/       # 오프라인 및 에러 대응 Fallback SVG
 ```
+

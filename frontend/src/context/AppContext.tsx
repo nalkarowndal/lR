@@ -1,9 +1,26 @@
-import React, { useState, useEffect, createContext, useContext, type ReactNode } from 'react';
+import React, { useState, useEffect, createContext, useContext, type ReactNode, useCallback } from 'react';
 import { api, setAuthToken } from '../services/api';
 
-export type ViewState = 'SHOP_MAIN' | 'SHOP_ADMIN' | 'RECRUIT_APP' | 'SHOP_CATEGORY' | 'SHOP_SELL';
+export type ViewState = 
+  | 'SHOP_MAIN' 
+  | 'SHOP_CATEGORY' 
+  | 'SHOP_SELL' 
+  | 'SHOP_MY_PAGE' 
+  | 'SHOP_SETTINGS' 
+  | 'SHOP_ADMIN' 
+  | 'RECRUIT_APP';
+
 export type Role = 'STORE' | 'ADMIN';
-export type OverlayState = 'SEARCH' | 'LOGIN' | 'REGISTER' | 'FORGOT_PASSWORD' | null;
+export type OverlayState = 'SEARCH' | 'LOGIN' | 'REGISTER' | 'FORGOT_PASSWORD' | 'PROFILE_EDIT' | null;
+export type TransitionDirection = 'forward' | 'backward' | 'none';
+
+export interface UserSettings {
+  service_notifications: boolean;
+  marketing_notifications: boolean;
+  product_notifications: boolean;
+  reduce_animations: boolean;
+  theme: 'light' | 'dark';
+}
 
 export interface User {
   id: number;
@@ -11,6 +28,7 @@ export interface User {
   name: string;
   role: 'USER' | 'ADMIN';
   phone?: string;
+  avatar_url?: string;
 }
 
 export interface RecruitRequest {
@@ -56,12 +74,27 @@ export interface Product {
 interface AppContextType {
   currentView: ViewState;
   setCurrentView: React.Dispatch<React.SetStateAction<ViewState>>;
+  transitionDirection: TransitionDirection;
+  navigateTo: (view: ViewState) => void;
+  goBack: (fallbackView?: ViewState) => void;
+  isNavigating: boolean;
+  
   activeOverlay: OverlayState;
   setActiveOverlay: React.Dispatch<React.SetStateAction<OverlayState>>;
+  
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  isAuthLoading: boolean;
   logoutUser: () => Promise<void>;
   checkUserAuth: () => Promise<void>;
+  
+  userSettings: UserSettings;
+  updateUserSettings: (newSettings: Partial<UserSettings>) => Promise<void>;
+  
+  favorites: number[];
+  toggleFavorite: (productId: number) => Promise<boolean>;
+  isFavorite: (productId: number) => boolean;
+
   role: Role;
   setRole: React.Dispatch<React.SetStateAction<Role>>;
   requests: RecruitRequest[];
@@ -80,10 +113,25 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [currentView, setCurrentView] = useState<ViewState>('SHOP_MAIN');
+  const [viewHistory, setViewHistory] = useState<ViewState[]>(['SHOP_MAIN']);
+  const [transitionDirection, setTransitionDirection] = useState<TransitionDirection>('none');
+  const [isNavigating, setIsNavigating] = useState<boolean>(false);
+
   const [activeOverlay, setActiveOverlay] = useState<OverlayState>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
   const [role, setRole] = useState<Role>('STORE');
   const [isBackendConnected, setIsBackendConnected] = useState<boolean>(false);
+
+  const [userSettings, setUserSettings] = useState<UserSettings>({
+    service_notifications: true,
+    marketing_notifications: false,
+    product_notifications: true,
+    reduce_animations: false,
+    theme: 'light'
+  });
+
+  const [favorites, setFavorites] = useState<number[]>([]);
 
   // Fallback initial data
   const [requests, setRequests] = useState<RecruitRequest[]>([
@@ -102,16 +150,73 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     { id: 2, name: '이영희', phone: '010-8765-4321', exp: '주방 3년', checked: true },
   ]);
 
+  // Navigate with directional animation & debounce lock
+  const navigateTo = useCallback((view: ViewState) => {
+    if (view === currentView) return;
+    setIsNavigating(true);
+    setTransitionDirection('forward');
+    setCurrentView(view);
+    setViewHistory(prev => [...prev, view]);
+
+    setTimeout(() => {
+      setIsNavigating(false);
+    }, 280);
+  }, [currentView]);
+
+  // Go back with reverse animation
+  const goBack = useCallback((fallbackView: ViewState = 'SHOP_MAIN') => {
+    setIsNavigating(true);
+    setTransitionDirection('backward');
+
+    setViewHistory(prev => {
+      if (prev.length <= 1) {
+        setCurrentView(fallbackView);
+        return [fallbackView];
+      }
+      const nextHistory = prev.slice(0, -1);
+      const targetView = nextHistory[nextHistory.length - 1];
+      setCurrentView(targetView);
+      return nextHistory;
+    });
+
+    setTimeout(() => {
+      setIsNavigating(false);
+    }, 250);
+  }, []);
+
   const checkUserAuth = async () => {
     try {
-      const res = await api.getMe();
-      if (res?.success && res.user) {
-        setUser(res.user);
+      setIsAuthLoading(true);
+      const res = await api.getMyProfile();
+      if (res?.success && res.profile) {
+        setUser({
+          id: res.profile.id,
+          email: res.profile.email,
+          name: res.profile.name,
+          role: res.profile.role,
+          phone: res.profile.phone,
+          avatar_url: res.profile.avatar_url
+        });
+        if (res.profile.settings) {
+          setUserSettings(res.profile.settings);
+        }
       } else {
         setUser(null);
       }
     } catch {
-      setUser(null);
+      // Fallback: check basic session
+      try {
+        const basicRes = await api.getMe();
+        if (basicRes?.success && basicRes.user) {
+          setUser(basicRes.user);
+        } else {
+          setUser(null);
+        }
+      } catch {
+        setUser(null);
+      }
+    } finally {
+      setIsAuthLoading(false);
     }
   };
 
@@ -122,7 +227,60 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       setAuthToken(null);
     } finally {
       setUser(null);
+      setFavorites([]);
     }
+  };
+
+  const updateUserSettings = async (newSettings: Partial<UserSettings>) => {
+    setUserSettings(prev => ({ ...prev, ...newSettings }));
+    if (user) {
+      try {
+        await api.updateMySettings(newSettings);
+      } catch (err) {
+        console.warn('[AppContext] Failed to persist user settings:', err);
+      }
+    }
+  };
+
+  const loadFavorites = async () => {
+    if (!user) {
+      setFavorites([]);
+      return;
+    }
+    try {
+      const res = await api.getMyFavorites();
+      if (res?.success && Array.isArray(res.favorites)) {
+        setFavorites(res.favorites.map(f => f.id));
+      }
+    } catch {
+      // Offline fallback
+    }
+  };
+
+  const toggleFavorite = async (productId: number): Promise<boolean> => {
+    if (!user) {
+      setActiveOverlay('LOGIN');
+      return false;
+    }
+
+    const isFav = favorites.includes(productId);
+    if (isFav) {
+      setFavorites(prev => prev.filter(id => id !== productId));
+      try {
+        await api.removeFavorite(productId);
+      } catch {}
+      return false;
+    } else {
+      setFavorites(prev => [...prev, productId]);
+      try {
+        await api.addFavorite(productId);
+      } catch {}
+      return true;
+    }
+  };
+
+  const isFavorite = (productId: number): boolean => {
+    return favorites.includes(productId);
   };
 
   // Load and synchronize data from Node.js backend
@@ -131,6 +289,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       const health = await api.checkHealth();
       if (!health) {
         setIsBackendConnected(false);
+        setIsAuthLoading(false);
         return;
       }
       setIsBackendConnected(true);
@@ -171,6 +330,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch {
       setIsBackendConnected(false);
+      setIsAuthLoading(false);
     }
   };
 
@@ -178,10 +338,19 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     refreshData();
   }, []);
 
+  useEffect(() => {
+    if (user) {
+      loadFavorites();
+    }
+  }, [user]);
+
   return (
     <AppContext.Provider value={{ 
-      currentView, setCurrentView, activeOverlay, setActiveOverlay,
-      user, setUser, logoutUser, checkUserAuth,
+      currentView, setCurrentView, transitionDirection, navigateTo, goBack, isNavigating,
+      activeOverlay, setActiveOverlay,
+      user, setUser, isAuthLoading, logoutUser, checkUserAuth,
+      userSettings, updateUserSettings,
+      favorites, toggleFavorite, isFavorite,
       role, setRole, requests, setRequests, messages, setMessages, 
       workerDB, setWorkerDB, products, setProducts, isBackendConnected, refreshData
     }}>

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middlewares/auth.js';
 import { authRouter } from './auth.routes.js';
+import userRouter from './user.routes.js';
 import { productRouter } from './product.routes.js';
 import { categoryRouter } from './category.routes.js';
 import { searchRouter } from './search.routes.js';
@@ -19,6 +20,7 @@ apiRouter.get('/health', (_req, res) => {
 
 // 3. Domain routes
 apiRouter.use('/auth', authRouter);
+apiRouter.use('/users', userRouter);
 apiRouter.use('/products', productRouter);
 apiRouter.use('/categories', categoryRouter);
 apiRouter.use('/search', searchRouter);

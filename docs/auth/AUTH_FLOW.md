@@ -100,3 +100,4 @@ sequenceDiagram
     API-->>Frontend: 200 OK
     Frontend-->>User: 변경 완료 모달 -> 로그인 창 전환
 ```
+

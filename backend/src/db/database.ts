@@ -61,6 +61,7 @@ function initSchema(db: DatabaseSync) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS sell_requests (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER,
       brand_name TEXT NOT NULL,
       user_name TEXT NOT NULL DEFAULT '고객',
       status TEXT NOT NULL DEFAULT '접수완료',
@@ -116,6 +117,7 @@ function initSchema(db: DatabaseSync) {
       password_hash TEXT NOT NULL,
       name TEXT NOT NULL,
       phone TEXT DEFAULT '',
+      avatar_url TEXT DEFAULT '',
       role TEXT NOT NULL DEFAULT 'USER',
       marketing_consent INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -160,10 +162,40 @@ function initSchema(db: DatabaseSync) {
     );
   `);
 
-  // 12. Migration: Ensure products.image_url exists in existing databases
+  // 12. User Settings Table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS user_settings (
+      user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+      service_notifications INTEGER NOT NULL DEFAULT 1,
+      marketing_notifications INTEGER NOT NULL DEFAULT 0,
+      product_notifications INTEGER NOT NULL DEFAULT 1,
+      reduce_animations INTEGER NOT NULL DEFAULT 0,
+      theme TEXT NOT NULL DEFAULT 'light',
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `);
+
+  // 13. Favorites Table (찜 목록)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS favorites (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      UNIQUE(user_id, product_id)
+    );
+  `);
+
+  // 14. Non-destructive Migrations for existing database instances
   try {
     db.exec(`ALTER TABLE products ADD COLUMN image_url TEXT;`);
-  } catch {
-    // Column already exists
-  }
+  } catch {}
+
+  try {
+    db.exec(`ALTER TABLE users ADD COLUMN avatar_url TEXT DEFAULT '';`);
+  } catch {}
+
+  try {
+    db.exec(`ALTER TABLE sell_requests ADD COLUMN user_id INTEGER;`);
+  } catch {}
 }

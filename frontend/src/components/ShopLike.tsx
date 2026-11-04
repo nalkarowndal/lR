@@ -66,34 +66,20 @@ export const ShopLike = () => {
     }
   };
 
-  // 소셜 간편 로그인 (실제 데모 계정 세션 연동)
-  const handleSocialLogin = async (provider: string) => {
-    if (loggingInProvider) return;
-    setLoggingInProvider(provider);
-    setErrorMsg('');
+  // 소셜 간편 로그인 안내 (공식 연동 준비 상태 명시)
+  const handleSocialLogin = (provider: string) => {
+    showToast(`${provider} 간편 로그인은 현재 연동 준비 중입니다. 이메일 로그인을 이용해주세요.`, 'info');
+  };
 
-    try {
-      // 데모 편의를 위해 기본 고객 계정으로 실제 세션 생성
-      const res = await api.login({
-        email: 'customer@luxuryrental.com',
-        password: 'luxury1234!'
-      });
-
-      if (res?.success) {
-        setAuthToken(res.token);
-        setUser(res.user);
-        setLoginSuccess(true);
-        showToast(`${provider} 간편 로그인 완료! (${res.user.name}님)`, 'success');
-
-        setTimeout(() => {
-          setActiveOverlay(null);
-          setLoginSuccess(false);
-          setLoggingInProvider(null);
-        }, 650);
-      }
-    } catch (err: any) {
-      setErrorMsg(err?.message || `${provider} 로그인 연동 중 오류가 발생했습니다.`);
-      setLoggingInProvider(null);
+  const handleFillDemo = (type: 'ADMIN' | 'USER') => {
+    if (type === 'ADMIN') {
+      setEmail('admin@luxuryrental.com');
+      setPassword('admin1234!');
+      showToast('최고관리자(ADMIN) 테스트 계정 정보가 입력되었습니다.', 'info');
+    } else {
+      setEmail('customer@luxuryrental.com');
+      setPassword('luxury1234!');
+      showToast('일반회원(USER) 테스트 계정 정보가 입력되었습니다.', 'info');
     }
   };
 
@@ -226,6 +212,27 @@ export const ShopLike = () => {
           </div>
         ) : (
           <form onSubmit={handleEmailLogin} className="w-full max-w-sm space-y-3.5 mb-6 animate-fadeIn">
+            {/* 🌟 개발/시연용 빠른 계정 입력 배너 */}
+            <div className="bg-gray-50 border border-gray-200/80 rounded-xl p-2.5 flex items-center justify-between text-xs">
+              <span className="text-[11px] font-bold text-gray-500">빠른 테스트:</span>
+              <div className="flex gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => handleFillDemo('ADMIN')}
+                  className="px-2 py-1 bg-white hover:bg-gray-100 text-gray-900 border border-gray-200 rounded-md font-bold text-[10px] transition"
+                >
+                  👑 관리자
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleFillDemo('USER')}
+                  className="px-2 py-1 bg-white hover:bg-gray-100 text-gray-900 border border-gray-200 rounded-md font-bold text-[10px] transition"
+                >
+                  일반회원
+                </button>
+              </div>
+            </div>
+
             <div>
               <input 
                 type="email"

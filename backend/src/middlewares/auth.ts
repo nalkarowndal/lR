@@ -8,6 +8,7 @@ export interface AuthUser {
   name: string;
   role: 'USER' | 'ADMIN';
   phone?: string;
+  avatar_url?: string;
 }
 
 declare global {
@@ -33,7 +34,7 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
   try {
     const db = getDatabase();
     const row = db.prepare(`
-      SELECT u.id, u.email, u.name, u.role, u.phone 
+      SELECT u.id, u.email, u.name, u.role, u.phone, u.avatar_url 
       FROM sessions s
       JOIN users u ON u.id = s.user_id
       WHERE s.token = ? AND s.expires_at > datetime('now')
@@ -63,17 +64,17 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
 }
 
 /**
- * Requires verified ADMIN role or valid x-admin-key.
+ * Requires verified ADMIN role or valid x-admin-key (if configured).
  * Insecure client header spoofing (x-user-role) has been completely removed.
  */
 export function requireAdmin(req: Request, res: Response, next: NextFunction) {
-  // 1. Exact API Key match for server/cron automation
+  // 1. Exact API Key match for server/cron automation (disabled if adminApiKey is empty)
   const apiKey = req.headers['x-admin-key'];
-  if (apiKey && apiKey === config.adminApiKey) {
+  if (apiKey && config.adminApiKey && apiKey === config.adminApiKey) {
     return next();
   }
 
-  // 2. Strict Session Role Check
+  // 2. Strict Session Role Check (must have active session with role === 'ADMIN')
   if (!req.user || req.user.role !== 'ADMIN') {
     return res.status(403).json({
       success: false,

@@ -10,3 +10,4 @@ authRouter.get('/me', requireAuth, getMe);
 authRouter.post('/logout', logout);
 authRouter.post('/forgot-password', forgotPassword);
 authRouter.post('/reset-password', resetPassword);
+

@@ -122,7 +122,7 @@ flowchart TD
    - `ShopMain.tsx` L.56: `"LUXURYRENTAL"` (상단 헤더)
    - `ShopMain.tsx` L.253: `"(주)럭셔리 렌탈"`
    - `ShopMain.tsx` L.264: `"럭셔리렌탈은 고객님이 현금 결제한 금액에 대해..."`
-   - `ShopMain.tsx` L.297: `"마이럭셔리렌탈"` (바텀 바)
+   - `ShopMain.tsx` L.297: `"마이페이지"` (바텀 바)
    - `ShopLike.tsx` L.21: `"LUXURYRENTAL"`
    - `ShopAdmin.tsx` L.91: `"LUXURY RENTAL 통합 관리자 센터"`
 3. **처리 방침**:

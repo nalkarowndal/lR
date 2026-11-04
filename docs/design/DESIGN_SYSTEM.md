@@ -62,3 +62,4 @@ luxuryRental의 디자인 철학은 **"Modern Luxury & Minimal Commerce"**입니
 - 배경: `bg-gray-50`
 - 로딩: `animate-pulse bg-gray-200`
 - 에러 처리: `ProductVisualBadge` SVG 자동 대체
+

@@ -82,7 +82,7 @@ const BRAND_PRODUCTS_MAP: Record<string, BrandProduct[]> = {
 };
 
 export const ShopCategory = () => {
-  const { setCurrentView, setActiveOverlay } = useApp();
+  const { goBack, setActiveOverlay } = useApp();
   const [mainTab, setMainTab] = useState<'CATEGORY' | 'BRAND'>('CATEGORY');
   const [subTab, setSubTab] = useState('여성');
   const [leftActive, setLeftActive] = useState('가방/핸드백');
@@ -109,8 +109,8 @@ export const ShopCategory = () => {
         <button 
           type="button"
           aria-label="메인 화면으로 뒤로가기"
-          onClick={() => setCurrentView('SHOP_MAIN')}
-          className="p-1 -ml-1 text-gray-800 hover:text-black transition"
+          onClick={() => goBack('SHOP_MAIN')}
+          className="p-1 -ml-1 text-gray-800 hover:text-black transition active:scale-95"
         >
           <ChevronLeft size={24} />
         </button>

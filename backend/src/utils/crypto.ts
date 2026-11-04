@@ -38,3 +38,4 @@ export function generateSessionToken(): string {
 export function generateResetToken(): string {
   return crypto.randomBytes(16).toString('hex');
 }
+

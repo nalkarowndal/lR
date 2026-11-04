@@ -42,3 +42,4 @@ luxuryRental의 모션 시스템은 **"Discreet, Fluid, and Purposeful"** (절�
 - `@keyframes scaleUp`: 0% opacity 0, transform scale(0.95) -> 100% opacity 1, transform scale(1)
 - `@keyframes slideDown`: 0% opacity 0, transform translateY(-12px) -> 100% opacity 1, transform translateY(0)
 - `@keyframes slideUp`: 0% opacity 0, transform translateY(12px) -> 100% opacity 1, transform translateY(0)
+

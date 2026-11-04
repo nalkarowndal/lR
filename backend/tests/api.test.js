@@ -3,10 +3,15 @@ import assert from 'node:assert/strict';
 import { app } from '../dist/app.js';
 import { getDatabase } from '../dist/db/database.js';
 import { seedDatabase } from '../dist/db/seed.js';
+import { hashPassword } from '../dist/utils/crypto.js';
 
 // Setup database & seed
-getDatabase();
+const testDb = getDatabase();
 seedDatabase();
+testDb.prepare('UPDATE users SET password_hash = ? WHERE email = ?').run(
+  hashPassword('luxury1234!'),
+  'customer@luxuryrental.com'
+);
 
 test('Backend Health & API Endpoints Suite', async (t) => {
   let server;
@@ -401,6 +406,149 @@ test('Backend Health & API Endpoints Suite', async (t) => {
     const postData = await postRes.json();
     assert.equal(postRes.status, 201);
     assert.equal(postData.data.text, '승인 처리되었습니다.');
+  });
+
+  // ==========================================
+  // [USER PROFILE & SETTINGS & FAVORITES SUITE]
+  // ==========================================
+  await t.test('GET /users/me returns authenticated user profile & settings', async () => {
+    // Re-login customer since reset-password invalidated earlier sessions for security
+    const loginRes = await fetch(`${baseUrl}/auth/login`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        email: 'customer@luxuryrental.com',
+        password: 'luxury1234!'
+      })
+    });
+    const loginData = await loginRes.json();
+    assert.equal(loginRes.status, 200);
+    customerToken = loginData.token;
+
+    const res = await fetch(`${baseUrl}/users/me`, {
+      headers: { 'Authorization': `Bearer ${customerToken}` }
+    });
+    const data = await res.json();
+    assert.equal(res.status, 200);
+    assert.equal(data.success, true);
+    assert.equal(data.profile.email, 'customer@luxuryrental.com');
+    assert.equal(data.profile.role, 'USER');
+    assert.ok(data.profile.settings);
+    assert.equal(typeof data.profile.stats.favorites_count, 'number');
+  });
+
+  await t.test('PATCH /users/me updates name & strictly blocks role escalation', async () => {
+    const res = await fetch(`${baseUrl}/users/me`, {
+      method: 'PATCH',
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${customerToken}`
+      },
+      body: JSON.stringify({
+        name: '김럭셔리',
+        phone: '010-5555-6666',
+        role: 'ADMIN' // Malicious attempt to escalate role
+      })
+    });
+    const data = await res.json();
+    assert.equal(res.status, 200);
+    assert.equal(data.success, true);
+    assert.equal(data.profile.name, '김럭셔리');
+    assert.equal(data.profile.role, 'USER', 'Role must remain USER, rejecting client elevation attempt');
+  });
+
+  await t.test('PATCH /users/me/settings updates notifications & animation preferences', async () => {
+    const res = await fetch(`${baseUrl}/users/me/settings`, {
+      method: 'PATCH',
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${customerToken}`
+      },
+      body: JSON.stringify({
+        marketing_notifications: true,
+        reduce_animations: true
+      })
+    });
+    const data = await res.json();
+    assert.equal(res.status, 200);
+    assert.equal(data.success, true);
+    assert.equal(data.settings.marketing_notifications, true);
+    assert.equal(data.settings.reduce_animations, true);
+  });
+
+  await t.test('POST & GET & DELETE /users/me/favorites manages product wishlist', async () => {
+    // 1. Add favorite
+    const addRes = await fetch(`${baseUrl}/users/me/favorites/1`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${customerToken}` }
+    });
+    const addData = await addRes.json();
+    assert.equal(addRes.status, 200);
+    assert.equal(addData.success, true);
+
+    // 2. Get favorites
+    const getRes = await fetch(`${baseUrl}/users/me/favorites`, {
+      headers: { 'Authorization': `Bearer ${customerToken}` }
+    });
+    const getData = await getRes.json();
+    assert.equal(getRes.status, 200);
+    assert.equal(getData.success, true);
+    assert.ok(Array.isArray(getData.favorites));
+    assert.ok(getData.favorites.some(f => f.id === 1));
+
+    // 3. Remove favorite
+    const delRes = await fetch(`${baseUrl}/users/me/favorites/1`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${customerToken}` }
+    });
+    const delData = await delRes.json();
+    assert.equal(delRes.status, 200);
+    assert.equal(delData.success, true);
+  });
+
+  await t.test('PATCH /users/me/password verifies current password before updating', async () => {
+    // 1. Invalid current password rejects
+    const failRes = await fetch(`${baseUrl}/users/me/password`, {
+      method: 'PATCH',
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${customerToken}`
+      },
+      body: JSON.stringify({
+        currentPassword: 'wrongPassword123!',
+        newPassword: 'newLuxuryPass2026!'
+      })
+    });
+    assert.equal(failRes.status, 400);
+
+    // 2. Valid current password succeeds
+    const okRes = await fetch(`${baseUrl}/users/me/password`, {
+      method: 'PATCH',
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${customerToken}`
+      },
+      body: JSON.stringify({
+        currentPassword: 'luxury1234!',
+        newPassword: 'newLuxuryPass2026!'
+      })
+    });
+    const okData = await okRes.json();
+    assert.equal(okRes.status, 200);
+    assert.equal(okData.success, true);
+
+    // 3. Restore customer password for test idempotency
+    await fetch(`${baseUrl}/users/me/password`, {
+      method: 'PATCH',
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${customerToken}`
+      },
+      body: JSON.stringify({
+        currentPassword: 'newLuxuryPass2026!',
+        newPassword: 'luxury1234!'
+      })
+    });
   });
 
   await t.test('Server teardown', async () => {

@@ -10,5 +10,6 @@ export const config = {
     .split(',')
     .map(s => s.trim()),
   databasePath: process.env.DATABASE_PATH || path.resolve(process.cwd(), 'data', 'luxuryrental.sqlite'),
-  adminApiKey: process.env.ADMIN_API_KEY || 'luxury_admin_secret_key_2026'
+  // Dedicated server-to-server admin API key (empty if not configured, preventing default key exploits)
+  adminApiKey: process.env.ADMIN_API_KEY || ''
 };

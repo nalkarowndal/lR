@@ -152,3 +152,4 @@ export function deleteProductImage(req: Request, res: Response, next: NextFuncti
     next(err);
   }
 }
+

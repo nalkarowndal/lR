@@ -4,7 +4,7 @@ import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 
 export const ShopSell = () => {
-  const { setCurrentView } = useApp();
+  const { goBack } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBrand, setSelectedBrand] = useState<{ ko: string; en: string } | null>(null);
   const [showDirectModal, setShowDirectModal] = useState(false);
@@ -170,8 +170,8 @@ export const ShopSell = () => {
         <button 
           type="button"
           aria-label="메인 화면으로 뒤로가기"
-          onClick={() => setCurrentView('SHOP_MAIN')} 
-          className="p-1 -ml-1 text-gray-800 hover:text-black transition"
+          onClick={() => goBack('SHOP_MAIN')} 
+          className="p-1 -ml-1 text-gray-800 hover:text-black transition active:scale-95"
         >
           <ChevronLeft size={24} />
         </button>

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { 
+import {
   Search, ShoppingCart, Settings, Heart, User, Home, List, ChevronRight
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { 
+import { useToast } from '../context/ToastContext';
+import { Modal } from './ui/Modal';
+import {
   LuxuryDressIcon, LuxuryBagIcon, LuxuryHandshakeIcon, LuxuryGiftIcon,
   MenuHangerIcon, MenuTagIcon, MenuClockIcon, MenuMembershipIcon,
   MenuCareIcon, MenuVipIcon, MenuBuybackIcon, MenuInviteIcon,
@@ -16,22 +18,22 @@ import { ProductImage } from './ui/ProductImage';
 // ==========================================
 const ShoppingBagIcon = ({ size }: { size: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
+    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" />
   </svg>
 );
 
 const InstagramIcon = ({ size }: { size: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
   </svg>
 );
 
 const YoutubeIcon = ({ size }: { size: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/>
-    <path d="m10 15 5-3-5-3z"/>
+    <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" />
+    <path d="m10 15 5-3-5-3z" />
   </svg>
 );
 
@@ -79,16 +81,59 @@ const RECOMMENDATIONS_DATA: Record<string, Array<{
 };
 
 export const ShopMain = () => {
-  const { setCurrentView, setActiveOverlay, user, logoutUser } = useApp();
+  const { setCurrentView, navigateTo, setActiveOverlay, user, logoutUser } = useApp();
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState('20대 여성');
+  const [serviceInfoModal, setServiceInfoModal] = useState<{ title: string; desc: string } | null>(null);
 
   const currentRecommendList = RECOMMENDATIONS_DATA[activeTab] || RECOMMENDATIONS_DATA['20대 여성'];
 
+  const handleMenuClick = (title: string) => {
+    switch (title) {
+      case '렌트 소개':
+        setServiceInfoModal({
+          title: 'LUXURYRENTAL 렌트 서비스 소개',
+          desc: '원하는 명품을 1일 단위부터 자유롭게 렌탈할 수 있는 프리미엄 커머스 서비스입니다. 반납 시 무료 수거와 100% 전문 감정 정품 보증을 기본 제공합니다.'
+        });
+        break;
+      case '70% 할인':
+      case '오늘신규입고':
+        navigateTo('SHOP_CATEGORY');
+        break;
+      case '베이직멤버십':
+        setServiceInfoModal({
+          title: '베이직 멤버십 혜택',
+          desc: '매월 1회 무료 배송 쿠폰과 렌탈료 5% 추가 할인 적립 혜택을 드립니다. 마이페이지에서 간편하게 등록하실 수 있습니다.'
+        });
+        break;
+      case '렌트잇 케어':
+        setServiceInfoModal({
+          title: '렌트잇 케어 안심 보험',
+          desc: '렌탈 이용 중 발생하는 생활 스크래치, 미세 오염을 무상으로 복원해 드리는 안심 케어 서비스입니다.'
+        });
+        break;
+      case 'VIP':
+        setServiceInfoModal({
+          title: 'VIP 컨시어지 서비스',
+          desc: '하이엔드 명품 전담 큐레이터 1:1 매칭 및 희귀 에디션 우선 예약 혜택을 제공합니다.'
+        });
+        break;
+      case '바이백':
+        navigateTo('SHOP_SELL');
+        break;
+      case '친구 초대':
+        showToast('친구 초대 추천인 코드가 클립보드에 복사되었습니다! (가입 시 1만P 적립)', 'success');
+        break;
+      default:
+        navigateTo('SHOP_CATEGORY');
+    }
+  };
+
   return (
     <div className="flex flex-col h-full bg-gray-50 relative pb-28 overflow-y-auto scrollbar-hide w-full">
-      
+
       {/* 🌟 PC 화면 좌측에 정밀하게 고정되는 앱 다운로드 & QR 배너 */}
-      <aside 
+      <aside
         aria-label="앱 다운로드 배너"
         className="hidden lg:flex flex-col fixed right-[calc(50%+244px)] top-1/2 -translate-y-1/2 bg-white border border-gray-200/90 p-5 rounded-2xl shadow-xl w-64 z-40 transition-all"
       >
@@ -117,14 +162,14 @@ export const ShopMain = () => {
 
       {/* 1. Header */}
       <header className="sticky top-0 bg-white/95 backdrop-blur-md z-50 px-4 py-3 flex justify-between items-center border-b border-gray-100 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
-        <h1 
-          className="text-xl font-black tracking-tighter cursor-pointer select-none text-gray-950" 
+        <h1
+          className="text-xl font-black tracking-tighter cursor-pointer select-none text-gray-950"
           onClick={() => setCurrentView('SHOP_MAIN')}
         >
           LUXURYRENTAL
         </h1>
         <div className="flex items-center gap-3 text-gray-800">
-          <button 
+          <button
             type="button"
             aria-label="상품 검색 열기"
             onClick={() => setActiveOverlay('SEARCH')}
@@ -133,7 +178,7 @@ export const ShopMain = () => {
             <Search size={22} />
           </button>
 
-          <button 
+          <button
             type="button"
             aria-label="장바구니 및 로그인"
             onClick={() => setActiveOverlay('LOGIN')}
@@ -142,11 +187,11 @@ export const ShopMain = () => {
             <ShoppingCart size={22} />
           </button>
 
-          <button 
+          <button
             type="button"
-            aria-label="관리자 센터로 이동"
-            onClick={() => setCurrentView('SHOP_ADMIN')} 
-            className="text-indigo-600 bg-indigo-50/80 p-1.5 rounded-full hover:bg-indigo-100 active:scale-95 transition shadow-sm"
+            aria-label="설정 센터로 이동"
+            onClick={() => navigateTo('SHOP_SETTINGS')}
+            className="text-gray-700 bg-gray-100 p-1.5 rounded-full hover:bg-gray-200 active:scale-95 transition shadow-sm"
           >
             <Settings size={21} />
           </button>
@@ -159,9 +204,9 @@ export const ShopMain = () => {
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[11px] font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md tracking-tight">
-                {user.role === 'ADMIN' ? '👑 관리자' : '💎 VIP 프리미엄 회원'}
+                {user.role === 'ADMIN' ? '👑 최고관리자' : '일반 회원'}
               </span>
-              <button 
+              <button
                 type="button"
                 onClick={logoutUser}
                 className="text-xs font-bold text-gray-500 hover:text-black border border-gray-200 px-2.5 py-1 rounded-lg transition"
@@ -170,18 +215,18 @@ export const ShopMain = () => {
               </button>
             </div>
             <h2 className="text-xl font-extrabold text-gray-900 leading-snug tracking-tight">
-              반갑습니다, <span className="text-indigo-600 font-black">{user.name}</span>님!<br/>
+              반갑습니다, <span className="text-indigo-600 font-black">{user.name}</span>님!<br />
               오늘도 특별한 명품을 만나보세요
             </h2>
           </div>
         ) : (
           <div>
             <h2 className="text-xl font-extrabold text-gray-900 leading-snug mb-4 tracking-tight">
-              어서오세요, <span className="text-orange-500 font-black">로그인</span> 후<br/>리본즈를 이용해보세요
+              어서오세요, <span className="text-orange-500 font-black">로그인</span> 후<br />리본즈를 이용해보세요
             </h2>
-            <button 
+            <button
               type="button"
-              onClick={() => setActiveOverlay('LOGIN')} 
+              onClick={() => setActiveOverlay('LOGIN')}
               className="w-full bg-gray-900 hover:bg-black active:scale-[0.99] text-white font-bold py-3.5 rounded-xl mb-6 shadow-sm transition-all"
             >
               간편 로그인하기
@@ -192,11 +237,11 @@ export const ShopMain = () => {
         {/* 렌트하기 / 구매하기 / 판매하기 액션 카드 */}
         <div className="space-y-3 mb-6">
           <div className="grid grid-cols-2 gap-3">
-            <div 
+            <div
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setActiveOverlay('LOGIN')}
-              onClick={() => setActiveOverlay('LOGIN')}
+              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigateTo('SHOP_CATEGORY')}
+              onClick={() => navigateTo('SHOP_CATEGORY')}
               className="bg-pink-50/70 border border-pink-100 hover:border-pink-200 hover:shadow-md active:scale-[0.98] p-4 rounded-2xl flex flex-col justify-between cursor-pointer transition-all group"
             >
               <div>
@@ -204,18 +249,18 @@ export const ShopMain = () => {
                   첫 렌트 70% 할인
                 </span>
                 <h4 className="font-extrabold text-gray-900 text-base group-hover:text-pink-600 transition-colors">렌트하기</h4>
-                <p className="text-[11px] text-gray-500 mt-0.5 leading-tight">특별한 날,<br/>마음껏 렌트하기</p>
+                <p className="text-[11px] text-gray-500 mt-0.5 leading-tight">특별한 날,<br />마음껏 렌트하기</p>
               </div>
               <div className="flex justify-end mt-3">
                 <LuxuryDressIcon className="w-10 h-10 text-pink-500 transition-transform group-hover:scale-110" />
               </div>
             </div>
 
-            <div 
+            <div
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setActiveOverlay('LOGIN')}
-              onClick={() => setActiveOverlay('LOGIN')}
+              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigateTo('SHOP_CATEGORY')}
+              onClick={() => navigateTo('SHOP_CATEGORY')}
               className="bg-blue-50/70 border border-blue-100 hover:border-blue-200 hover:shadow-md active:scale-[0.98] p-4 rounded-2xl flex flex-col justify-between cursor-pointer transition-all group"
             >
               <div>
@@ -223,7 +268,7 @@ export const ShopMain = () => {
                   정품 보증
                 </span>
                 <h4 className="font-extrabold text-gray-900 text-base group-hover:text-blue-600 transition-colors">구매하기</h4>
-                <p className="text-[11px] text-gray-500 mt-0.5 leading-tight">내 마 음에 쏙,<br/>지금 바로 구매하기</p>
+                <p className="text-[11px] text-gray-500 mt-0.5 leading-tight">내 마 음에 쏙,<br />지금 바로 구매하기</p>
               </div>
               <div className="flex justify-end mt-3">
                 <LuxuryBagIcon className="w-10 h-10 text-blue-500 transition-transform group-hover:scale-110" />
@@ -231,11 +276,11 @@ export const ShopMain = () => {
             </div>
           </div>
 
-          <div 
+          <div
             role="button"
             tabIndex={0}
-            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setCurrentView('SHOP_SELL')}
-            onClick={() => setCurrentView('SHOP_SELL')}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigateTo('SHOP_SELL')}
+            onClick={() => navigateTo('SHOP_SELL')}
             className="bg-emerald-50/70 border border-emerald-100 hover:border-emerald-200 hover:shadow-md active:scale-[0.99] p-4 rounded-2xl flex justify-between items-center cursor-pointer transition-all group"
           >
             <div>
@@ -252,7 +297,7 @@ export const ShopMain = () => {
         </div>
 
         {/* 회원가입 이벤트 배너 카드 */}
-        <div 
+        <div
           onClick={() => setActiveOverlay('REGISTER')}
           role="button"
           tabIndex={0}
@@ -273,11 +318,17 @@ export const ShopMain = () => {
         {/* 리본즈만의 서비스 */}
         <h3 className="font-extrabold text-lg mb-3 text-gray-900 tracking-tight">리본즈만의 서비스</h3>
         <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="bg-gray-50 border border-gray-100 p-4 rounded-xl hover:bg-gray-100/80 transition-colors cursor-pointer">
+          <div 
+            onClick={() => handleMenuClick('렌트 소개')}
+            className="bg-gray-50 border border-gray-100 p-4 rounded-xl hover:bg-gray-100/80 active:scale-[0.99] transition-all cursor-pointer"
+          >
             <h4 className="font-bold text-gray-900 text-sm">명품 구독하기</h4>
             <p className="text-[10px] text-gray-500 mt-1">1달 구독료로 무제한 사용</p>
           </div>
-          <div className="bg-gray-50 border border-gray-100 p-4 rounded-xl hover:bg-gray-100/80 transition-colors cursor-pointer">
+          <div 
+            onClick={() => navigateTo('SHOP_CATEGORY')}
+            className="bg-gray-50 border border-gray-100 p-4 rounded-xl hover:bg-gray-100/80 active:scale-[0.99] transition-all cursor-pointer"
+          >
             <h4 className="font-bold text-gray-900 text-sm">중고명품 구매</h4>
             <p className="text-[10px] text-gray-500 mt-1">합리적인 명품 소비의 시작</p>
           </div>
@@ -286,19 +337,21 @@ export const ShopMain = () => {
         {/* 8-Grid 프리미엄 아이콘 메뉴 */}
         <div className="grid grid-cols-4 gap-y-6 gap-x-2 text-center bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
           {[
-            { icon: <MenuHangerIcon />, title: '렌트 소개' }, 
+            { icon: <MenuHangerIcon />, title: '렌트 소개' },
             { icon: <MenuTagIcon />, title: '70% 할인' },
-            { icon: <MenuClockIcon />, title: '오늘신규입고' }, 
+            { icon: <MenuClockIcon />, title: '오늘신규입고' },
             { icon: <MenuMembershipIcon />, title: '베이직멤버십' },
-            { icon: <MenuCareIcon />, title: '렌트잇 케어' }, 
+            { icon: <MenuCareIcon />, title: '렌트잇 케어' },
             { icon: <MenuVipIcon />, title: 'VIP' },
-            { icon: <MenuBuybackIcon />, title: '바이백' }, 
+            { icon: <MenuBuybackIcon />, title: '바이백' },
             { icon: <MenuInviteIcon />, title: '친구 초대' }
           ].map((menu, idx) => (
-            <div 
-              key={idx} 
+            <div
+              key={idx}
               role="button"
               tabIndex={0}
+              onClick={() => handleMenuClick(menu.title)}
+              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleMenuClick(menu.title)}
               className="flex flex-col items-center gap-2 cursor-pointer group active:scale-95 transition-transform"
             >
               <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center border border-gray-100 shadow-2xs group-hover:bg-gray-100 group-hover:border-gray-200 transition-colors">
@@ -317,16 +370,16 @@ export const ShopMain = () => {
           <div className="flex-1 bg-white border border-gray-100 hover:border-gray-200 rounded-xl p-4 flex justify-between items-center shadow-xs cursor-pointer hover:shadow-sm transition-all group">
             <div>
               <h4 className="font-bold text-sm text-gray-900 group-hover:text-indigo-600 transition-colors">렌트 이용 가이드</h4>
-              <p className="text-[10px] text-gray-500 mt-1">예약부터 반납까지<br/>30초 만에 알아보기</p>
+              <p className="text-[10px] text-gray-500 mt-1">예약부터 반납까지<br />30초 만에 알아보기</p>
             </div>
-            <ChevronRight size={16} className="text-gray-400 group-hover:translate-x-0.5 transition-transform"/>
+            <ChevronRight size={16} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
           </div>
           <div className="flex-1 bg-white border border-gray-100 hover:border-gray-200 rounded-xl p-4 flex justify-between items-center shadow-xs cursor-pointer hover:shadow-sm transition-all group">
             <div>
               <h4 className="font-bold text-sm text-gray-900 group-hover:text-indigo-600 transition-colors">구독 가이드</h4>
-              <p className="text-[10px] text-gray-500 mt-1">명품 무제한 교환<br/>30초 만에 알아보기</p>
+              <p className="text-[10px] text-gray-500 mt-1">명품 무제한 교환<br />30초 만에 알아보기</p>
             </div>
-            <ChevronRight size={16} className="text-gray-400 group-hover:translate-x-0.5 transition-transform"/>
+            <ChevronRight size={16} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
           </div>
         </div>
       </section>
@@ -336,15 +389,14 @@ export const ShopMain = () => {
         <h3 className="font-extrabold text-lg mb-3 text-gray-900 tracking-tight">회원님이 좋아하실 것 같은 상품</h3>
         <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-4 pb-1">
           {['20대 여성', '20대 남성', '30대 여성', '30대 남성', '40대 여성'].map(tab => (
-            <button 
-              key={tab} 
+            <button
+              key={tab}
               type="button"
               onClick={() => setActiveTab(tab)}
-              className={`whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold border transition-all ${
-                activeTab === tab 
-                  ? 'bg-gray-800 text-white border-gray-800 shadow-xs' 
+              className={`whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold border transition-all ${activeTab === tab
+                  ? 'bg-gray-800 text-white border-gray-800 shadow-xs'
                   : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-              }`}
+                }`}
             >
               {tab}
             </button>
@@ -355,16 +407,16 @@ export const ShopMain = () => {
             <div key={i} className="flex flex-col group cursor-pointer">
               <div className="relative aspect-square bg-gray-100 rounded-xl mb-2 flex items-center justify-center overflow-hidden border border-gray-100 shadow-2xs">
                 <ProductImage src={item.image} alt={item.title} category={item.category} />
-                <button 
+                <button
                   type="button"
                   aria-label={`${item.title} 좋아요`}
                   onClick={(e) => {
                     e.stopPropagation();
                     setActiveOverlay('LOGIN');
-                  }} 
+                  }}
                   className="absolute top-2 right-2 p-1.5 rounded-full bg-white/70 backdrop-blur-md text-gray-400 hover:text-red-500 hover:bg-white transition shadow-xs z-10"
                 >
-                  <Heart size={16}/>
+                  <Heart size={16} />
                 </button>
                 {item.tag === '예약 마감' && (
                   <div className="absolute bottom-0 w-full bg-black/60 backdrop-blur-xs text-white text-center text-[10px] py-1 font-bold z-10 tracking-wider">
@@ -414,12 +466,12 @@ export const ShopMain = () => {
 
       {/* 6. 전체보기 버튼 & 푸터 */}
       <div className="bg-white p-5 pt-8 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
-        <button 
+        <button
           type="button"
           onClick={() => setCurrentView('SHOP_CATEGORY')}
           className="w-full border border-gray-300 hover:border-gray-400 hover:bg-gray-50 active:scale-[0.99] py-3.5 rounded-xl text-sm font-bold text-gray-800 flex justify-center items-center gap-1 mb-10 transition-all shadow-2xs"
         >
-          전체보기 <ChevronRight size={16}/>
+          전체보기 <ChevronRight size={16} />
         </button>
 
         <footer className="text-xs text-gray-500 border-t border-gray-100 pt-6">
@@ -431,17 +483,17 @@ export const ShopMain = () => {
             <span className="hover:text-black cursor-pointer">입점신청</span>
             <span className="hover:text-black cursor-pointer">제휴문의</span>
           </div>
-          
+
           <div className="flex justify-between items-center mb-6">
             <button type="button" className="flex items-center gap-1 font-bold border border-gray-200 px-2.5 py-1.5 rounded-lg text-gray-700 hover:bg-gray-50 transition">
-              (주)럭셔리 렌탈 <ChevronRight size={14} className="rotate-90"/>
+              (주)럭셔리 렌탈 <ChevronRight size={14} className="rotate-90" />
             </button>
             <div className="flex gap-2">
               <div className="w-8 h-8 border border-gray-200 rounded-lg flex justify-center items-center text-gray-600 hover:text-black hover:border-gray-400 cursor-pointer transition">
-                <InstagramIcon size={16}/>
+                <InstagramIcon size={16} />
               </div>
               <div className="w-8 h-8 border border-gray-200 rounded-lg flex justify-center items-center text-gray-600 hover:text-black hover:border-gray-400 cursor-pointer transition">
-                <YoutubeIcon size={16}/>
+                <YoutubeIcon size={16} />
               </div>
               <div className="w-8 h-8 border border-gray-200 rounded-lg flex justify-center items-center font-bold text-[10px] text-gray-600 hover:text-black hover:border-gray-400 cursor-pointer transition">
                 APP
@@ -453,64 +505,102 @@ export const ShopMain = () => {
             <p className="font-bold text-gray-700">토스페이먼츠 매매보호(에스크로)서비스</p>
             <p>럭셔리렌탈은 고객님이 현금 결제한 금액에 대해 토스페이먼츠와 매매보호 계약을 체결하여 안전거래를 보장하고 있습니다.</p>
             <p className="flex items-center gap-1 text-gray-600 mt-1 cursor-pointer hover:underline">
-              서비스 가입 확인 <ChevronRight size={10}/>
+              서비스 가입 확인 <ChevronRight size={10} />
             </p>
           </div>
-          
+
           <p className="text-[10px] text-gray-400">© 2011-2026 Luxury CO.,LTD ALL RIGHTS RESERVED.</p>
         </footer>
       </div>
 
       {/* 7. 플로팅 바텀 네비게이션 (Pill Style) */}
-      <nav 
+      <nav
         aria-label="하단 네비게이션"
         className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white/95 backdrop-blur-md border border-gray-200/80 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex justify-between items-center px-4 py-2 z-50 select-none"
       >
-        <button 
+        <button
           type="button"
-          onClick={() => setCurrentView('SHOP_CATEGORY')} 
+          onClick={() => navigateTo('SHOP_CATEGORY')}
           className="flex flex-col items-center gap-1 cursor-pointer w-16 text-gray-700 hover:text-black transition active:scale-95"
         >
-          <List size={22} className="text-gray-800"/>
+          <List size={22} className="text-gray-800" />
           <span className="text-[10px] text-gray-800 font-bold">카테고리</span>
         </button>
-        
-        <button 
+
+        <button
           type="button"
-          onClick={() => setCurrentView('SHOP_SELL')} 
+          onClick={() => navigateTo('SHOP_SELL')}
           className="flex flex-col items-center gap-1 cursor-pointer w-16 text-gray-700 hover:text-black transition active:scale-95"
         >
           <ShoppingBagIcon size={22} />
           <span className="text-[10px] text-gray-800 font-bold">내 상품 판매</span>
         </button>
-        
-        <button 
+
+        <button
           type="button"
-          onClick={() => setCurrentView('SHOP_MAIN')}
+          onClick={() => navigateTo('SHOP_MAIN')}
           className="flex flex-col items-center justify-center cursor-pointer bg-gray-100 hover:bg-gray-200/80 rounded-full w-20 h-14 active:scale-95 transition"
         >
-          <Home size={22} className="text-black mb-0.5"/>
+          <Home size={22} className="text-black mb-0.5" />
           <span className="text-[10px] text-black font-black">홈</span>
         </button>
 
-        <button 
+        <button
           type="button"
-          onClick={() => setActiveOverlay('LOGIN')} 
+          onClick={() => {
+            if (!user) setActiveOverlay('LOGIN');
+            else navigateTo('SHOP_MY_PAGE');
+          }}
           className="flex flex-col items-center gap-1 cursor-pointer w-16 text-gray-700 hover:text-black transition active:scale-95"
         >
-          <Heart size={22} className="text-gray-800"/>
+          <Heart size={22} className="text-gray-800" />
           <span className="text-[10px] text-gray-800 font-bold">좋아요</span>
         </button>
 
-        <button 
+        <button
           type="button"
-          onClick={() => setActiveOverlay('LOGIN')} 
+          onClick={() => {
+            if (!user) setActiveOverlay('LOGIN');
+            else navigateTo('SHOP_MY_PAGE');
+          }}
           className="flex flex-col items-center gap-1 cursor-pointer w-16 text-gray-700 hover:text-black transition active:scale-95"
         >
-          <User size={22} className="text-gray-800"/>
-          <span className="text-[10px] text-gray-800 font-bold">마이럭셔리렌탈</span>
+          <User size={22} className="text-gray-800" />
+          <span className="text-[10px] text-gray-800 font-bold">마이페이지</span>
         </button>
       </nav>
+
+      {/* 8. 서비스 상세 안내 모달 */}
+      <Modal
+        isOpen={Boolean(serviceInfoModal)}
+        onClose={() => setServiceInfoModal(null)}
+        title={serviceInfoModal?.title || '서비스 안내'}
+      >
+        <div className="space-y-4 text-xs leading-relaxed text-gray-600">
+          <p className="bg-gray-50 p-4 rounded-xl border border-gray-100 text-gray-800 font-medium">
+            {serviceInfoModal?.desc}
+          </p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setServiceInfoModal(null);
+                navigateTo('SHOP_CATEGORY');
+              }}
+              className="flex-1 py-2.5 bg-black text-white rounded-xl font-bold text-xs hover:bg-gray-800 transition"
+            >
+              상품 둘러보기
+            </button>
+            <button
+              type="button"
+              onClick={() => setServiceInfoModal(null)}
+              className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold text-xs hover:bg-gray-200 transition"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

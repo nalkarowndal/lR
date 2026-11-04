@@ -6,3 +6,4 @@
   - Native scrypt password hashing with 16-byte random salt.
   - Server-verified SQLite sessions table with 7-day expiration.
 - **Reference**: `docs/auth/AUTH_FLOW.md`, `docs/auth/AUTH_API.md`, `docs/qa/AUTH_QA.md`
+

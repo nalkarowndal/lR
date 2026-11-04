@@ -67,3 +67,4 @@
 - **Typography**: Pretendard / System Font, 고대비 및 가독성 준수
 - **Border Radius**: 12px (`rounded-xl`), 16px (`rounded-2xl`)
 - **Shadows**: Soft Ambient `shadow-[0_2px_8px_rgba(0,0,0,0.04)]`, Elevated `shadow-xl`
+

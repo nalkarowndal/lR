@@ -49,3 +49,4 @@
 9. **Louis Vuitton Speedy Monogram Bag**:
    - 프롬프트: Louis Vuitton classic monogram canvas top-handle bag with natural vachetta leather trim and gold brass lock on beige limestone studio surface.
    - 산출물: `louisvuitton_speedy.jpg` (1024x1024)
+

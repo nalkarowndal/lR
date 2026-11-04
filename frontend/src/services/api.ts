@@ -85,7 +85,7 @@ export const api = {
   },
 
   forgotPassword: async (email: string) => {
-    return fetchJson<{ success: boolean; message: string; resetToken?: string }>('/auth/forgot-password', {
+    return fetchJson<{ success: boolean; message: string; resetToken?: string; devResetToken?: string }>('/auth/forgot-password', {
       method: 'POST',
       body: JSON.stringify({ email })
     });
@@ -96,6 +96,56 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(payload)
     });
+  },
+
+  // User Profile & Settings Endpoints
+  getMyProfile: async () => {
+    return fetchJson<{ success: boolean; profile: any }>('/users/me');
+  },
+
+  updateMyProfile: async (payload: { name?: string; phone?: string; avatar_url?: string }) => {
+    return fetchJson<{ success: boolean; message: string; profile: any }>('/users/me', {
+      method: 'PATCH',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  changeMyPassword: async (payload: { currentPassword: string; newPassword: string }) => {
+    return fetchJson<{ success: boolean; message: string }>('/users/me/password', {
+      method: 'PATCH',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  getMySettings: async () => {
+    return fetchJson<{ success: boolean; settings: any }>('/users/me/settings');
+  },
+
+  updateMySettings: async (payload: { service_notifications?: boolean; marketing_notifications?: boolean; product_notifications?: boolean; reduce_animations?: boolean; theme?: 'light' | 'dark' }) => {
+    return fetchJson<{ success: boolean; message: string; settings: any }>('/users/me/settings', {
+      method: 'PATCH',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  getMyFavorites: async () => {
+    return fetchJson<{ success: boolean; favorites: any[] }>('/users/me/favorites');
+  },
+
+  addFavorite: async (productId: number) => {
+    return fetchJson<{ success: boolean; message: string }>(`/users/me/favorites/${productId}`, {
+      method: 'POST'
+    });
+  },
+
+  removeFavorite: async (productId: number) => {
+    return fetchJson<{ success: boolean; message: string }>(`/users/me/favorites/${productId}`, {
+      method: 'DELETE'
+    });
+  },
+
+  getMySellRequests: async () => {
+    return fetchJson<{ success: boolean; sellRequests: any[] }>('/users/me/sell-requests');
   },
 
   // Products

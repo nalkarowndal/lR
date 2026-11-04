@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { getDatabase } from '../db/database.js';
 import { hashPassword, verifyPassword, generateSessionToken, generateResetToken } from '../utils/crypto.js';
 import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from '../schemas/auth.schemas.js';
+import { config } from '../config/env.js';
 
 export function register(req: Request, res: Response, next: NextFunction) {
   try {
@@ -154,11 +155,20 @@ export function forgotPassword(req: Request, res: Response, next: NextFunction) 
       VALUES (?, ?, datetime('now', '+1 hour'))
     `).run(resetToken, user.id);
 
-    return res.json({
+    const responsePayload: Record<string, any> = {
       success: true,
-      message: '비밀번호 재설정 토큰이 생성되었습니다.',
-      resetToken // Returned for dev and demo testing
-    });
+      message: config.nodeEnv === 'production'
+        ? '등록된 이메일 계정으로 비밀번호 재설정 링크가 전송되었습니다.'
+        : '개발/테스트 모드: 비밀번호 재설정 토큰이 생성되었습니다.'
+    };
+
+    if (config.nodeEnv !== 'production') {
+      responsePayload.resetToken = resetToken;
+      responsePayload.devResetToken = resetToken;
+      responsePayload.devNotice = '개발 환경 안내: 이메일 발송 대신 테스트용 토큰이 직접 반환되었습니다.';
+    }
+
+    return res.json(responsePayload);
   } catch (err) {
     next(err);
   }
@@ -200,3 +210,4 @@ export function resetPassword(req: Request, res: Response, next: NextFunction) {
     next(err);
   }
 }
+
