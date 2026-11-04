@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, Eye, EyeOff, Check, AlertCircle, ChevronRight, CheckSquare, Square } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
@@ -8,6 +8,8 @@ import { LegalTermsModal } from './ui/LegalTermsModal';
 export const ShopRegister = () => {
   const { activeOverlay, setActiveOverlay, setUser } = useApp();
   const { showToast } = useToast();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const firstInputRef = useRef<HTMLInputElement>(null);
 
   const isOpen = activeOverlay === 'REGISTER';
 
@@ -57,6 +59,11 @@ export const ShopRegister = () => {
 
   useEffect(() => {
     if (isOpen) {
+      const timer = setTimeout(() => {
+        firstInputRef.current?.focus({ preventScroll: true });
+        window.scrollTo({ left: 0 });
+      }, 320);
+
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
           if (activeLegalDoc) {
@@ -65,9 +72,36 @@ export const ShopRegister = () => {
             setActiveOverlay(null);
           }
         }
+
+        // W3C Modal Dialog Focus Trap
+        if (e.key === 'Tab' && dialogRef.current && !activeLegalDoc) {
+          const focusables = dialogRef.current.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          );
+          if (focusables.length > 0) {
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+
+            if (e.shiftKey) {
+              if (document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+              }
+            } else {
+              if (document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+              }
+            }
+          }
+        }
       };
+
       window.addEventListener('keydown', handleKeyDown);
-      return () => window.removeEventListener('keydown', handleKeyDown);
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener('keydown', handleKeyDown);
+      };
     } else {
       setErrorMsg('');
       setIsLoading(false);
@@ -133,11 +167,14 @@ export const ShopRegister = () => {
 
   return (
     <div 
+      ref={dialogRef}
       aria-modal="true"
       role="dialog"
       aria-label="회원가입"
+      aria-hidden={!isOpen}
+      inert={!isOpen ? true : undefined}
       className={`absolute inset-0 bg-white z-[100] transition-transform duration-300 ease-in-out flex flex-col ${
-        isOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'
+        isOpen ? 'translate-x-0 visible' : 'translate-x-full pointer-events-none invisible'
       }`}
     >
       {/* 1. Header */}
@@ -184,6 +221,7 @@ export const ShopRegister = () => {
               이메일 주소 <span className="text-rose-500">*</span>
             </label>
             <input 
+              ref={firstInputRef}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}

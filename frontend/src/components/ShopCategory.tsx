@@ -24,7 +24,7 @@ const SUBCATEGORIES_BY_CATEGORY: Record<string, string[]> = {
 };
 
 export const ShopCategory = () => {
-  const { goBack, setActiveOverlay, user, favorites, toggleFavorite } = useApp();
+  const { goBack, navigateTo, setActiveOverlay, user, favorites, toggleFavorite } = useApp();
   const { showToast } = useToast();
   const [mainTab, setMainTab] = useState<'CATEGORY' | 'BRAND'>('CATEGORY');
   const [subTab, setSubTab] = useState('여성');
@@ -84,9 +84,11 @@ export const ShopCategory = () => {
     }
   }, [mainTab, activeBrand]);
 
-  const currentBrandProducts: CatalogProduct[] = serverBrandProducts.length > 0
-    ? serverBrandProducts
-    : (BRAND_PRODUCTS_MAP[activeBrand] || BRAND_PRODUCTS_MAP['루이비통'] || []);
+  const baseBrandProducts = BRAND_PRODUCTS_MAP[activeBrand] || BRAND_PRODUCTS_MAP['루이비통'] || [];
+  const adminNewProducts = serverBrandProducts.filter(sp => 
+    !baseBrandProducts.some(bp => bp.title === sp.title) && sp.imageUrl
+  );
+  const currentBrandProducts: CatalogProduct[] = [...baseBrandProducts, ...adminNewProducts];
 
   const handleTileClick = (targetCategory: string, tileTitle: string) => {
     setLeftActive(targetCategory);
@@ -106,7 +108,7 @@ export const ShopCategory = () => {
         <button 
           type="button"
           aria-label="메인 화면으로 뒤로가기"
-          onClick={() => goBack('SHOP_MAIN')}
+          onClick={() => navigateTo('SHOP_MAIN')}
           className="p-1 -ml-1 text-gray-800 hover:text-black transition active:scale-95"
         >
           <ChevronLeft size={24} />

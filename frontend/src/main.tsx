@@ -25,7 +25,7 @@ import { ProtectedAdminView } from './components/navigation/ProtectedAdminView';
 
 // 4. Main Router
 export const MainRouter = () => {
-  const { currentView, userSettings } = useApp();
+  const { currentView, userSettings, activeOverlay } = useApp();
 
   // Sync user preference for reduced motion with body class
   useEffect(() => {
@@ -53,41 +53,47 @@ export const MainRouter = () => {
     <div className="min-h-screen bg-gray-100 flex justify-center items-center font-sans text-gray-900">
       <div className="w-full max-w-md h-screen sm:h-[90vh] bg-white relative flex flex-col overflow-hidden shadow-2xl sm:rounded-2xl">
         
-        {currentView === 'SHOP_MAIN' && (
-          <AnimatedView viewKey="SHOP_MAIN">
-            <ShopMain />
-          </AnimatedView>
-        )}
+        <div 
+          className="flex-1 w-full h-full flex flex-col"
+          aria-hidden={activeOverlay !== null}
+          inert={activeOverlay !== null ? true : undefined}
+        >
+          {currentView === 'SHOP_MAIN' && (
+            <AnimatedView viewKey="SHOP_MAIN">
+              <ShopMain />
+            </AnimatedView>
+          )}
 
-        {currentView === 'SHOP_CATEGORY' && (
-          <AnimatedView viewKey="SHOP_CATEGORY">
-            <ShopCategory />
-          </AnimatedView>
-        )}
+          {currentView === 'SHOP_CATEGORY' && (
+            <AnimatedView viewKey="SHOP_CATEGORY">
+              <ShopCategory />
+            </AnimatedView>
+          )}
 
-        {currentView === 'SHOP_SELL' && (
-          <AnimatedView viewKey="SHOP_SELL">
-            <ShopSell />
-          </AnimatedView>
-        )}
+          {currentView === 'SHOP_SELL' && (
+            <AnimatedView viewKey="SHOP_SELL">
+              <ShopSell />
+            </AnimatedView>
+          )}
 
-        {currentView === 'SHOP_SETTINGS' && (
-          <AnimatedView viewKey="SHOP_SETTINGS">
-            <ShopSettings />
-          </AnimatedView>
-        )}
+          {currentView === 'SHOP_SETTINGS' && (
+            <AnimatedView viewKey="SHOP_SETTINGS">
+              <ShopSettings />
+            </AnimatedView>
+          )}
 
-        {currentView === 'SHOP_MY_PAGE' && (
-          <AnimatedView viewKey="SHOP_MY_PAGE">
-            <ShopMyPage />
-          </AnimatedView>
-        )}
+          {currentView === 'SHOP_MY_PAGE' && (
+            <AnimatedView viewKey="SHOP_MY_PAGE">
+              <ShopMyPage />
+            </AnimatedView>
+          )}
 
-        {currentView === 'RECRUIT_APP' && (
-          <AnimatedView viewKey="RECRUIT_APP">
-            <RecruitApp />
-          </AnimatedView>
-        )}
+          {currentView === 'RECRUIT_APP' && (
+            <AnimatedView viewKey="RECRUIT_APP">
+              <RecruitApp />
+            </AnimatedView>
+          )}
+        </div>
         
         {/* 슬라이딩 오버레이 */}
         <ShopSearch />

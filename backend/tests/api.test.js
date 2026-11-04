@@ -182,25 +182,11 @@ test('Backend Health & API Endpoints Suite', async (t) => {
     });
     assert.equal(repeatRes.status, 400);
 
-    // Restore customer password
-    await fetch(`${baseUrl}/auth/forgot-password`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email: 'customer@luxuryrental.com' })
-    });
-    const restoreTokenRow = testDb.prepare(`
-      SELECT token FROM password_reset_tokens 
-      WHERE user_id = (SELECT id FROM users WHERE email = 'customer@luxuryrental.com')
-      ORDER BY created_at DESC LIMIT 1
-    `).get();
-    await fetch(`${baseUrl}/auth/reset-password`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        token: restoreTokenRow.token,
-        newPassword: 'luxury1234!'
-      })
-    });
+    // Restore customer password back to luxury1234! for subsequent tests
+    testDb.prepare('UPDATE users SET password_hash = ? WHERE email = ?').run(
+      hashPassword('luxury1234!'),
+      'customer@luxuryrental.com'
+    );
   });
 
   // ==========================================
@@ -360,6 +346,9 @@ test('Backend Health & API Endpoints Suite', async (t) => {
     const getData = await getRes.json();
     assert.equal(getRes.status, 200);
     assert.ok(getData.data.some(p => p.title === '테스트 신규 렌탈백 v2'));
+
+    // Clean up created test product so it does not pollute catalog with image-less data
+    testDb.prepare('DELETE FROM products WHERE id = ?').run(createData.data.id);
   });
 
   await t.test('Admin Recruit Requests: GET, POST and PATCH with Admin Token', async () => {

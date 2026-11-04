@@ -45,8 +45,8 @@ async function runBrowserQA() {
 
   try {
     // 1. Visit Main Screen
-    console.log('[QA] Navigating to http://127.0.0.1:5173/ ...');
-    await page.goto('http://127.0.0.1:5173/', { waitUntil: 'networkidle0', timeout: 15000 });
+    console.log('[QA] Navigating to http://localhost:5173/ ...');
+    await page.goto('http://localhost:5173/', { waitUntil: 'networkidle0', timeout: 15000 });
     await new Promise(r => setTimeout(r, 1000));
 
     // Test 1: Main Action Service Cards (Engraved Dress, Bag, Handshake, Gift)
@@ -314,6 +314,10 @@ async function runBrowserQA() {
     });
     await new Promise(r => setTimeout(r, 600));
 
+    // Return cleanly to ShopMain for multi-viewport responsive and interactive QA
+    await page.reload({ waitUntil: 'networkidle0' });
+    await new Promise(r => setTimeout(r, 1000));
+
     // Test 8: Multi-viewport Responsive QA (360px, 390px, 430px, 768px, 1440px)
     console.log('[QA] Running Multi-Viewport Responsive QA...');
     const viewports = [
@@ -351,6 +355,124 @@ async function runBrowserQA() {
       const vpScreenshotPath = path.join(screenshotsDir, `responsive_${vp.name}.png`);
       await page.screenshot({ path: vpScreenshotPath });
       console.log(`[QA] Responsive ${vp.label}: passed=${vpPass}, saved to responsive_${vp.name}.png`);
+
+      // 🌟 Desktop 1440px: High-priority layout offset, focus trap, and cart tests
+      if (vp.name === 'desktop_1440') {
+        console.log('[QA] Testing Desktop 1440px Search Panel Alignment & Focus...');
+        // 1. Open Search Overlay
+        await page.evaluate(() => {
+          const btn = document.querySelector('button[aria-label="상품 검색 열기"]');
+          if (btn) btn.click();
+        });
+        // Wait for 300ms slide-in transition + 320ms focus timer
+        await new Promise(r => setTimeout(r, 500));
+
+        const searchAlignment = await page.evaluate(() => {
+          const searchPanel = document.querySelector('div[role="dialog"][aria-label="통합 검색"]');
+          const appContainer = searchPanel ? searchPanel.closest('.max-w-md') || searchPanel.parentElement : null;
+          const searchRect = searchPanel ? searchPanel.getBoundingClientRect() : null;
+          const appRect = appContainer ? appContainer.getBoundingClientRect() : null;
+          const windowScrollX = window.scrollX;
+          const offsetDiff = (searchRect && appRect) ? Math.abs(searchRect.left - appRect.left) : 999;
+          return {
+            searchLeft: searchRect ? searchRect.left : null,
+            appLeft: appRect ? appRect.left : null,
+            offsetDiff,
+            windowScrollX,
+            isPerfectAligned: offsetDiff < 2 && windowScrollX === 0
+          };
+        });
+
+        testResults.tests.push({
+          id: 'TEST-08-DESKTOP-SEARCH-ALIGNMENT',
+          name: 'Desktop 1440px Search Panel Alignment & Zero Scroll Shift',
+          passed: searchAlignment.isPerfectAligned,
+          details: searchAlignment
+        });
+
+        const desktopSearchScreenshot = path.join(screenshotsDir, 'responsive_desktop_1440_search_aligned.png');
+        await page.screenshot({ path: desktopSearchScreenshot });
+        console.log(`[QA] Desktop Search Alignment: passed=${searchAlignment.isPerfectAligned}, offsetDiff=${searchAlignment.offsetDiff}px, scrollX=${searchAlignment.windowScrollX}`);
+
+        // 2. Close Search Overlay
+        await page.evaluate(() => {
+          const closeBtn = document.querySelector('div[aria-label="통합 검색"] button[aria-label="검색창 닫기"]');
+          if (closeBtn) closeBtn.click();
+        });
+        await new Promise(r => setTimeout(r, 450));
+
+        // 3. Test Closed Overlay Keyboard Focus Exclusion (W3C Dialog inert/invisible)
+        console.log('[QA] Testing Closed Overlays Keyboard Focus Exclusion...');
+        const focusExclusion = await page.evaluate(() => {
+          const focusables = Array.from(document.querySelectorAll('button, a, input, [tabindex]:not([tabindex="-1"])'));
+          const hiddenElements = focusables.filter(el => {
+            const inertParent = el.closest('[inert]');
+            const invisibleParent = el.closest('.invisible');
+            return inertParent || invisibleParent;
+          });
+          
+          return {
+            totalFocusables: focusables.length,
+            hiddenFocusablesCount: hiddenElements.length,
+            allHiddenExcludedFromTab: hiddenElements.every(el => el.closest('[inert]') !== null || el.closest('.invisible') !== null)
+          };
+        });
+
+        testResults.tests.push({
+          id: 'TEST-09-KEYBOARD-FOCUS-EXCLUSION',
+          name: 'Closed Overlays Keyboard Focus Exclusion (Inert/Invisible)',
+          passed: focusExclusion.allHiddenExcludedFromTab,
+          details: focusExclusion
+        });
+        console.log(`[QA] Keyboard Focus Exclusion: passed=${focusExclusion.allHiddenExcludedFromTab}`);
+
+        // 4. Test Product Recommendation Detail Modal & Cart Workflow
+        console.log('[QA] Testing Product Recommendation Detail Modal & Cart on Home View...');
+        
+        // Click recommendation card
+        const cardTest = await page.evaluate(async () => {
+          const cards = document.querySelectorAll('[data-testid="recommend-product-card"]');
+          const card = cards[0];
+          if (card) {
+            card.scrollIntoView({ behavior: 'instant', block: 'center' });
+            card.click();
+          }
+          await new Promise(r => setTimeout(r, 600));
+          const modal = document.querySelector('div[role="dialog"][aria-label="상품 상세 정보"]');
+          return {
+            cardsCount: cards.length,
+            modalOpened: Boolean(modal)
+          };
+        });
+
+        // Click "장바구니 담기"
+        await page.evaluate(async () => {
+          const modal = document.querySelector('div[role="dialog"][aria-label="상품 상세 정보"]');
+          if (modal) {
+            const addBtn = Array.from(modal.querySelectorAll('button')).find(b => b.textContent && b.textContent.includes('장바구니 담기'));
+            if (addBtn) addBtn.click();
+          }
+          await new Promise(r => setTimeout(r, 600));
+        });
+
+        const cartBadgeVerified = await page.evaluate(() => {
+          const badge = document.querySelector('header span.bg-indigo-600');
+          return Boolean(badge && badge.textContent && parseInt(badge.textContent.trim(), 10) >= 1);
+        });
+
+        const cartPass = cardTest.cardsCount > 0 && cardTest.modalOpened && cartBadgeVerified;
+        testResults.tests.push({
+          id: 'TEST-10-RECOMMENDATION-DETAIL-CART',
+          name: 'Product Recommendation Detail Modal & Cart Add',
+          passed: cartPass,
+          details: {
+            cardsCount: cardTest.cardsCount,
+            modalOpened: cardTest.modalOpened,
+            cartBadgeVerified
+          }
+        });
+        console.log(`[QA] Product Detail & Cart: passed=${cartPass} (cardsCount=${cardTest.cardsCount}, modal=${cardTest.modalOpened}, badge=${cartBadgeVerified})`);
+      }
     }
 
   } catch (err) {

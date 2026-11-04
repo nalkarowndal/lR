@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ChevronLeft, Mail, CheckCircle2, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
@@ -13,6 +13,8 @@ import {
 export const ShopLike = () => {
   const { activeOverlay, setActiveOverlay, setUser } = useApp();
   const { showToast } = useToast();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const emailInputRef = useRef<HTMLInputElement>(null);
 
   const [loggingInProvider, setLoggingInProvider] = useState<string | null>(null);
   const [loginSuccess, setLoginSuccess] = useState(false);
@@ -31,13 +33,45 @@ export const ShopLike = () => {
 
   useEffect(() => {
     if (isOpen) {
+      const timer = setTimeout(() => {
+        emailInputRef.current?.focus({ preventScroll: true });
+        window.scrollTo({ left: 0 });
+      }, 320);
+
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
           setActiveOverlay(null);
         }
+
+        // W3C Modal Dialog Focus Trap
+        if (e.key === 'Tab' && dialogRef.current) {
+          const focusables = dialogRef.current.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          );
+          if (focusables.length > 0) {
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+
+            if (e.shiftKey) {
+              if (document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+              }
+            } else {
+              if (document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+              }
+            }
+          }
+        }
       };
+
       window.addEventListener('keydown', handleKeyDown);
-      return () => window.removeEventListener('keydown', handleKeyDown);
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener('keydown', handleKeyDown);
+      };
     } else {
       setLoggingInProvider(null);
       setLoginSuccess(false);
@@ -86,11 +120,15 @@ export const ShopLike = () => {
 
   return (
     <div
+      ref={dialogRef}
       aria-modal="true"
       role="dialog"
       aria-label="간편 로그인"
-      className={`absolute inset-0 bg-white z-[100] transition-transform duration-300 ease-in-out flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'
-        }`}
+      aria-hidden={!isOpen}
+      inert={!isOpen ? true : undefined}
+      className={`absolute inset-0 bg-white z-[100] transition-all duration-300 ease-in-out flex flex-col ${
+        isOpen ? 'translate-x-0 opacity-100 visible' : 'translate-x-full opacity-0 pointer-events-none invisible'
+      }`}
     >
       {/* 1. Header */}
       <div className="px-4 py-3 bg-white border-b border-gray-100 flex items-center justify-between">
@@ -224,6 +262,7 @@ export const ShopLike = () => {
           <form onSubmit={handleEmailLogin} className="w-full max-w-sm space-y-3.5 mb-6 animate-fadeIn">
             <div>
               <input
+                ref={emailInputRef}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

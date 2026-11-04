@@ -35,3 +35,9 @@ Thumbs.db
 # Analysis temporary zips and backups
 artifacts/analysis/
 artifacts/backups/
+
+# Dynamic User Uploads (generated during runtime / test)
+frontend/public/assets/uploads/avatars/*
+!frontend/public/assets/uploads/avatars/.gitkeep
+frontend/public/assets/uploads/products/*
+!frontend/public/assets/uploads/products/.gitkeep

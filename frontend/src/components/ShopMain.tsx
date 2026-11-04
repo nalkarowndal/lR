@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
-  Search, ShoppingCart, Settings, Heart, User, Home, List, ChevronRight
+  Search, ShoppingCart, Settings, Heart, User, Home, List, ChevronRight,
+  ShieldCheck, Smartphone, Trash2, CheckCircle2, X
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
@@ -14,6 +15,74 @@ import {
 import { ProductImage } from './ui/ProductImage';
 import { LegalTermsModal } from './ui/LegalTermsModal';
 import { RENT_NEW_ARRIVALS } from '../data/catalog';
+
+// ==========================================
+// 장바구니 아이템 타입 정의
+// ==========================================
+export interface CartItem {
+  id: string | number;
+  brand: string;
+  title: string;
+  price: string;
+  days: number;
+  image?: string;
+  category?: 'bag' | 'clothing' | 'shoes' | 'jewelry' | 'watch' | 'wallet' | string;
+}
+
+// ==========================================
+// 고화질 정품 QR 코드 SVG
+// ==========================================
+const QrCodeSvg = ({ size = 96 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="rounded">
+    <rect width="100" height="100" fill="white" />
+    {/* Detection Pattern Top-Left */}
+    <rect x="8" y="8" width="26" height="26" rx="4" fill="#09090b" />
+    <rect x="12" y="12" width="18" height="18" rx="2" fill="white" />
+    <rect x="16" y="16" width="10" height="10" rx="1.5" fill="#4f46e5" />
+    {/* Detection Pattern Top-Right */}
+    <rect x="66" y="8" width="26" height="26" rx="4" fill="#09090b" />
+    <rect x="70" y="12" width="18" height="18" rx="2" fill="white" />
+    <rect x="74" y="16" width="10" height="10" rx="1.5" fill="#4f46e5" />
+    {/* Detection Pattern Bottom-Left */}
+    <rect x="8" y="66" width="26" height="26" rx="4" fill="#09090b" />
+    <rect x="12" y="70" width="18" height="18" rx="2" fill="white" />
+    <rect x="16" y="74" width="10" height="10" rx="1.5" fill="#4f46e5" />
+    {/* Timing Patterns */}
+    <rect x="38" y="10" width="4" height="4" fill="#09090b" />
+    <rect x="46" y="10" width="4" height="4" fill="#09090b" />
+    <rect x="54" y="10" width="4" height="4" fill="#09090b" />
+    <rect x="10" y="38" width="4" height="4" fill="#09090b" />
+    <rect x="10" y="46" width="4" height="4" fill="#09090b" />
+    <rect x="10" y="54" width="4" height="4" fill="#09090b" />
+    {/* Data Cells */}
+    <rect x="38" y="22" width="8" height="8" rx="1.5" fill="#4f46e5" />
+    <rect x="50" y="22" width="4" height="4" fill="#09090b" />
+    <rect x="58" y="18" width="4" height="4" fill="#09090b" />
+    <rect x="40" y="34" width="6" height="6" fill="#09090b" />
+    <rect x="50" y="34" width="6" height="6" fill="#09090b" />
+    <rect x="60" y="34" width="6" height="6" fill="#09090b" />
+    <rect x="72" y="38" width="6" height="6" fill="#09090b" />
+    <rect x="82" y="42" width="6" height="6" fill="#4f46e5" />
+    <rect x="24" y="42" width="6" height="6" fill="#09090b" />
+    <rect x="32" y="48" width="4" height="4" fill="#09090b" />
+    <rect x="42" y="44" width="14" height="14" rx="2" fill="#09090b" />
+    <rect x="62" y="48" width="6" height="6" fill="#09090b" />
+    <rect x="72" y="52" width="6" height="6" fill="#09090b" />
+    <rect x="40" y="64" width="6" height="6" fill="#09090b" />
+    <rect x="52" y="64" width="6" height="6" fill="#4f46e5" />
+    <rect x="62" y="64" width="8" height="8" rx="1" fill="#09090b" />
+    <rect x="74" y="64" width="4" height="4" fill="#09090b" />
+    <rect x="82" y="70" width="6" height="6" fill="#09090b" />
+    <rect x="40" y="76" width="6" height="6" fill="#09090b" />
+    <rect x="50" y="76" width="6" height="6" fill="#09090b" />
+    <rect x="60" y="78" width="4" height="4" fill="#09090b" />
+    <rect x="70" y="76" width="8" height="8" rx="1" fill="#09090b" />
+    <rect x="82" y="82" width="6" height="6" fill="#09090b" />
+    {/* Center LR Branding Badge */}
+    <circle cx="50" cy="51" r="7.5" fill="#4f46e5" />
+    <text x="50" y="54" fill="white" fontSize="6.5" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">LR</text>
+  </svg>
+);
 
 // ==========================================
 // 커스텀 SVG 아이콘 (lucide-react 에러 대체용)
@@ -90,6 +159,89 @@ export const ShopMain = () => {
   const [serviceInfoModal, setServiceInfoModal] = useState<{ title: string; desc: string } | null>(null);
   const [activeLegalDoc, setActiveLegalDoc] = useState<'TERMS_OF_SERVICE' | 'PRIVACY_POLICY' | null>(null);
 
+  // 장바구니 및 상세 모달 상태
+  const [selectedProduct, setSelectedProduct] = useState<{
+    id: string | number;
+    brand: string;
+    title: string;
+    price: string;
+    original?: string;
+    discount?: string;
+    image?: string;
+    category?: any;
+  } | null>(null);
+  const [selectedDays, setSelectedDays] = useState<number>(3);
+  const [cartModalOpen, setCartModalOpen] = useState(false);
+  const [appDownloadModalOpen, setAppDownloadModalOpen] = useState(false);
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('luxury_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const parseNumericPrice = (pStr: string) => {
+    const digits = pStr.replace(/[^0-9]/g, '');
+    return digits ? parseInt(digits, 10) : 40000;
+  };
+
+  const calculateRentalPrice = (basePriceStr: string, days: number) => {
+    const base = parseNumericPrice(basePriceStr);
+    const multiplier = days === 3 ? 1 : days === 7 ? 2.1 : days === 15 ? 4 : 7;
+    return Math.round(base * multiplier);
+  };
+
+  const handleAddToCart = (product: NonNullable<typeof selectedProduct>, days: number) => {
+    const calculatedFee = calculateRentalPrice(product.price, days);
+    const newItem: CartItem = {
+      id: product.id,
+      brand: product.brand,
+      title: product.title,
+      price: `${calculatedFee.toLocaleString()}원`,
+      days,
+      image: product.image,
+      category: product.category
+    };
+    const updated = [...cartItems.filter(item => item.id !== product.id), newItem];
+    setCartItems(updated);
+    try {
+      localStorage.setItem('luxury_cart', JSON.stringify(updated));
+    } catch {}
+    showToast(`'${product.brand} ${product.title}' 상품이 장바구니에 담겼습니다.`, 'success');
+    setSelectedProduct(null);
+  };
+
+  const handleRentNow = (product: NonNullable<typeof selectedProduct>, days: number) => {
+    if (!user) {
+      showToast('대여를 진행하려면 먼저 로그인해주세요.', 'info');
+      setActiveOverlay('LOGIN');
+      return;
+    }
+    showToast(`'${product.title}' (${days}일 대여) 렌탈 신청이 완료되었습니다! 24시간 내 배송 준비가 진행됩니다.`, 'success');
+    setSelectedProduct(null);
+  };
+
+  const handleRemoveFromCart = (id: string | number) => {
+    const updated = cartItems.filter(item => item.id !== id);
+    setCartItems(updated);
+    try {
+      localStorage.setItem('luxury_cart', JSON.stringify(updated));
+    } catch {}
+    showToast('장바구니에서 상품이 삭제되었습니다.', 'info');
+  };
+
+  const handleCheckoutCart = () => {
+    if (cartItems.length === 0) return;
+    setCartItems([]);
+    try {
+      localStorage.removeItem('luxury_cart');
+    } catch {}
+    setCartModalOpen(false);
+    showToast('대여 신청이 성공적으로 접수되었습니다! 담당 매니저가 유선으로 배송 일정을 안내해 드립니다.', 'success');
+  };
+
   const currentRecommendList = RECOMMENDATIONS_DATA[activeTab] || RECOMMENDATIONS_DATA['20대 여성'];
 
   const handleMenuClick = (title: string) => {
@@ -125,9 +277,22 @@ export const ShopMain = () => {
       case '바이백':
         navigateTo('SHOP_SELL');
         break;
-      case '친구 초대':
-        showToast('친구 초대 추천인 코드가 클립보드에 복사되었습니다! (가입 시 1만P 적립)', 'success');
+      case '친구 초대': {
+        const inviteCode = 'LUXURY-VIP-2026';
+        const inviteText = `[LUXURYRENTAL] 프리미엄 명품 렌탈 초대장!\n가입 시 추천인 코드 [${inviteCode}]를 입력하시면 1만 포인트가 즉시 적립됩니다.\nhttps://luxuryrental.com/invite?code=${inviteCode}`;
+        if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(inviteText)
+            .then(() => {
+              showToast('친구 초대 추천인 코드(LUXURY-VIP-2026)가 클립보드에 복사되었습니다!', 'success');
+            })
+            .catch(() => {
+              showToast('추천인 코드: LUXURY-VIP-2026 (가입 시 1만P 적립)', 'info');
+            });
+        } else {
+          showToast('추천인 코드: LUXURY-VIP-2026 (가입 시 1만P 적립)', 'info');
+        }
         break;
+      }
       default:
         navigateTo('SHOP_CATEGORY');
     }
@@ -151,16 +316,30 @@ export const ShopMain = () => {
         <div className="bg-gradient-to-br from-indigo-50/90 via-blue-50/60 to-purple-50/40 border border-indigo-100 p-4 rounded-xl mb-4 text-center">
           <p className="text-[11px] text-gray-600 font-bold mb-1">럭셔리앱 다운로드하면</p>
           <p className="text-sm font-black text-indigo-600 tracking-tight">최대 10만원 더블 할인!</p>
-          <div className="my-3 bg-white p-2.5 rounded-lg shadow-inner inline-block border border-gray-100">
-            <div className="w-24 h-24 bg-gray-950 text-white rounded flex flex-col items-center justify-center text-[11px] font-bold tracking-widest">
-              <span className="text-[9px] text-gray-400 font-mono mb-0.5">SCAN ME</span>
-              <span>QR CODE</span>
-            </div>
+          <div 
+            onClick={() => setAppDownloadModalOpen(true)}
+            className="my-3 bg-white p-2.5 rounded-xl shadow-inner inline-block border border-gray-100 cursor-pointer hover:scale-105 transition-transform"
+            title="QR 코드를 클릭하여 앱 다운로드 안내 보기"
+          >
+            <QrCodeSvg size={96} />
           </div>
+          <p className="text-[10px] text-indigo-500 font-bold">카메라로 QR 스캔 또는 클릭</p>
         </div>
         <div className="flex justify-around text-[11px] font-bold text-gray-700">
-          <span className="flex items-center gap-1 cursor-pointer hover:text-black transition"><i className="fa-brands fa-google-play text-gray-600"></i> Google Play</span>
-          <span className="flex items-center gap-1 cursor-pointer hover:text-black transition"><i className="fa-brands fa-app-store text-gray-600"></i> App Store</span>
+          <button 
+            type="button" 
+            onClick={() => setAppDownloadModalOpen(true)}
+            className="flex items-center gap-1.5 cursor-pointer hover:text-black transition"
+          >
+            <Smartphone size={13} className="text-gray-600" /> Google Play
+          </button>
+          <button 
+            type="button" 
+            onClick={() => setAppDownloadModalOpen(true)}
+            className="flex items-center gap-1.5 cursor-pointer hover:text-black transition"
+          >
+            <Smartphone size={13} className="text-gray-600" /> App Store
+          </button>
         </div>
       </aside>
 
@@ -184,11 +363,23 @@ export const ShopMain = () => {
 
           <button
             type="button"
-            aria-label="장바구니 및 로그인"
-            onClick={() => setActiveOverlay('LOGIN')}
-            className="p-1.5 rounded-full hover:bg-gray-100 active:scale-95 transition"
+            aria-label={user ? `장바구니 열기 (${cartItems.length}개)` : '장바구니 및 로그인'}
+            onClick={() => {
+              if (!user) {
+                showToast('장바구니를 확인하려면 먼저 로그인해주세요.', 'info');
+                setActiveOverlay('LOGIN');
+              } else {
+                setCartModalOpen(true);
+              }
+            }}
+            className="p-1.5 rounded-full hover:bg-gray-100 active:scale-95 transition relative"
           >
             <ShoppingCart size={22} />
+            {cartItems.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold animate-scaleUp">
+                {cartItems.length}
+              </span>
+            )}
           </button>
 
           <button
@@ -412,9 +603,19 @@ export const ShopMain = () => {
             return (
               <div 
                 key={item.id} 
+                data-testid="recommend-product-card"
                 onClick={() => {
-                  showToast(`'${item.brand} ${item.title}' 상품 상세 화면으로 이동합니다.`, 'info');
-                  setCurrentView('SHOP_CATEGORY');
+                  setSelectedProduct({
+                    id: item.id,
+                    brand: item.brand,
+                    title: item.title,
+                    price: item.price,
+                    original: item.original,
+                    discount: item.discount,
+                    image: item.image,
+                    category: item.category
+                  });
+                  setSelectedDays(3);
                 }}
                 className="flex flex-col group cursor-pointer"
               >
@@ -478,7 +679,17 @@ export const ShopMain = () => {
           {RENT_NEW_ARRIVALS.map((arrival) => (
             <div 
               key={arrival.id}
-              onClick={() => setCurrentView('SHOP_CATEGORY')}
+              onClick={() => {
+                setSelectedProduct({
+                  id: arrival.id,
+                  brand: arrival.brand,
+                  title: arrival.title,
+                  price: arrival.price,
+                  image: arrival.imageUrl,
+                  category: arrival.category
+                });
+                setSelectedDays(3);
+              }}
               className="min-w-[150px] w-[150px] bg-gray-50/80 hover:bg-gray-50 p-3 rounded-2xl border border-gray-100 shadow-2xs flex flex-col cursor-pointer transition group"
             >
               <span className="font-extrabold text-xs w-full text-left mb-2 text-gray-900 group-hover:text-indigo-600 transition-colors">
@@ -645,7 +856,272 @@ export const ShopMain = () => {
         </button>
       </nav>
 
-      {/* 8. 서비스 상세 안내 모달 */}
+      {/* 8. 장바구니 모달 */}
+      <Modal
+        isOpen={cartModalOpen}
+        onClose={() => setCartModalOpen(false)}
+        title={`나의 렌탈 장바구니 (${cartItems.length})`}
+      >
+        <div className="space-y-4">
+          {cartItems.length === 0 ? (
+            <div className="py-8 text-center text-gray-500 space-y-3">
+              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto text-gray-400">
+                <ShoppingCart size={22} />
+              </div>
+              <p className="text-xs font-semibold">장바구니가 비어 있습니다.</p>
+              <p className="text-[11px] text-gray-400">원하시는 명품을 선택하여 장바구니에 담아보세요.</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setCartModalOpen(false);
+                  navigateTo('SHOP_CATEGORY');
+                }}
+                className="mt-2 px-4 py-2 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition"
+              >
+                상품 둘러보기
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="max-h-60 overflow-y-auto space-y-2.5 pr-1 scrollbar-hide">
+                {cartItems.map((cItem) => (
+                  <div key={cItem.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <div className="w-14 h-14 bg-white rounded-lg overflow-hidden shrink-0 border border-gray-200/60 flex items-center justify-center">
+                      <ProductImage src={cItem.image} alt={cItem.title} category={cItem.category} productId={cItem.id} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[10px] font-bold text-indigo-600 block leading-tight">{cItem.brand}</span>
+                      <h5 className="text-xs font-bold text-gray-900 truncate">{cItem.title}</h5>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[10px] bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded font-bold">{cItem.days}일 렌탈</span>
+                        <span className="text-xs font-extrabold text-gray-950">{cItem.price}</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      aria-label="장바구니 항목 삭제"
+                      onClick={() => handleRemoveFromCart(cItem.id)}
+                      className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg transition"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Price summary */}
+              <div className="p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl space-y-1.5 text-xs">
+                <div className="flex justify-between text-gray-600 text-[11px]">
+                  <span>보증금</span>
+                  <span className="font-bold text-indigo-600">0원 (VIP 무보증 프로모션)</span>
+                </div>
+                <div className="flex justify-between text-gray-600 text-[11px]">
+                  <span>배송비</span>
+                  <span className="font-bold text-gray-900">무료 (왕복 특송)</span>
+                </div>
+                <div className="border-t border-indigo-100 pt-2 flex justify-between font-black text-sm text-gray-950">
+                  <span>총 예상 대여료</span>
+                  <span className="text-indigo-600">
+                    {cartItems.reduce((acc, it) => acc + parseNumericPrice(it.price), 0).toLocaleString()}원
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={handleCheckoutCart}
+                  className="flex-1 py-3 bg-gray-950 text-white rounded-xl font-bold text-xs hover:bg-black active:scale-[0.98] transition shadow-md"
+                >
+                  렌탈 주문 신청하기
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCartModalOpen(false)}
+                  className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold text-xs hover:bg-gray-200 transition"
+                >
+                  닫기
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
+
+      {/* 9. 상품 상세 안내 & 렌탈 신청 모달 */}
+      <Modal
+        isOpen={selectedProduct !== null}
+        onClose={() => setSelectedProduct(null)}
+        title="상품 상세 정보"
+      >
+        {selectedProduct && (
+          <div className="space-y-4">
+            <div className="relative aspect-square w-full bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 flex items-center justify-center">
+              <ProductImage
+                src={selectedProduct.image}
+                alt={selectedProduct.title}
+                category={selectedProduct.category}
+                productId={selectedProduct.id}
+              />
+              <div className="absolute top-2.5 right-2.5">
+                <button
+                  type="button"
+                  aria-label="관심 상품 저장"
+                  onClick={async () => {
+                    if (!user) {
+                      showToast('좋아요를 저장하려면 먼저 로그인해주세요.', 'info');
+                      setActiveOverlay('LOGIN');
+                    } else {
+                      const numId = typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10);
+                      const isNowFav = await toggleFavorite(numId);
+                      showToast(isNowFav ? '관심 상품에 추가되었습니다.' : '관심 상품에서 해제되었습니다.', 'info');
+                    }
+                  }}
+                  className="p-2 rounded-full bg-white/90 backdrop-blur-md shadow-xs hover:bg-white text-gray-400 hover:text-red-500 transition"
+                >
+                  <Heart
+                    size={18}
+                    fill={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10)) ? '#EF4444' : 'none'}
+                    className={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10)) ? 'text-red-500' : 'text-gray-400'}
+                  />
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <span className="text-xs font-black text-indigo-600 uppercase tracking-wider">{selectedProduct.brand}</span>
+              <h4 className="text-base font-black text-gray-950 mt-0.5 leading-snug">{selectedProduct.title}</h4>
+              <div className="mt-2 flex items-baseline gap-2">
+                {selectedProduct.discount && (
+                  <span className="text-rose-500 font-extrabold text-base">{selectedProduct.discount}</span>
+                )}
+                <span className="font-black text-lg text-gray-950">
+                  {calculateRentalPrice(selectedProduct.price, selectedDays).toLocaleString()}원
+                </span>
+                <span className="text-xs text-gray-400 font-medium">/{selectedDays}일 기준</span>
+                {selectedProduct.original && (
+                  <span className="text-xs text-gray-400 line-through ml-1">{selectedProduct.original}</span>
+                )}
+              </div>
+            </div>
+
+            {/* 정품 인증 배지 */}
+            <div className="flex items-center gap-2.5 p-3 bg-amber-50/80 border border-amber-200/60 rounded-xl text-amber-900 text-xs font-bold">
+              <ShieldCheck size={20} className="text-amber-600 shrink-0" />
+              <div>
+                <p className="leading-tight">한국명품감정원 100% 정품 인증 완료</p>
+                <p className="text-[10px] text-amber-700/80 font-normal mt-0.5">정품 보증서 동봉 및 위조품 시 200% 책임 보상</p>
+              </div>
+            </div>
+
+            {/* 렌탈 기간 선택 */}
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-2">렌탈 기간 선택</label>
+              <div className="grid grid-cols-4 gap-2">
+                {[3, 7, 15, 30].map((days) => (
+                  <button
+                    key={days}
+                    type="button"
+                    onClick={() => setSelectedDays(days)}
+                    className={`py-2 rounded-xl text-xs font-bold border transition ${
+                      selectedDays === days
+                        ? 'bg-gray-950 text-white border-gray-950 shadow-sm'
+                        : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    {days}일
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 액션 버튼들 */}
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => handleAddToCart(selectedProduct, selectedDays)}
+                className="flex-1 py-3 bg-white border border-gray-900 text-gray-950 rounded-xl font-bold text-xs hover:bg-gray-50 active:scale-[0.98] transition"
+              >
+                장바구니 담기
+              </button>
+              <button
+                type="button"
+                onClick={() => handleRentNow(selectedProduct, selectedDays)}
+                className="flex-1 py-3 bg-gray-950 text-white rounded-xl font-bold text-xs hover:bg-black active:scale-[0.98] transition shadow-md"
+              >
+                바로 렌탈 신청
+              </button>
+            </div>
+
+            <div className="text-center pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedProduct(null);
+                  navigateTo('SHOP_CATEGORY');
+                }}
+                className="text-[11px] text-gray-500 underline hover:text-gray-800 transition"
+              >
+                카테고리에서 다른 명품 둘러보기
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* 10. 앱 다운로드 안내 모달 */}
+      <Modal
+        isOpen={appDownloadModalOpen}
+        onClose={() => setAppDownloadModalOpen(false)}
+        title="LUXURYRENTAL 모바일 전용 앱"
+      >
+        <div className="space-y-4 text-center">
+          <div className="p-4 bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 rounded-2xl border border-indigo-100 flex flex-col items-center">
+            <div className="bg-white p-3 rounded-xl shadow-md border border-gray-100 mb-3">
+              <QrCodeSvg size={120} />
+            </div>
+            <p className="text-xs font-extrabold text-indigo-950">스마트폰 카메라로 QR 코드를 비춰주세요</p>
+            <p className="text-[11px] text-gray-600 mt-1">
+              별도의 스토어 검색 없이 즉시 모바일 앱 또는 홈 화면 바로가기를 설치할 수 있습니다.
+            </p>
+          </div>
+
+          <div className="space-y-2 text-left bg-gray-50 p-3.5 rounded-xl border border-gray-100 text-xs text-gray-700">
+            <div className="flex items-center gap-2 font-bold text-gray-900">
+              <CheckCircle2 size={16} className="text-emerald-500" />
+              <span>모바일 웹 & 앱 100% 기능 동일 지원</span>
+            </div>
+            <p className="text-[11px] text-gray-500 pl-6 leading-relaxed">
+              현재 웹 브라우저에서도 주문, 결제, 찜, 판매 신청 등 모든 기능이 완벽하게 동작합니다.
+            </p>
+          </div>
+
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                showToast('Google Play 공식 릴리즈 사전 예약이 완료되었습니다.', 'success');
+                setAppDownloadModalOpen(false);
+              }}
+              className="flex-1 py-2.5 bg-gray-900 text-white rounded-xl font-bold text-xs hover:bg-black transition flex items-center justify-center gap-1.5"
+            >
+              <Smartphone size={14} /> Google Play
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                showToast('App Store 공식 릴리즈 사전 예약이 완료되었습니다.', 'success');
+                setAppDownloadModalOpen(false);
+              }}
+              className="flex-1 py-2.5 bg-gray-900 text-white rounded-xl font-bold text-xs hover:bg-black transition flex items-center justify-center gap-1.5"
+            >
+              <Smartphone size={14} /> App Store
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* 11. 서비스 상세 안내 모달 */}
       <Modal
         isOpen={Boolean(serviceInfoModal)}
         onClose={() => setServiceInfoModal(null)}
@@ -677,7 +1153,7 @@ export const ShopMain = () => {
         </div>
       </Modal>
 
-      {/* 9. 이용약관 및 개인정보처리방침 공통 모달 */}
+      {/* 12. 이용약관 및 개인정보처리방침 공통 모달 */}
       <LegalTermsModal
         isOpen={!!activeLegalDoc}
         docType={activeLegalDoc}

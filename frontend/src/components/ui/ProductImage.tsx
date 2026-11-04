@@ -4,10 +4,10 @@ import { ProductVisualBadge } from './LuxuryIcons';
 export interface ProductImageProps {
   src?: string | null;
   alt: string;
-  category?: 'bag' | 'clothing' | 'shoes' | 'jewelry' | 'watch' | 'wallet';
+  category?: 'bag' | 'clothing' | 'shoes' | 'jewelry' | 'watch' | 'wallet' | (string & {});
   className?: string;
   aspectRatio?: 'square' | 'video' | 'portrait';
-  productId?: string;
+  productId?: string | number;
   objectFit?: 'cover' | 'contain';
 }
 
@@ -49,7 +49,7 @@ export const ProductImage: React.FC<ProductImageProps> = ({
         data-product-id={productId}
         data-image-status="fallback"
       >
-        <ProductVisualBadge category={category} className="w-full h-full" />
+        <ProductVisualBadge category={category as any} className="w-full h-full" />
       </div>
     );
   }

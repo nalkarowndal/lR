@@ -41,3 +41,4 @@ for (const [brand, items] of Object.entries(map)) {
 }
 
 console.log(`Inserted ${inserted} missing brand products into SQLite.`);
+

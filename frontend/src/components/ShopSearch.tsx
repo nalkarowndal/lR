@@ -7,6 +7,7 @@ import { api } from '../services/api';
 
 export const ShopSearch = () => {
   const { activeOverlay, setActiveOverlay } = useApp();
+  const dialogRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -15,12 +16,42 @@ export const ShopSearch = () => {
 
   useEffect(() => {
     if (isOpen) {
-      const timer = setTimeout(() => inputRef.current?.focus(), 120);
+      // 300ms 슬라이드 전환이 완전히 완료된 후(320ms) preventScroll: true로 초점 이동
+      // 데스크톱(1440px) 뷰포트에서 조기 focus로 인한 130px 가로 스크롤 밀림 현상 원천 방지
+      const timer = setTimeout(() => {
+        inputRef.current?.focus({ preventScroll: true });
+        window.scrollTo({ left: 0 });
+      }, 320);
+
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
           setActiveOverlay(null);
         }
+
+        // W3C WAI-ARIA Modal Dialog Pattern: Focus Trap
+        if (e.key === 'Tab' && dialogRef.current) {
+          const focusables = dialogRef.current.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          );
+          if (focusables.length > 0) {
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+
+            if (e.shiftKey) {
+              if (document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+              }
+            } else {
+              if (document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+              }
+            }
+          }
+        }
       };
+
       window.addEventListener('keydown', handleKeyDown);
       return () => {
         clearTimeout(timer);
@@ -67,8 +98,15 @@ export const ShopSearch = () => {
     const timer = setTimeout(async () => {
       try {
         const res = await api.search(q);
+        const lowerQ = q.toLowerCase();
+        const localMatches = SEARCH_CATALOG.filter((item: CatalogProduct) => 
+          item.brand.toLowerCase().includes(lowerQ) || 
+          item.title.toLowerCase().includes(lowerQ)
+        );
+
         if (isCurrent && res?.success && Array.isArray(res.data) && res.data.length > 0) {
-          const mapped: CatalogProduct[] = res.data.map(item => ({
+          const validServerItems = res.data.filter((item: any) => item.image_url);
+          const mapped: CatalogProduct[] = validServerItems.map((item: any) => ({
             id: item.id,
             brand: item.brand,
             title: item.title,
@@ -78,15 +116,16 @@ export const ShopSearch = () => {
             tag: item.tag || (item.type === 'RENT' ? '렌트' : '구매'),
             imageStatus: 'READY' as const
           }));
-          setSearchResults(mapped);
+
+          const combined = [...localMatches];
+          for (const sItem of mapped) {
+            if (!combined.some(c => c.title === sItem.title)) {
+              combined.push(sItem);
+            }
+          }
+          setSearchResults(combined.length > 0 ? combined : localMatches);
         } else if (isCurrent) {
-          // If server returns 0 results, also check local catalog
-          const lowerQ = q.toLowerCase();
-          const fallback = SEARCH_CATALOG.filter((item: CatalogProduct) => 
-            item.brand.toLowerCase().includes(lowerQ) || 
-            item.title.toLowerCase().includes(lowerQ)
-          );
-          setSearchResults(fallback);
+          setSearchResults(localMatches);
         }
       } catch (err) {
         if (isCurrent) {
@@ -117,11 +156,14 @@ export const ShopSearch = () => {
 
   return (
     <div 
+      ref={dialogRef}
       aria-modal="true"
       role="dialog"
       aria-label="통합 검색"
-      className={`absolute inset-0 bg-white z-[110] transition-transform duration-300 ease-in-out flex flex-col ${
-        isOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'
+      aria-hidden={!isOpen}
+      inert={!isOpen ? true : undefined}
+      className={`absolute inset-0 bg-white z-[110] transition-all duration-300 ease-in-out flex flex-col ${
+        isOpen ? 'translate-x-0 opacity-100 visible' : 'translate-x-full opacity-0 pointer-events-none invisible'
       }`}
     >
       {/* 상단 검색바 헤더 */}

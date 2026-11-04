@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, KeyRound, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
@@ -7,6 +7,8 @@ import { api } from '../services/api';
 export const ShopPasswordReset = () => {
   const { activeOverlay, setActiveOverlay } = useApp();
   const { showToast } = useToast();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const firstInputRef = useRef<HTMLInputElement>(null);
 
   const isOpen = activeOverlay === 'FORGOT_PASSWORD';
 
@@ -20,9 +22,37 @@ export const ShopPasswordReset = () => {
 
   useEffect(() => {
     if (isOpen) {
+      const timer = setTimeout(() => {
+        firstInputRef.current?.focus({ preventScroll: true });
+        window.scrollTo({ left: 0 });
+      }, 320);
+
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
           setActiveOverlay(null);
+        }
+
+        // W3C Modal Dialog Focus Trap
+        if (e.key === 'Tab' && dialogRef.current) {
+          const focusables = dialogRef.current.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          );
+          if (focusables.length > 0) {
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+
+            if (e.shiftKey) {
+              if (document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+              }
+            } else {
+              if (document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+              }
+            }
+          }
         }
       };
       window.addEventListener('keydown', handleKeyDown);
@@ -36,7 +66,10 @@ export const ShopPasswordReset = () => {
         setSuccessMsg('이메일 재설정 링크가 확인되었습니다. 변경하실 새 비밀번호를 입력해주세요.');
       }
 
-      return () => window.removeEventListener('keydown', handleKeyDown);
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener('keydown', handleKeyDown);
+      };
     } else {
       setStep('REQUEST');
       setErrorMsg('');
@@ -91,11 +124,14 @@ export const ShopPasswordReset = () => {
 
   return (
     <div 
+      ref={dialogRef}
       aria-modal="true"
       role="dialog"
       aria-label="비밀번호 재설정"
+      aria-hidden={!isOpen}
+      inert={!isOpen ? true : undefined}
       className={`absolute inset-0 bg-white z-[100] transition-transform duration-300 ease-in-out flex flex-col ${
-        isOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'
+        isOpen ? 'translate-x-0 visible' : 'translate-x-full pointer-events-none invisible'
       }`}
     >
       <div className="px-4 py-3 bg-white border-b border-gray-100 flex items-center justify-between">
@@ -143,6 +179,7 @@ export const ShopPasswordReset = () => {
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-1.5">이메일 주소</label>
               <input 
+                ref={firstInputRef}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -164,6 +201,7 @@ export const ShopPasswordReset = () => {
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-1.5">재설정 인증 토큰</label>
               <input 
+                ref={firstInputRef}
                 type="text"
                 value={token}
                 onChange={(e) => setToken(e.target.value)}
