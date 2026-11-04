@@ -2,8 +2,9 @@ import puppeteer from 'puppeteer-core';
 import path from 'path';
 import fs from 'fs';
 
-const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const outputDir = 'd:/JSW_React/8.portfolio/IIL/docs/screenshots';
+const chromePath = process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+const defaultDir = path.resolve(process.cwd(), '../docs/screenshots_phase2');
+const outputDir = process.env.SCREENSHOT_OUTPUT_DIR || defaultDir;
 
 // 폴더 확인 및 생성
 if (!fs.existsSync(outputDir)) {

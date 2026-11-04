@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { 
-  LayoutDashboard, Send, Upload, FileText, PlusCircle, Users, MessageSquare, ShieldCheck
+  Send, Upload, FileText
 } from 'lucide-react';
 
 export const RecruitApp = () => {
-  const [role, setRole] = useState<'STORE' | 'ADMIN'>('STORE');
+  const [role] = useState<'STORE' | 'ADMIN'>('STORE');
   const [activeTab, setActiveTab] = useState<'dashboard' | 'request' | 'workers' | 'chat'>('dashboard');
 
   // 상태 데이터
@@ -13,7 +13,7 @@ export const RecruitApp = () => {
     { id: 2, storeName: '홍대점', date: '2026-11-01', section: '카운터', time: '12:00 - 20:00', breakTime: '60분', required: 1, hired: 0, status: '채용중' as const, partner: '김지인' }
   ]);
 
-  const [workers, setWorkers] = useState([
+  const [workers] = useState([
     { id: 1, name: '김철수', phone: '010-1234-5678', exp: '홀 서빙 1년' },
     { id: 2, name: '이영희', phone: '010-8765-4321', exp: '카운터 2년' }
   ]);
@@ -148,128 +148,120 @@ export const RecruitApp = () => {
           <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm max-w-2xl mx-auto w-full">
             <h3 className="font-bold text-base text-gray-900 mb-1">신규 구인 요청 작성</h3>
             <p className="text-xs text-gray-500 mb-6">날짜, 근무시간, 파트 및 필요 인원을 선택하여 입력하면 담당자 화면에 즉시 접수됩니다.</p>
-            
             <form onSubmit={handleAddRequest} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1">매장 선택</label>
-                <select value={newReq.storeName} onChange={e => setNewReq({...newReq, storeName: e.target.value})} className="w-full border rounded-xl p-3 text-sm font-medium bg-gray-50">
+                <select value={newReq.storeName} onChange={e => setNewReq({...newReq, storeName: e.target.value})} className="w-full border border-gray-300 rounded-xl p-3 text-sm">
                   <option value="강남본점">강남본점</option>
                   <option value="홍대점">홍대점</option>
                   <option value="잠실점">잠실점</option>
                   <option value="성수점">성수점</option>
                 </select>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">근무 날짜</label>
-                  <input type="date" value={newReq.date} onChange={e => setNewReq({...newReq, date: e.target.value})} required className="w-full border rounded-xl p-3 text-sm" />
+                  <input type="date" value={newReq.date} onChange={e => setNewReq({...newReq, date: e.target.value})} required className="w-full border border-gray-300 rounded-xl p-3 text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">파트 (섹션)</label>
-                  <select value={newReq.section} onChange={e => setNewReq({...newReq, section: e.target.value})} className="w-full border rounded-xl p-3 text-sm font-medium bg-gray-50">
+                  <select value={newReq.section} onChange={e => setNewReq({...newReq, section: e.target.value})} className="w-full border border-gray-300 rounded-xl p-3 text-sm">
                     <option value="홀 서빙">홀 서빙</option>
                     <option value="카운터">카운터</option>
                     <option value="주방 보조">주방 보조</option>
                   </select>
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">출퇴근 시간</label>
-                  <input type="text" value={newReq.time} onChange={e => setNewReq({...newReq, time: e.target.value})} placeholder="예: 10:00 - 15:00" className="w-full border rounded-xl p-3 text-sm" />
+                  <input type="text" value={newReq.time} onChange={e => setNewReq({...newReq, time: e.target.value})} placeholder="예: 10:00 - 15:00" className="w-full border border-gray-300 rounded-xl p-3 text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">휴게 시간</label>
-                  <input type="text" value={newReq.breakTime} onChange={e => setNewReq({...newReq, breakTime: e.target.value})} placeholder="예: 30분" className="w-full border rounded-xl p-3 text-sm" />
+                  <input type="text" value={newReq.breakTime} onChange={e => setNewReq({...newReq, breakTime: e.target.value})} placeholder="예: 30분" className="w-full border border-gray-300 rounded-xl p-3 text-sm" />
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">필요 인원</label>
-                  <input type="number" min="1" value={newReq.required} onChange={e => setNewReq({...newReq, required: Number(e.target.value)})} className="w-full border rounded-xl p-3 text-sm" />
+                  <input type="number" min="1" value={newReq.required} onChange={e => setNewReq({...newReq, required: Number(e.target.value)})} className="w-full border border-gray-300 rounded-xl p-3 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">지인파트너 등록 (선택)</label>
-                  <input type="text" value={newReq.partner} onChange={e => setNewReq({...newReq, partner: e.target.value})} placeholder="추천 지인 이름 입력" className="w-full border rounded-xl p-3 text-sm" />
+                  <label className="block text-xs font-bold text-gray-700 mb-1">지인파트너 등록</label>
+                  <input type="text" value={newReq.partner} onChange={e => setNewReq({...newReq, partner: e.target.value})} placeholder="추천 지인 이름" className="w-full border border-gray-300 rounded-xl p-3 text-sm" />
                 </div>
               </div>
-
-              <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow transition mt-4">
-                구인 요청 즉시 등록 및 전송
+              <button type="submit" className="w-full bg-indigo-600 text-white font-bold py-3.5 rounded-xl shadow hover:bg-indigo-700 mt-4">
+                구인 요청 즉시 등록
               </button>
             </form>
           </div>
         )}
 
-        {/* 근무자 DB 및 단체 문자 탭 */}
+        {/* 근무자 DB 탭 */}
         {activeTab === 'workers' && (
-          <div className="space-y-4 max-w-3xl mx-auto w-full">
-            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="space-y-4 max-w-4xl mx-auto w-full">
+            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center">
               <div>
-                <h3 className="font-bold text-gray-900 text-sm">근무자 DB 관리</h3>
-                <p className="text-xs text-gray-500">매장별 파트타임 및 상시 근무자 인적사항을 통합 관리합니다.</p>
+                <h3 className="font-bold text-base text-gray-900">근무자 DB 관리</h3>
+                <p className="text-xs text-gray-500">인재 풀을 관리하고 선별된 인원에게 단체 문자를 발송합니다.</p>
               </div>
-              <button onClick={() => alert('신규 근무자 등록 창')} className="bg-indigo-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow">
+              <button onClick={() => alert('신규 근무자 등록 모달이 열립니다.')} className="bg-indigo-600 text-white text-xs font-bold px-4 py-2 rounded-xl shadow">
                 + 근무자 등록
               </button>
             </div>
-
-            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-sm text-gray-800">등록된 근무자 리스트 ({workers.length}명)</h3>
-                <button onClick={() => alert('선택 대상 단체 문자 발송 완료')} className="bg-green-600 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow">
-                  <Send size={14} /> 선택 대상 단체 문자 발송
+            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm space-y-3">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-bold text-gray-500">등록된 인재 ({workers.length}명)</span>
+                <button onClick={() => alert('단체 문자가 발송되었습니다.')} className="text-xs bg-gray-900 text-white font-bold px-3 py-1.5 rounded-lg flex items-center gap-1">
+                  <Send size={12} /> 선택 대상 단체 문자 발송
                 </button>
               </div>
-              <div className="space-y-2">
-                {workers.map(w => (
-                  <div key={w.id} className="bg-gray-50 p-3.5 rounded-xl border border-gray-200 flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                      <input type="checkbox" defaultChecked className="w-4 h-4 text-indigo-600 rounded" />
-                      <div>
-                        <span className="font-bold text-sm text-gray-900">{w.name}</span>
-                        <span className="text-xs text-gray-500 ml-2">({w.phone})</span>
-                      </div>
+              {workers.map(w => (
+                <div key={w.id} className="p-3 border border-gray-100 rounded-xl flex justify-between items-center bg-gray-50/50">
+                  <div className="flex items-center gap-3">
+                    <input type="checkbox" defaultChecked className="rounded text-indigo-600" />
+                    <div>
+                      <span className="font-bold text-sm text-gray-900">{w.name}</span>
+                      <span className="text-xs text-gray-500 ml-2">({w.phone})</span>
                     </div>
-                    <span className="text-xs bg-indigo-50 text-indigo-700 font-semibold px-3 py-1 rounded-lg">{w.exp}</span>
                   </div>
-                ))}
-              </div>
+                  <span className="text-xs bg-indigo-50 text-indigo-700 font-semibold px-2 py-1 rounded-md">{w.exp}</span>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
-        {/* 실시간 소통 및 채팅 탭 */}
+        {/* 실시간 채팅 탭 */}
         {activeTab === 'chat' && (
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col h-[500px] max-w-3xl mx-auto w-full">
-            <div className="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-              <span className="font-bold text-sm text-gray-800">실시간 소통 채널 (구인·결근·지각·조퇴 문의)</span>
-              <span className="text-xs text-green-600 font-bold">● 실시간 연결됨</span>
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col h-[500px] max-w-4xl mx-auto w-full overflow-hidden">
+            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <span className="font-bold text-sm text-gray-800">실시간 소통 채널</span>
+              <span className="text-xs text-green-600 font-bold">● 연결됨</span>
             </div>
-            <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50/30">
+            <div className="flex-1 p-4 overflow-y-auto space-y-3">
               {messages.map(m => (
                 <div key={m.id} className={`flex flex-col ${m.isMine ? 'items-end' : 'items-start'}`}>
                   <span className="text-[10px] text-gray-500 mb-1">{m.sender} · {m.time}</span>
-                  <div className={`p-3 rounded-2xl text-sm max-w-sm shadow-sm ${m.isMine ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-gray-200 text-gray-800 rounded-tl-none'}`}>
+                  <div className={`p-3 rounded-2xl text-xs max-w-xs ${m.isMine ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-gray-100 text-gray-800 rounded-tl-none'}`}>
                     {m.text}
                   </div>
                 </div>
               ))}
             </div>
-            <div className="p-3 bg-white border-t border-gray-200 flex gap-2">
+            <div className="p-3 border-t border-gray-100 flex gap-2">
               <input 
                 type="text" 
                 value={inputMsg} 
                 onChange={e => setInputMsg(e.target.value)} 
                 onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
-                placeholder="메시지 입력 (예: 강남본점 조퇴 인원 발생 충원 요청)..." 
-                className="flex-1 border border-gray-300 rounded-xl px-4 py-3 text-sm outline-none focus:border-indigo-600"
+                placeholder="메시지를 입력하세요..." 
+                className="flex-1 border border-gray-300 rounded-xl px-4 py-2 text-xs outline-none"
               />
-              <button onClick={handleSendMessage} className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-3 rounded-xl font-bold flex items-center gap-1 shadow">
-                <Send size={16} /> 전송
+              <button onClick={handleSendMessage} className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold flex items-center gap-1 text-xs">
+                <Send size={14} /> 전송
               </button>
             </div>
           </div>

@@ -2,7 +2,11 @@ import puppeteer from 'puppeteer-core';
 import fs from 'fs';
 import path from 'path';
 
-const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+const chromePath = process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+const outDir = process.env.SCREENSHOT_OUTPUT_DIR || path.resolve(process.cwd(), '../docs/screenshots_phase2');
+if (!fs.existsSync(outDir)) {
+  fs.mkdirSync(outDir, { recursive: true });
+}
 
 async function test() {
   console.log('Launching browser...');
@@ -14,7 +18,6 @@ async function test() {
   const page = await browser.newPage();
   await page.setViewport({ width: 1280, height: 900 });
   await page.goto('http://127.0.0.1:5173/', { waitUntil: 'networkidle0' });
-  const outDir = 'd:/JSW_React/8.portfolio/IIL/docs/screenshots';
   await page.screenshot({ path: path.join(outDir, '00_test.png') });
   console.log('Saved test screenshot!');
   await browser.close();

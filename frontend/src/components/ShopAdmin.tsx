@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 
 export const ShopAdmin = () => {
@@ -15,14 +15,34 @@ export const ShopAdmin = () => {
     message: ''
   });
 
+  // 신규 근무자 등록 모달 상태
+  const [showWorkerModal, setShowWorkerModal] = useState(false);
+  const [newWorkerForm, setNewWorkerForm] = useState({
+    name: '',
+    phone: '',
+    exp: '매장 관리 1년'
+  });
+
   const showAlert = (title: string, message: string, onConfirm?: () => void) => {
     setModal({ isOpen: true, title, message, onConfirm });
   };
 
-  const closeModal = () => {
+  const closeModal = React.useCallback(() => {
     if (modal.onConfirm) modal.onConfirm();
     setModal({ isOpen: false, title: '', message: '' });
-  };
+  }, [modal]);
+
+  // ESC 키로 모달 닫기
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (modal.isOpen) closeModal();
+        if (showWorkerModal) setShowWorkerModal(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [modal.isOpen, showWorkerModal, closeModal]);
 
   const [requests, setRequests] = useState([
     { id: 1, storeName: '강남본점', date: '2026-10-31', section: '홀 서빙', time: '10:00 - 15:00', breakTime: '30분', required: 2, hired: 1, status: '채용중', partner: '' },
@@ -30,8 +50,8 @@ export const ShopAdmin = () => {
   ]);
 
   const [workers, setWorkers] = useState([
-    { id: 1, name: '김철수', phone: '010-1234-5678', exp: '홀 서빙 1년' },
-    { id: 2, name: '이영희', phone: '010-8765-4321', exp: '카운터 2년' }
+    { id: 1, name: '김철수', phone: '010-1234-5678', exp: '홀 서빙 1년', checked: true },
+    { id: 2, name: '이영희', phone: '010-8765-4321', exp: '카운터 2년', checked: true }
   ]);
 
   const [messages, setMessages] = useState([
@@ -41,6 +61,7 @@ export const ShopAdmin = () => {
   const [inputMsg, setInputMsg] = useState('');
   const [newReq, setNewReq] = useState({ storeName: '강남본점', date: '', section: '홀 서빙', time: '10:00 - 15:00', breakTime: '30분', required: 1, partner: '' });
 
+  // 신규 상품 즉시 등록 및 팝업 (기존 capture-all.js 호환)
   const handleAddProduct = () => {
     setProducts([...products, { id: Date.now(), title: '프리미엄 렌탈 상품', type: 'RENT', price: 50000 }]);
     showAlert('상품 등록 완료', '새로운 렌탈 상품이 성공적으로 등록되었습니다.');
@@ -54,25 +75,50 @@ export const ShopAdmin = () => {
 
   const handleSendMessage = () => {
     if (!inputMsg.trim()) return;
-    setMessages([...messages, { id: Date.now(), sender: role === 'ADMIN' ? '담당자' : '매장', text: inputMsg, time: '방금', isMine: true }]);
+    setMessages([...messages, { id: Date.now(), sender: role === 'ADMIN' ? '담당자' : '매장', text: inputMsg.trim(), time: '방금', isMine: true }]);
     setInputMsg('');
   };
 
+  const toggleWorkerCheck = (id: number) => {
+    setWorkers(workers.map(w => w.id === id ? { ...w, checked: !w.checked } : w));
+  };
+
+  const handleAddWorkerSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newWorkerForm.name.trim()) return;
+    setWorkers([
+      ...workers,
+      {
+        id: Date.now(),
+        name: newWorkerForm.name.trim(),
+        phone: newWorkerForm.phone.trim() || '010-0000-0000',
+        exp: newWorkerForm.exp.trim() || '신규',
+        checked: true
+      }
+    ]);
+    setShowWorkerModal(false);
+    setNewWorkerForm({ name: '', phone: '', exp: '매장 관리 1년' });
+    showAlert('근무자 등록 완료', '신규 근무자 정보가 성공적으로 데이터베이스에 등록되었습니다.');
+  };
+
+  const selectedWorkersCount = workers.filter(w => w.checked).length;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-zinc-900 to-black text-gray-100 flex flex-col w-full font-sans relative">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-zinc-950 to-black text-gray-100 flex flex-col w-full font-sans relative select-none">
       
       {/* 🌟 글래스모피즘 커스텀 팝업 모달 */}
       {modal.isOpen && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fadeIn">
-          <div className="backdrop-blur-2xl bg-zinc-900/80 border border-white/20 w-full max-w-md p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fadeIn">
+          <div className="backdrop-blur-2xl bg-zinc-900/90 border border-white/20 w-full max-w-md p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center">
             <div className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mb-4 text-white shadow-inner">
-              <i className="fa-solid fa-circle-check text-xl"></i>
+              <i className="fa-solid fa-circle-check text-xl text-emerald-400"></i>
             </div>
             <h3 className="text-lg font-black text-white mb-2">{modal.title}</h3>
-            <p className="text-xs text-gray-300 mb-6 leading-relaxed">{modal.message}</p>
+            <p className="text-xs text-gray-300 mb-6 leading-relaxed whitespace-pre-line">{modal.message}</p>
             <button 
+              type="button"
               onClick={closeModal} 
-              className="w-full bg-white text-black hover:bg-gray-200 font-black py-3.5 rounded-xl shadow-xl transition text-sm"
+              className="w-full bg-white text-black hover:bg-gray-200 font-black py-3.5 rounded-xl shadow-xl transition text-sm cursor-pointer active:scale-[0.99]"
             >
               확인
             </button>
@@ -80,8 +126,68 @@ export const ShopAdmin = () => {
         </div>
       )}
 
+      {/* 🌟 신규 근무자 등록 모달 */}
+      {showWorkerModal && (
+        <div className="fixed inset-0 z-[990] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fadeIn">
+          <div className="backdrop-blur-2xl bg-zinc-900/90 border border-white/20 w-full max-w-md p-6 rounded-3xl shadow-2xl">
+            <h3 className="text-lg font-black text-white mb-2">신규 근무자 등록</h3>
+            <p className="text-xs text-gray-400 mb-5">인재 풀에 추가할 근무자의 인적사항을 입력하세요.</p>
+            <form onSubmit={handleAddWorkerSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-300 mb-1">근무자 이름</label>
+                <input 
+                  type="text" 
+                  value={newWorkerForm.name} 
+                  onChange={e => setNewWorkerForm({...newWorkerForm, name: e.target.value})} 
+                  placeholder="예: 박민수" 
+                  required
+                  className="w-full bg-black/50 border border-white/15 rounded-xl p-3 text-sm text-white outline-none" 
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-300 mb-1">연락처</label>
+                <input 
+                  type="text" 
+                  value={newWorkerForm.phone} 
+                  onChange={e => setNewWorkerForm({...newWorkerForm, phone: e.target.value})} 
+                  placeholder="예: 010-5555-7777" 
+                  required
+                  className="w-full bg-black/50 border border-white/15 rounded-xl p-3 text-sm text-white outline-none" 
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-300 mb-1">담당/경력</label>
+                <input 
+                  type="text" 
+                  value={newWorkerForm.exp} 
+                  onChange={e => setNewWorkerForm({...newWorkerForm, exp: e.target.value})} 
+                  placeholder="예: 카운터 1년" 
+                  required
+                  className="w-full bg-black/50 border border-white/15 rounded-xl p-3 text-sm text-white outline-none" 
+                />
+              </div>
+              <div className="flex gap-2 pt-2">
+                <button 
+                  type="button" 
+                  onClick={() => setShowWorkerModal(false)}
+                  className="flex-1 bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl text-sm"
+                >
+                  취소
+                </button>
+                <button 
+                  type="submit" 
+                  className="flex-1 bg-white text-black hover:bg-gray-200 font-black py-3 rounded-xl text-sm shadow"
+                >
+                  등록 완료
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* 1. 최상단 글래스모피즘 헤더 */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-black/40 border-b border-white/10 shadow-xl w-full">
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-black/50 border-b border-white/10 shadow-xl w-full">
         <div className="w-full max-w-[1800px] mx-auto px-6 lg:px-12 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-white/10 border border-white/10 shadow-inner text-white">
@@ -96,22 +202,29 @@ export const ShopAdmin = () => {
           <div className="flex items-center gap-4">
             <div className="flex bg-white/5 border border-white/10 p-1 rounded-xl backdrop-blur-sm">
               <button 
+                type="button"
                 onClick={() => setMainTab('SHOP')} 
-                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${mainTab === 'SHOP' ? 'bg-white text-black shadow-md' : 'text-gray-400 hover:text-white'}`}
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  mainTab === 'SHOP' ? 'bg-white text-black shadow-md' : 'text-gray-400 hover:text-white'
+                }`}
               >
                 <i className="fa-solid fa-store mr-1.5"></i> 쇼핑몰 관리
               </button>
               <button 
+                type="button"
                 onClick={() => setMainTab('RECRUIT')} 
-                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${mainTab === 'RECRUIT' ? 'bg-white text-black shadow-md' : 'text-gray-400 hover:text-white'}`}
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  mainTab === 'RECRUIT' ? 'bg-white text-black shadow-md' : 'text-gray-400 hover:text-white'
+                }`}
               >
                 <i className="fa-solid fa-user-tie mr-1.5"></i> 구인/채용 관리
               </button>
             </div>
 
             <button 
+              type="button"
               onClick={() => setCurrentView('SHOP_MAIN')} 
-              className="text-xs bg-white/10 hover:bg-white/20 border border-white/10 text-white px-4 py-2.5 rounded-xl font-bold transition shadow flex items-center gap-2"
+              className="text-xs bg-white/10 hover:bg-white/20 border border-white/10 text-white px-4 py-2.5 rounded-xl font-bold transition shadow flex items-center gap-2 cursor-pointer active:scale-95"
             >
               <i className="fa-solid fa-mobile-screen"></i> 앱으로 돌아가기
             </button>
@@ -131,10 +244,15 @@ export const ShopAdmin = () => {
                   <h2 className="text-xl font-black text-white">상품 등록 및 배너 관리</h2>
                   <p className="text-xs text-gray-400 mt-1">스토어에 노출되는 렌탈 및 판매 상품을 관리합니다.</p>
                 </div>
-                <button onClick={handleAddProduct} className="flex items-center gap-2 text-xs bg-white text-black hover:bg-gray-200 px-5 py-3 rounded-xl font-extrabold shadow-lg transition">
+                <button 
+                  type="button"
+                  onClick={handleAddProduct} 
+                  className="flex items-center gap-2 text-xs bg-white text-black hover:bg-gray-200 px-5 py-3 rounded-xl font-extrabold shadow-lg transition cursor-pointer active:scale-95"
+                >
                   <i className="fa-solid fa-plus"></i> 신규 상품 등록
                 </button>
               </div>
+
               {products.length === 0 ? (
                 <div className="text-center py-20 border border-dashed border-white/10 rounded-2xl">
                   <p className="text-sm text-gray-400">등록된 상품이 없습니다.</p>
@@ -142,7 +260,7 @@ export const ShopAdmin = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {products.map(p => (
-                    <div key={p.id} className="bg-white/5 border border-white/10 p-5 rounded-2xl flex justify-between items-center backdrop-blur-md">
+                    <div key={p.id} className="bg-white/5 border border-white/10 p-5 rounded-2xl flex justify-between items-center backdrop-blur-md hover:border-white/25 transition">
                       <div>
                         <span className="text-[10px] bg-white/10 text-gray-200 font-bold px-2.5 py-1 rounded-md mr-2">[{p.type}]</span>
                         <span className="font-bold text-white text-sm">{p.title}</span>
@@ -177,8 +295,9 @@ export const ShopAdmin = () => {
                   {role === 'STORE' ? '매장 화면 (35개 지점 연동)' : '본사 담당자 관리 화면'}
                 </span>
                 <button 
+                  type="button"
                   onClick={() => setRole(role === 'STORE' ? 'ADMIN' : 'STORE')} 
-                  className="text-xs bg-white text-black hover:bg-gray-200 px-4 py-2.5 rounded-xl font-black shadow transition"
+                  className="text-xs bg-white text-black hover:bg-gray-200 px-4 py-2.5 rounded-xl font-black shadow transition cursor-pointer active:scale-95"
                 >
                   {role === 'STORE' ? '담당자 화면으로 전환' : '매장 화면으로 전환'}
                 </button>
@@ -188,28 +307,40 @@ export const ShopAdmin = () => {
             {/* 네비게이션 탭 */}
             <div className="flex border-b border-white/10 px-8 gap-4 bg-white/[0.01]">
               <button 
+                type="button"
                 onClick={() => setRecruitTab('dashboard')} 
-                className={`py-4 text-sm font-bold border-b-2 transition-all px-2 flex items-center gap-2 ${recruitTab === 'dashboard' ? 'border-white text-white' : 'border-transparent text-gray-400 hover:text-white'}`}
+                className={`py-4 text-sm font-bold border-b-2 transition-all px-2 flex items-center gap-2 cursor-pointer ${
+                  recruitTab === 'dashboard' ? 'border-white text-white' : 'border-transparent text-gray-400 hover:text-white'
+                }`}
               >
                 <i className="fa-solid fa-table-columns"></i> 채용 현황 및 접수 리스트
               </button>
               {role === 'STORE' && (
                 <button 
+                  type="button"
                   onClick={() => setRecruitTab('request')} 
-                  className={`py-4 text-sm font-bold border-b-2 transition-all px-2 flex items-center gap-2 ${recruitTab === 'request' ? 'border-white text-white' : 'border-transparent text-gray-400 hover:text-white'}`}
+                  className={`py-4 text-sm font-bold border-b-2 transition-all px-2 flex items-center gap-2 cursor-pointer ${
+                    recruitTab === 'request' ? 'border-white text-white' : 'border-transparent text-gray-400 hover:text-white'
+                  }`}
                 >
                   <i className="fa-solid fa-file-pen"></i> 신규 구인 요청 작성
                 </button>
               )}
               <button 
+                type="button"
                 onClick={() => setRecruitTab('workers')} 
-                className={`py-4 text-sm font-bold border-b-2 transition-all px-2 flex items-center gap-2 ${recruitTab === 'workers' ? 'border-white text-white' : 'border-transparent text-gray-400 hover:text-white'}`}
+                className={`py-4 text-sm font-bold border-b-2 transition-all px-2 flex items-center gap-2 cursor-pointer ${
+                  recruitTab === 'workers' ? 'border-white text-white' : 'border-transparent text-gray-400 hover:text-white'
+                }`}
               >
                 <i className="fa-solid fa-users-gear"></i> 근무자 DB & 단체 문자
               </button>
               <button 
+                type="button"
                 onClick={() => setRecruitTab('chat')} 
-                className={`py-4 text-sm font-bold border-b-2 transition-all px-2 flex items-center gap-2 ${recruitTab === 'chat' ? 'border-white text-white' : 'border-transparent text-gray-400 hover:text-white'}`}
+                className={`py-4 text-sm font-bold border-b-2 transition-all px-2 flex items-center gap-2 cursor-pointer ${
+                  recruitTab === 'chat' ? 'border-white text-white' : 'border-transparent text-gray-400 hover:text-white'
+                }`}
               >
                 <i className="fa-solid fa-comments"></i> 실시간 소통 및 채팅
               </button>
@@ -227,7 +358,11 @@ export const ShopAdmin = () => {
                         <h4 className="font-bold text-white text-sm">담당자 전용 엑셀 업로드 도구</h4>
                         <p className="text-xs text-gray-400 mt-0.5">엑셀 파일을 일괄 업로드하여 35개 매장의 구인 현황을 실시간 반영합니다.</p>
                       </div>
-                      <button onClick={() => showAlert('엑셀 업로드', '엑셀 파일(.xlsx) 일괄 업로드 창이 열렸습니다.')} className="bg-white text-black hover:bg-gray-200 text-xs font-extrabold px-5 py-3 rounded-xl flex items-center gap-2 shadow-lg transition">
+                      <button 
+                        type="button"
+                        onClick={() => showAlert('엑셀 업로드', '엑셀 파일(.xlsx) 일괄 업로드 창이 열렸습니다.')} 
+                        className="bg-white text-black hover:bg-gray-200 text-xs font-extrabold px-5 py-3 rounded-xl flex items-center gap-2 shadow-lg transition cursor-pointer"
+                      >
                         <i className="fa-solid fa-file-excel"></i> 엑셀 구인현황 업로드
                       </button>
                     </div>
@@ -274,11 +409,19 @@ export const ShopAdmin = () => {
                               <span className="font-black text-base text-white ml-1">{req.hired} / {req.required} 명</span>
                             </div>
                             {role === 'ADMIN' ? (
-                              <button onClick={() => showAlert('채용 결과 등록', '해당 근무자의 최종 채용 결과가 등록되었습니다.')} className="bg-white text-black hover:bg-gray-200 text-xs font-black px-4 py-2 rounded-xl shadow">
+                              <button 
+                                type="button"
+                                onClick={() => showAlert('채용 결과 등록', '해당 근무자의 최종 채용 결과가 등록되었습니다.')} 
+                                className="bg-white text-black hover:bg-gray-200 text-xs font-black px-4 py-2 rounded-xl shadow cursor-pointer transition"
+                              >
                                 채용 결과 등록
                               </button>
                             ) : (
-                              <button onClick={() => showAlert('TO 변경 요청 완료', '미충원 TO 변경 요청이 본사 담당자에게 전송되었습니다.')} className="bg-white/10 hover:bg-white/20 border border-white/10 text-white text-xs font-bold px-4 py-2 rounded-xl transition">
+                              <button 
+                                type="button"
+                                onClick={() => showAlert('TO 변경 요청 완료', '미충원 TO 변경 요청이 본사 담당자에게 전송되었습니다.')} 
+                                className="bg-white/10 hover:bg-white/20 border border-white/10 text-white text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer"
+                              >
                                 TO 변경요청
                               </button>
                             )}
@@ -344,7 +487,10 @@ export const ShopAdmin = () => {
                       </div>
                     </div>
 
-                    <button type="submit" className="w-full bg-white text-black hover:bg-gray-200 font-black py-4 rounded-xl shadow-xl transition mt-6 text-base">
+                    <button 
+                      type="submit" 
+                      className="w-full bg-white text-black hover:bg-gray-200 font-black py-4 rounded-xl shadow-xl transition mt-6 text-base cursor-pointer active:scale-[0.99]"
+                    >
                       구인 요청 즉시 등록 및 전송
                     </button>
                   </form>
@@ -359,7 +505,11 @@ export const ShopAdmin = () => {
                       <h4 className="font-bold text-white text-base">근무자 DB 관리</h4>
                       <p className="text-xs text-gray-400">매장별 파트타임 및 상시 근무자 인적사항을 통합 관리합니다.</p>
                     </div>
-                    <button onClick={() => showAlert('근무자 등록', '신규 근무자 등록 창이 열렸습니다.')} className="bg-white text-black hover:bg-gray-200 text-xs font-black px-5 py-3 rounded-xl shadow">
+                    <button 
+                      type="button"
+                      onClick={() => setShowWorkerModal(true)} 
+                      className="bg-white text-black hover:bg-gray-200 text-xs font-black px-5 py-3 rounded-xl shadow cursor-pointer transition active:scale-95"
+                    >
                       + 근무자 등록
                     </button>
                   </div>
@@ -367,15 +517,24 @@ export const ShopAdmin = () => {
                   <div className="bg-white/5 border border-white/10 p-8 rounded-2xl backdrop-blur-md">
                     <div className="flex justify-between items-center mb-6">
                       <h4 className="font-bold text-white text-sm">등록된 근무자 리스트 ({workers.length}명)</h4>
-                      <button onClick={() => showAlert('단체 문자 발송', '선택된 근무자 대상 단체 문자 발송이 완료되었습니다.')} className="bg-white text-black hover:bg-gray-200 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow">
+                      <button 
+                        type="button"
+                        onClick={() => showAlert('단체 문자 발송', `선택된 ${selectedWorkersCount}명의 근무자 대상 단체 문자 발송이 완료되었습니다.`)} 
+                        className="bg-white text-black hover:bg-gray-200 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow cursor-pointer transition active:scale-95"
+                      >
                         <i className="fa-solid fa-paper-plane"></i> 선택 대상 단체 문자 발송
                       </button>
                     </div>
                     <div className="space-y-3">
                       {workers.map(w => (
-                        <div key={w.id} className="bg-black/30 border border-white/10 p-4 rounded-xl flex justify-between items-center">
+                        <div key={w.id} className="bg-black/30 border border-white/10 p-4 rounded-xl flex justify-between items-center hover:border-white/20 transition">
                           <div className="flex items-center gap-3">
-                            <input type="checkbox" defaultChecked className="w-4 h-4 text-white rounded accent-white" />
+                            <input 
+                              type="checkbox" 
+                              checked={w.checked} 
+                              onChange={() => toggleWorkerCheck(w.id)}
+                              className="w-4 h-4 text-white rounded accent-white cursor-pointer" 
+                            />
                             <div>
                               <span className="font-bold text-white text-sm">{w.name}</span>
                               <span className="text-xs text-gray-400 ml-2">({w.phone})</span>
@@ -394,14 +553,21 @@ export const ShopAdmin = () => {
                 <div className="bg-white/5 border border-white/10 rounded-3xl shadow-2xl flex flex-col h-[650px] w-full backdrop-blur-md overflow-hidden">
                   <div className="p-5 border-b border-white/10 bg-white/[0.02] flex justify-between items-center">
                     <span className="font-extrabold text-sm text-white">실시간 소통 채널 (구인·결근·지각·조퇴 문의)</span>
-                    <span className="text-xs text-emerald-400 font-bold flex items-center gap-1.5">● 실시간 연결됨</span>
+                    <span className="text-xs text-emerald-400 font-bold flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      실시간 연결됨
+                    </span>
                   </div>
                   
                   <div className="flex-1 p-6 overflow-y-auto space-y-4">
                     {messages.map(m => (
                       <div key={m.id} className={`flex flex-col ${m.isMine ? 'items-end' : 'items-start'}`}>
                         <span className="text-[10px] text-gray-400 mb-1">{m.sender} · {m.time}</span>
-                        <div className={`p-4 rounded-2xl text-sm max-w-md shadow-lg ${m.isMine ? 'bg-white text-black font-medium rounded-tr-none' : 'bg-white/10 border border-white/10 text-white rounded-tl-none'}`}>
+                        <div className={`p-4 rounded-2xl text-sm max-w-md shadow-lg ${
+                          m.isMine 
+                            ? 'bg-white text-black font-medium rounded-tr-none' 
+                            : 'bg-white/10 border border-white/10 text-white rounded-tl-none'
+                        }`}>
                           {m.text}
                         </div>
                       </div>
@@ -417,7 +583,11 @@ export const ShopAdmin = () => {
                       placeholder="메시지를 입력하세요 (예: 강남본점 조퇴 인원 발생 충원 요청)..." 
                       className="flex-1 bg-black/40 border border-white/10 rounded-xl px-5 py-3.5 text-sm text-white outline-none placeholder-gray-500"
                     />
-                    <button onClick={handleSendMessage} className="bg-white text-black hover:bg-gray-200 px-6 py-3.5 rounded-xl font-black flex items-center gap-2 shadow-lg transition">
+                    <button 
+                      type="button"
+                      onClick={handleSendMessage} 
+                      className="bg-white text-black hover:bg-gray-200 px-6 py-3.5 rounded-xl font-black flex items-center gap-2 shadow-lg transition cursor-pointer active:scale-95"
+                    >
                       <i className="fa-solid fa-paper-plane"></i> 전송
                     </button>
                   </div>
