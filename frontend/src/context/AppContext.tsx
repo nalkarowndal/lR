@@ -446,6 +446,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           setActiveOverlay(overlay);
         }
       };
+      (window as any).__lrSetUser = setUser;
     }
   }, [navigateTo, returnFromAdmin, goBack, setActiveOverlay]);
 

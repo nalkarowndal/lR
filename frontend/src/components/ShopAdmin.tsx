@@ -110,6 +110,7 @@ export const ShopAdmin = () => {
         setGalleryProduct(null);
         setShowWorkerModal(false);
         setExcelModalOpen(false);
+        setModal({ isOpen: false, title: '', message: '' });
       };
     }
   }, []);
@@ -583,6 +584,8 @@ export const ShopAdmin = () => {
                     </div>
                     <button 
                       type="button" 
+                      data-testid="admin-gallery-close"
+                      aria-label="갤러리 닫기"
                       onClick={() => setGalleryProduct(null)} 
                       className="text-gray-400 hover:text-white p-1"
                     >
