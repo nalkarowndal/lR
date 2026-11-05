@@ -339,8 +339,6 @@ export const ShopMain = () => {
   // 맞춤 추천 상품 탭 슬라이드 및 제스처 상태
   const RECOMMEND_TABS = ['20대 여성', '20대 남성', '30대 여성', '30대 남성', '40대 여성'] as const;
   const tabScrollRef = useRef<HTMLDivElement>(null);
-  const [canTabScrollLeft, setCanTabScrollLeft] = useState(false);
-  const [canTabScrollRight, setCanTabScrollRight] = useState(true);
   const isTabMouseDownRef = useRef(false);
   const tabStartXRef = useRef(0);
   const tabScrollLeftRef = useRef(0);
@@ -350,36 +348,6 @@ export const ShopMain = () => {
   // 상품 영역 터치 스와이프 제스처
   const productTouchStartXRef = useRef(0);
   const productTouchEndXRef = useRef(0);
-
-  const updateTabScrollButtons = () => {
-    if (!tabScrollRef.current) return;
-    const { scrollLeft, scrollWidth, clientWidth } = tabScrollRef.current;
-    setCanTabScrollLeft(scrollLeft > 6);
-    setCanTabScrollRight(scrollLeft + clientWidth < scrollWidth - 6);
-  };
-
-  useEffect(() => {
-    const el = tabScrollRef.current;
-    if (!el) return;
-
-    updateTabScrollButtons();
-    const timer = setTimeout(updateTabScrollButtons, 120);
-    el.addEventListener('scroll', updateTabScrollButtons, { passive: true });
-    window.addEventListener('resize', updateTabScrollButtons);
-
-    return () => {
-      clearTimeout(timer);
-      el.removeEventListener('scroll', updateTabScrollButtons);
-      window.removeEventListener('resize', updateTabScrollButtons);
-    };
-  }, []);
-
-  const handleTabScroll = (direction: 'left' | 'right') => {
-    if (!tabScrollRef.current) return;
-    const offset = direction === 'left' ? -160 : 160;
-    tabScrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
-    setTimeout(updateTabScrollButtons, 320);
-  };
 
   const handleTabMouseDown = (e: React.MouseEvent) => {
     if (!tabScrollRef.current) return;
@@ -398,7 +366,6 @@ export const ShopMain = () => {
       hasTabDraggedRef.current = true;
     }
     tabScrollRef.current.scrollLeft = tabScrollLeftRef.current - walk;
-    updateTabScrollButtons();
   };
 
   const handleTabMouseUp = () => {
@@ -850,34 +817,6 @@ export const ShopMain = () => {
 
         {/* 연령/성별 탭 가로 슬라이더 */}
         <div className="relative mb-4">
-          {/* 좌측 슬라이드 이동 버튼 */}
-          {canTabScrollLeft && (
-            <button
-              type="button"
-              aria-label="추천 탭 왼쪽으로 이동"
-              onClick={() => handleTabScroll('left')}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-white/95 backdrop-blur-md border border-gray-200 shadow-md flex items-center justify-center text-gray-800 hover:text-black hover:scale-105 active:scale-95 transition"
-            >
-              <ChevronLeft size={15} />
-            </button>
-          )}
-
-          {/* 우측 슬라이드 이동 버튼 */}
-          {canTabScrollRight && (
-            <button
-              type="button"
-              aria-label="추천 탭 오른쪽으로 이동"
-              onClick={() => handleTabScroll('right')}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-white/95 backdrop-blur-md border border-gray-200 shadow-md flex items-center justify-center text-gray-800 hover:text-black hover:scale-105 active:scale-95 transition"
-            >
-              <ChevronRight size={15} />
-            </button>
-          )}
-
-          {/* 좌우 그라디언트 페이드 오버레이 */}
-          <div className={`absolute left-0 top-0 bottom-1 w-6 bg-gradient-to-r from-white to-transparent pointer-events-none z-10 transition-opacity ${canTabScrollLeft ? 'opacity-100' : 'opacity-0'}`} />
-          <div className={`absolute right-0 top-0 bottom-1 w-6 bg-gradient-to-l from-white to-transparent pointer-events-none z-10 transition-opacity ${canTabScrollRight ? 'opacity-100' : 'opacity-0'}`} />
-
           {/* 탭 버튼 가로 스크롤 컨테이너 */}
           <div
             ref={tabScrollRef}

@@ -26,7 +26,8 @@ test('Recommendation Slider: ShopMain tab slide navigation and cyclic advancing'
   // Verify ShopMain.tsx contains slider controls and refs
   const shopMain = fs.readFileSync(path.join(ROOT, 'frontend/src/components/ShopMain.tsx'), 'utf-8');
   assert.ok(shopMain.includes('tabScrollRef'), 'ShopMain must bind tabScrollRef');
-  assert.ok(shopMain.includes('handleTabScroll'), 'ShopMain must implement handleTabScroll');
+  assert.ok(!shopMain.includes('추천 탭 왼쪽으로 이동'), 'ShopMain must not have floating left button on tab row');
+  assert.ok(!shopMain.includes('추천 탭 오른쪽으로 이동'), 'ShopMain must not have floating right button on tab row');
   assert.ok(shopMain.includes('handleTabMouseDown'), 'ShopMain must support mouse dragging');
   assert.ok(shopMain.includes('slideToNextTab'), 'ShopMain must support slideToNextTab');
   assert.ok(shopMain.includes('animate-slideInRight'), 'ShopMain must use slideInRight transition');
@@ -44,3 +45,4 @@ test('Recommendation Slider: Floating Navigation absolute immunity intact', () =
   assert.ok(navSection.includes('좋아요'));
   assert.ok(navSection.includes('마이페이지'));
 });
+
