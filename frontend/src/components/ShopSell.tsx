@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronLeft, Search, ChevronRight, Check, PlusCircle, X, AlertCircle } from 'lucide-react';
+import { EngravedMedalEmblem } from './ui/LuxuryIcons';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 
@@ -369,8 +370,8 @@ export const ShopSell = () => {
       {receiptModal.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
           <div className="bg-white rounded-2xl p-6 max-w-xs w-full shadow-2xl text-center flex flex-col items-center animate-fadeIn">
-            <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
-              <Check size={24} className="stroke-[3]" />
+            <div className="mb-2">
+              <EngravedMedalEmblem className="w-16 h-16 mx-auto" />
             </div>
             <h3 className="font-extrabold text-base text-gray-900 mb-1">위탁 판매 접수 완료</h3>
             <p className="text-xs text-emerald-600 font-bold mb-3">접수번호: {receiptModal.receiptCode}</p>

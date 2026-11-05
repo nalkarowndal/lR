@@ -9,7 +9,10 @@ import { Modal } from './ui/Modal';
 import { ConfirmDialog } from './ui/ConfirmDialog';
 import { api } from '../services/api';
 import { LegalTermsModal } from './ui/LegalTermsModal';
-import { LuxuryCrownIcon } from './ui/LuxuryIcons';
+import { 
+  LuxuryCrownIcon, EngravedLockIcon, EngravedBellIcon, 
+  EngravedProfileCrest, EngravedSparkleTier 
+} from './ui/LuxuryIcons';
 
 export const ShopSettings: React.FC = () => {
   const { 
@@ -204,7 +207,7 @@ export const ShopSettings: React.FC = () => {
                   className="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-gray-50/80 transition"
                 >
                   <div className="flex items-center gap-3 text-gray-700">
-                    <User size={18} className="text-gray-500" />
+                    <EngravedProfileCrest className="w-5 h-5" />
                     <span className="text-sm font-medium text-gray-900">내 정보 관리</span>
                   </div>
                   <ChevronRight size={16} className="text-gray-400" />
@@ -216,7 +219,7 @@ export const ShopSettings: React.FC = () => {
                   className="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-gray-50/80 transition"
                 >
                   <div className="flex items-center gap-3 text-gray-700">
-                    <Lock size={18} className="text-gray-500" />
+                    <EngravedLockIcon className="w-5 h-5" />
                     <span className="text-sm font-medium text-gray-900">비밀번호 변경</span>
                   </div>
                   <ChevronRight size={16} className="text-gray-400" />
@@ -249,7 +252,7 @@ export const ShopSettings: React.FC = () => {
                 className="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-gray-50/80 transition"
               >
                 <div className="flex items-center gap-3 text-gray-700">
-                  <User size={18} className="text-gray-500" />
+                  <EngravedProfileCrest className="w-5 h-5" />
                   <span className="text-sm font-medium text-gray-900">로그인하기</span>
                 </div>
                 <ChevronRight size={16} className="text-gray-400" />
@@ -264,7 +267,7 @@ export const ShopSettings: React.FC = () => {
           <div className="divide-y divide-gray-50">
             <div className="px-4 py-3.5 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Bell size={18} className="text-gray-500" />
+                <EngravedBellIcon className="w-5 h-5" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">서비스 이용 알림</p>
                   <p className="text-xs text-gray-400">주문, 렌탈 반납일, 결제 현황 안내</p>
@@ -287,7 +290,7 @@ export const ShopSettings: React.FC = () => {
 
             <div className="px-4 py-3.5 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Sparkles size={18} className="text-gray-500" />
+                <EngravedSparkleTier className="w-5 h-5" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">마케팅 및 혜택 알림</p>
                   <p className="text-xs text-gray-400">명품 신규 입고 및 할인 쿠폰 소식</p>

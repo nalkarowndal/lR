@@ -243,7 +243,9 @@ export const ShopSearch = () => {
               <X size={16} />
             </button>
           ) : (
-            <SearchIcon size={18} className="text-gray-500" />
+            <div className="w-6 h-6 rounded-full bg-[#F5F2ED] border border-[#E6E0D4] flex items-center justify-center text-[#252525] shadow-2xs">
+              <SearchIcon size={12} className="text-[#252525] stroke-[2.5]" />
+            </div>
           )}
         </div>
       </div>

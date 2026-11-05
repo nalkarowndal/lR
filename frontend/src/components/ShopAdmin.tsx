@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
+import {
+  EngravedShieldAdmin,
+  EngravedAdminHandshake,
+  EngravedAdminPlus,
+  EngravedAdminRefresh,
+  EngravedBagIcon,
+  EngravedProfileCrest,
+} from './ui/LuxuryIcons';
 
 export const ShopAdmin = () => {
   const { 
@@ -385,8 +393,8 @@ export const ShopAdmin = () => {
       <header className="sticky top-0 z-50 backdrop-blur-md bg-black/50 border-b border-white/10 shadow-xl w-full">
         <div className="w-full max-w-[1800px] mx-auto px-6 lg:px-12 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-white/10 border border-white/10 shadow-inner text-white">
-              <i className="fa-solid fa-shield-halved text-base"></i>
+            <div className="p-2 rounded-xl bg-white/10 border border-white/10 shadow-inner flex items-center justify-center">
+              <EngravedShieldAdmin className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -406,29 +414,29 @@ export const ShopAdmin = () => {
               <button 
                 type="button"
                 onClick={() => setMainTab('SHOP')} 
-                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   mainTab === 'SHOP' ? 'bg-white text-black shadow-md' : 'text-gray-400 hover:text-white'
                 }`}
               >
-                <i className="fa-solid fa-store mr-1.5"></i> 쇼핑몰 관리
+                <EngravedBagIcon className="w-3.5 h-3.5" /> 쇼핑몰 관리
               </button>
               <button 
                 type="button"
                 onClick={() => setMainTab('RECRUIT')} 
-                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   mainTab === 'RECRUIT' ? 'bg-white text-black shadow-md' : 'text-gray-400 hover:text-white'
                 }`}
               >
-                <i className="fa-solid fa-user-tie mr-1.5"></i> 구인/채용 관리
+                <EngravedProfileCrest className="w-3.5 h-3.5" /> 구인/채용 관리
               </button>
               <button 
                 type="button"
                 onClick={() => setMainTab('SELL_REQUESTS')} 
-                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   mainTab === 'SELL_REQUESTS' ? 'bg-white text-black shadow-md' : 'text-gray-400 hover:text-white'
                 }`}
               >
-                <i className="fa-solid fa-handshake mr-1.5"></i> 위탁 판매 관리
+                <EngravedAdminHandshake className="w-3.5 h-3.5" /> 위탁 판매 관리
               </button>
             </div>
 
@@ -460,7 +468,7 @@ export const ShopAdmin = () => {
                   onClick={handleAddProduct} 
                   className="flex items-center gap-2 text-xs bg-white text-black hover:bg-gray-200 px-5 py-3 rounded-xl font-extrabold shadow-lg transition cursor-pointer active:scale-95"
                 >
-                  <i className="fa-solid fa-plus"></i> 신규 상품 등록
+                  <EngravedAdminPlus className="w-4 h-4" /> 신규 상품 등록
                 </button>
               </div>
 
@@ -1147,7 +1155,7 @@ export const ShopAdmin = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-6 border-b border-white/10">
               <div>
                 <h3 className="font-extrabold text-white text-xl tracking-tight flex items-center gap-2">
-                  <i className="fa-solid fa-handshake text-indigo-400"></i>
+                  <EngravedAdminHandshake className="w-5 h-5 text-amber-300" />
                   고객 위탁 판매 신청 관리 ({adminSellRequests.length}건)
                 </h3>
                 <p className="text-xs text-gray-400 mt-1">고객이 신청한 브랜드 명품 위탁 판매 건을 검수하고 감정 상태를 변경합니다.</p>
@@ -1155,9 +1163,9 @@ export const ShopAdmin = () => {
               <button 
                 type="button"
                 onClick={loadAdminSellRequests}
-                className="text-xs bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2.5 rounded-xl border border-white/10 transition flex items-center gap-2"
+                className="text-xs bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2.5 rounded-xl border border-white/10 transition flex items-center gap-2 cursor-pointer active:scale-95"
               >
-                <i className={`fa-solid fa-rotate-right ${isLoadingSells ? 'animate-spin' : ''}`}></i> 새로고침
+                <EngravedAdminRefresh className={`w-4 h-4 ${isLoadingSells ? 'animate-spin' : ''}`} /> 새로고침
               </button>
             </div>
 

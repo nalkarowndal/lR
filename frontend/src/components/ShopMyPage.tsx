@@ -8,6 +8,10 @@ import { useToast } from '../context/ToastContext';
 import { Modal } from './ui/Modal';
 import { ProductImage } from './ui/ProductImage';
 import { api } from '../services/api';
+import { 
+  LuxuryCrownIcon, EngravedShieldAdmin, 
+  EngravedProfileCrest, EngravedSparkleTier 
+} from './ui/LuxuryIcons';
 
 export const ShopMyPage: React.FC = () => {
   const { 
@@ -198,7 +202,12 @@ export const ShopMyPage: React.FC = () => {
                         ? 'bg-amber-100 text-amber-800 border border-amber-200'
                         : 'bg-gray-100 text-gray-700'
                     }`}>
-                      {user.role === 'ADMIN' ? '👑 관리자 계정' : '일반 회원'}
+                      {user.role === 'ADMIN' ? (
+                        <span className="flex items-center gap-1">
+                          <LuxuryCrownIcon className="w-3.5 h-3.5 inline text-amber-600" />
+                          관리자 계정
+                        </span>
+                      ) : '일반 회원'}
                     </span>
                   </div>
                   <p className="text-xs text-gray-500 mt-1">{user.email}</p>
@@ -247,7 +256,7 @@ export const ShopMyPage: React.FC = () => {
             {user.role === 'ADMIN' && (
               <div className="mt-4 p-3.5 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <ShieldCheck size={18} className="text-indigo-600" />
+                  <EngravedShieldAdmin className="w-5 h-5" />
                   <span className="text-xs font-bold text-indigo-950">관리자 대시보드 바로가기</span>
                 </div>
                 <button
@@ -263,8 +272,8 @@ export const ShopMyPage: React.FC = () => {
         ) : (
           <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-black rounded-2xl p-6 text-white shadow-lg">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                <UserCheck size={24} className="text-white" />
+              <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center shrink-0">
+                <EngravedProfileCrest className="w-12 h-12" />
               </div>
               <div>
                 <h2 className="text-base font-bold">럭셔리렌탈에 오신 것을 환영합니다</h2>
@@ -499,7 +508,7 @@ export const ShopMyPage: React.FC = () => {
       <div className="p-4 mt-2">
         <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm space-y-3">
           <h2 className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
-            <Sparkles size={16} className="text-amber-500" />
+            <EngravedSparkleTier className="w-4 h-4" />
             럭셔리렌탈 프리미엄 멤버십 혜택
           </h2>
           <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">

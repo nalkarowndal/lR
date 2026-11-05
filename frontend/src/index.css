@@ -97,6 +97,28 @@
   .animate-slideInLeft {
     animation: slideInLeft 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
+
+  /* 🌟 Luxury Engraved Metal / Satin Deboss Icon System (Strictly Scoped) */
+  .luxury-engraved-icon {
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+    user-select: none;
+    transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), filter 180ms ease;
+  }
+
+  .luxury-engraved-icon:hover {
+    transform: scale(1.04);
+  }
+
+  .luxury-engraved-icon:active,
+  .luxury-engraved-icon.is-active {
+    transform: scale(0.97) translateY(0.5px);
+  }
+
+  .luxury-engraved-gunmetal:hover {
+    filter: drop-shadow(0 0 4px rgba(223, 202, 155, 0.25));
+  }
 }
 
 /* 🌟 Prefers-Reduced-Motion & User Setting Support */
