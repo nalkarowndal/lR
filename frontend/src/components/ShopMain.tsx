@@ -422,7 +422,10 @@ export const ShopMain = () => {
       <header className="sticky top-0 bg-white/95 backdrop-blur-md z-50 px-4 py-3 flex justify-between items-center border-b border-gray-100 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
         <h1
           className="text-xl font-black tracking-tighter cursor-pointer select-none text-gray-950"
-          onClick={() => setCurrentView('SHOP_MAIN')}
+          onClick={() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            navigateTo('SHOP_MAIN');
+          }}
         >
           LUXURYRENTAL
         </h1>
@@ -793,7 +796,7 @@ export const ShopMain = () => {
       <div className="bg-white p-5 pt-8 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
         <button
           type="button"
-          onClick={() => setCurrentView('SHOP_CATEGORY')}
+          onClick={() => navigateTo('SHOP_CATEGORY')}
           className="w-full border border-gray-300 hover:border-gray-400 hover:bg-gray-50 active:scale-[0.99] py-3.5 rounded-xl text-sm font-bold text-gray-800 flex justify-center items-center gap-1 mb-10 transition-all shadow-2xs"
         >
           전체보기 <ChevronRight size={16} />

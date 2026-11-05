@@ -1,18 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ChevronLeft, Search as SearchIcon, X, ArrowUp, ArrowDown } from 'lucide-react';
+import { ChevronLeft, Search as SearchIcon, X, ArrowUp, ArrowDown, Heart, ShieldCheck } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useToast } from '../context/ToastContext';
+import { Modal } from './ui/Modal';
 import { ProductImage } from './ui/ProductImage';
 import { SEARCH_CATALOG, type CatalogProduct } from '../data/catalog';
+import { calculateRentalPriceDetails } from '../utils/pricing';
 import { api } from '../services/api';
 
 export const ShopSearch = () => {
-  const { activeOverlay, setActiveOverlay } = useApp();
+  const { activeOverlay, setActiveOverlay, user, favorites, toggleFavorite } = useApp();
+  const { showToast } = useToast();
   const dialogRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [searchQuery, setSearchQuery] = useState('');
   
   // 'SEARCH' 상태일 때만 열림
   const isOpen = activeOverlay === 'SEARCH';
+
+  // 상품 상세 모달 상태
+  const [selectedProduct, setSelectedProduct] = useState<CatalogProduct | null>(null);
+  const [selectedDays, setSelectedDays] = useState<number>(3);
 
   useEffect(() => {
     if (isOpen) {
@@ -157,6 +165,27 @@ export const ShopSearch = () => {
     inputRef.current?.focus();
   };
 
+  const handleAddToCart = (product: CatalogProduct, days: number) => {
+    const details = calculateRentalPriceDetails(product.price, product.originalPrice, days);
+    const newItem = {
+      id: product.id,
+      brand: product.brand,
+      title: product.title,
+      price: details.formattedCurrentPrice,
+      days,
+      image: product.imageUrl,
+      category: product.category
+    };
+    try {
+      const saved = localStorage.getItem('luxury_cart');
+      const cart = saved ? JSON.parse(saved) : [];
+      const updated = [...cart.filter((item: any) => item.id !== product.id), newItem];
+      localStorage.setItem('luxury_cart', JSON.stringify(updated));
+    } catch {}
+    showToast(`'${product.brand} ${product.title}' 상품이 장바구니에 담겼습니다.`, 'success');
+    setSelectedProduct(null);
+  };
+
   const filteredResults = searchResults.filter((item: CatalogProduct) => {
     if (selectedCategory === 'ALL') return true;
     if (selectedCategory === 'jewelry_watch') {
@@ -283,26 +312,61 @@ export const ShopSearch = () => {
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3">
-                {filteredResults.map((item: CatalogProduct) => (
-                  <div key={item.id} className="flex flex-col group cursor-pointer p-2 rounded-xl hover:bg-gray-50 transition">
-                    <div className="relative aspect-square bg-gray-100 rounded-xl mb-2 flex items-center justify-center overflow-hidden border border-gray-100 shadow-2xs">
-                      <ProductImage 
-                        src={item.imageUrl} 
-                        alt={item.title} 
-                        category={item.category}
-                        productId={item.id}
-                      />
-                      {item.tag && (
-                        <div className="absolute bottom-0 w-full bg-black/60 backdrop-blur-xs text-white text-center text-[10px] py-1 font-bold z-10">
-                          {item.tag}
-                        </div>
-                      )}
+                {filteredResults.map((item: CatalogProduct) => {
+                  const numericId = typeof item.id === 'number'
+                    ? item.id
+                    : (parseInt(String(item.id).replace(/\D/g, ''), 10) || 1);
+                  const isFav = favorites.includes(numericId);
+                  return (
+                    <div 
+                      key={item.id} 
+                      onClick={() => setSelectedProduct(item)}
+                      className="flex flex-col group cursor-pointer p-2 rounded-xl hover:bg-gray-50 transition"
+                    >
+                      <div className="relative aspect-square bg-gray-100 rounded-xl mb-2 flex items-center justify-center overflow-hidden border border-gray-100 shadow-2xs">
+                        <ProductImage 
+                          src={item.imageUrl} 
+                          alt={item.title} 
+                          category={item.category}
+                          productId={item.id}
+                        />
+                        <button 
+                          type="button"
+                          aria-label={`${item.title} 좋아요`}
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            if (!user) {
+                              showToast('좋아요를 저장하려면 로그인이 필요합니다.', 'info');
+                              setActiveOverlay('LOGIN');
+                            } else {
+                              try {
+                                const isNowFav = await toggleFavorite(numericId);
+                                showToast(isNowFav ? `'${item.title}' 관심 상품에 추가되었습니다.` : `'${item.title}' 관심 상품에서 해제되었습니다.`, 'info');
+                              } catch (err: any) {
+                                showToast('좋아요 저장 중 서버 오류가 발생했습니다. 다시 시도해주세요.', 'error');
+                              }
+                            }
+                          }}
+                          className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-md text-gray-400 hover:text-red-500 hover:bg-white transition shadow-xs z-10"
+                        >
+                          <Heart 
+                            size={15}
+                            fill={isFav ? '#EF4444' : 'none'}
+                            className={isFav ? 'text-red-500' : 'text-gray-400'}
+                          />
+                        </button>
+                        {item.tag && (
+                          <div className="absolute bottom-0 w-full bg-black/60 backdrop-blur-xs text-white text-center text-[10px] py-1 font-bold z-10">
+                            {item.tag}
+                          </div>
+                        )}
+                      </div>
+                      <span className="font-extrabold text-xs text-gray-900 group-hover:text-indigo-600 transition-colors">{item.brand}</span>
+                      <span className="text-[11px] text-gray-600 truncate">{item.title}</span>
+                      <span className="font-black text-sm text-gray-950 mt-1">{item.price}</span>
                     </div>
-                    <span className="font-extrabold text-xs text-gray-900">{item.brand}</span>
-                    <span className="text-[11px] text-gray-600 truncate">{item.title}</span>
-                    <span className="font-black text-sm text-gray-950 mt-1">{item.price}</span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -376,6 +440,116 @@ export const ShopSearch = () => {
           </>
         )}
       </div>
+
+      {/* 상품 상세 모달 */}
+      <Modal
+        isOpen={selectedProduct !== null}
+        onClose={() => setSelectedProduct(null)}
+        title="상품 상세 정보"
+      >
+        {selectedProduct && (() => {
+          const pricing = calculateRentalPriceDetails(
+            selectedProduct.price,
+            selectedProduct.originalPrice,
+            selectedDays
+          );
+
+          return (
+            <div className="space-y-4">
+              <div className="relative aspect-square w-full bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 flex items-center justify-center">
+                <ProductImage
+                  src={selectedProduct.imageUrl}
+                  alt={selectedProduct.title}
+                  category={selectedProduct.category}
+                  productId={selectedProduct.id}
+                />
+                <div className="absolute top-2.5 right-2.5">
+                  <button
+                    type="button"
+                    aria-label="관심 상품 저장"
+                    onClick={async () => {
+                      if (!user) {
+                        showToast('좋아요를 저장하려면 먼저 로그인해주세요.', 'info');
+                        setActiveOverlay('LOGIN');
+                      } else {
+                        const numId = typeof selectedProduct.id === 'number' 
+                          ? selectedProduct.id 
+                          : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10);
+                        const isNowFav = await toggleFavorite(numId);
+                        showToast(isNowFav ? '관심 상품에 추가되었습니다.' : '관심 상품에서 해제되었습니다.', 'info');
+                      }
+                    }}
+                    className="p-2 rounded-full bg-white/90 backdrop-blur-md shadow-xs hover:bg-white text-gray-400 hover:text-red-500 transition"
+                  >
+                    <Heart
+                      size={18}
+                      fill={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10)) ? '#EF4444' : 'none'}
+                      className={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10)) ? 'text-red-500' : 'text-gray-400'}
+                    />
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <span className="text-xs font-black text-indigo-600 uppercase tracking-wider">{selectedProduct.brand}</span>
+                <h4 className="text-base font-black text-gray-950 mt-0.5 leading-snug">{selectedProduct.title}</h4>
+                <div className="mt-2 flex items-baseline gap-2 flex-wrap">
+                  <span className="text-rose-500 font-extrabold text-base">{pricing.formattedDiscount}</span>
+                  <span className="font-black text-lg text-gray-950">
+                    {pricing.formattedCurrentPrice}
+                  </span>
+                  <span className="text-xs text-gray-400 font-medium">/{selectedDays}일 기준</span>
+                  <span className="text-xs text-gray-400 line-through ml-1">{pricing.formattedBasePrice}</span>
+                  <span className="text-[11px] text-indigo-700 bg-indigo-50 font-bold px-2 py-0.5 rounded-md ml-auto">
+                    1일 {pricing.formattedDailyRate}
+                  </span>
+                </div>
+              </div>
+
+              {/* 정품 인증 배지 */}
+              <div className="flex items-center gap-2.5 p-3 bg-amber-50/80 border border-amber-200/60 rounded-xl text-amber-900 text-xs font-bold">
+                <ShieldCheck size={20} className="text-amber-600 shrink-0" />
+                <div>
+                  <p className="leading-tight">한국명품감정원 100% 정품 인증 완료</p>
+                  <p className="text-[10px] text-amber-700/80 font-normal mt-0.5">정품 보증서 동봉 및 위조품 시 200% 책임 보상</p>
+                </div>
+              </div>
+
+              {/* 렌탈 기간 선택 */}
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-2">렌탈 기간 선택</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {[3, 7, 15, 30].map((days) => (
+                    <button
+                      key={days}
+                      type="button"
+                      onClick={() => setSelectedDays(days)}
+                      className={`py-2 rounded-xl text-xs font-bold border transition ${
+                        selectedDays === days
+                          ? 'border-gray-950 bg-gray-950 text-white shadow-xs'
+                          : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      {days}일
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 액션 버튼 */}
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => handleAddToCart(selectedProduct, selectedDays)}
+                  className="w-full py-3 bg-gray-950 text-white rounded-xl font-bold text-xs hover:bg-black active:scale-[0.98] transition shadow-md"
+                >
+                  장바구니 담기
+                </button>
+              </div>
+            </div>
+          );
+        })()}
+      </Modal>
     </div>
   );
 };
