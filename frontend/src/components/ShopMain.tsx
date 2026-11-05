@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
-  Search, ShoppingCart, Settings, Heart, User, Home, List, ChevronRight,
+  Search, ShoppingCart, Settings, Heart, User, Home, List, ChevronRight, ChevronLeft,
   ShieldCheck, Smartphone, Trash2, CheckCircle2, X, PackageCheck, ArrowRight
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
@@ -334,6 +334,137 @@ export const ShopMain = () => {
     setCompletedOrder(newOrder);
     setCartStep('ORDER_COMPLETE');
     showToast(`렌탈 주문이 정상 접수되었습니다! 주문번호: ${orderId}`, 'success');
+  };
+
+  // 맞춤 추천 상품 탭 슬라이드 및 제스처 상태
+  const RECOMMEND_TABS = ['20대 여성', '20대 남성', '30대 여성', '30대 남성', '40대 여성'] as const;
+  const tabScrollRef = useRef<HTMLDivElement>(null);
+  const [canTabScrollLeft, setCanTabScrollLeft] = useState(false);
+  const [canTabScrollRight, setCanTabScrollRight] = useState(true);
+  const isTabMouseDownRef = useRef(false);
+  const tabStartXRef = useRef(0);
+  const tabScrollLeftRef = useRef(0);
+  const hasTabDraggedRef = useRef(false);
+  const [recommendSlideDirection, setRecommendSlideDirection] = useState<'left' | 'right' | null>(null);
+
+  // 상품 영역 터치 스와이프 제스처
+  const productTouchStartXRef = useRef(0);
+  const productTouchEndXRef = useRef(0);
+
+  const updateTabScrollButtons = () => {
+    if (!tabScrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = tabScrollRef.current;
+    setCanTabScrollLeft(scrollLeft > 6);
+    setCanTabScrollRight(scrollLeft + clientWidth < scrollWidth - 6);
+  };
+
+  useEffect(() => {
+    const el = tabScrollRef.current;
+    if (!el) return;
+
+    updateTabScrollButtons();
+    const timer = setTimeout(updateTabScrollButtons, 120);
+    el.addEventListener('scroll', updateTabScrollButtons, { passive: true });
+    window.addEventListener('resize', updateTabScrollButtons);
+
+    return () => {
+      clearTimeout(timer);
+      el.removeEventListener('scroll', updateTabScrollButtons);
+      window.removeEventListener('resize', updateTabScrollButtons);
+    };
+  }, []);
+
+  const handleTabScroll = (direction: 'left' | 'right') => {
+    if (!tabScrollRef.current) return;
+    const offset = direction === 'left' ? -160 : 160;
+    tabScrollRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+    setTimeout(updateTabScrollButtons, 320);
+  };
+
+  const handleTabMouseDown = (e: React.MouseEvent) => {
+    if (!tabScrollRef.current) return;
+    isTabMouseDownRef.current = true;
+    hasTabDraggedRef.current = false;
+    tabStartXRef.current = e.pageX - tabScrollRef.current.offsetLeft;
+    tabScrollLeftRef.current = tabScrollRef.current.scrollLeft;
+  };
+
+  const handleTabMouseMove = (e: React.MouseEvent) => {
+    if (!isTabMouseDownRef.current || !tabScrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - tabScrollRef.current.offsetLeft;
+    const walk = (x - tabStartXRef.current) * 1.5;
+    if (Math.abs(walk) > 4) {
+      hasTabDraggedRef.current = true;
+    }
+    tabScrollRef.current.scrollLeft = tabScrollLeftRef.current - walk;
+    updateTabScrollButtons();
+  };
+
+  const handleTabMouseUp = () => {
+    isTabMouseDownRef.current = false;
+    setTimeout(() => { hasTabDraggedRef.current = false; }, 60);
+  };
+
+  const handleSelectTab = (tab: typeof RECOMMEND_TABS[number], btnEl?: HTMLElement) => {
+    if (hasTabDraggedRef.current) return;
+    const currentIndex = RECOMMEND_TABS.indexOf(activeTab as any);
+    const targetIndex = RECOMMEND_TABS.indexOf(tab);
+    setRecommendSlideDirection(targetIndex >= currentIndex ? 'right' : 'left');
+    setActiveTab(tab);
+
+    if (tabScrollRef.current && btnEl) {
+      const container = tabScrollRef.current;
+      const targetScroll = btnEl.offsetLeft - (container.clientWidth / 2) + (btnEl.clientWidth / 2);
+      container.scrollTo({ left: Math.max(0, targetScroll), behavior: 'smooth' });
+    }
+  };
+
+  const slideToNextTab = (direction: 'next' | 'prev') => {
+    const currentIndex = RECOMMEND_TABS.indexOf(activeTab as any);
+    if (direction === 'next') {
+      const nextIndex = (currentIndex + 1) % RECOMMEND_TABS.length;
+      setRecommendSlideDirection('right');
+      setActiveTab(RECOMMEND_TABS[nextIndex]);
+      if (tabScrollRef.current) {
+        const btns = tabScrollRef.current.querySelectorAll('button');
+        const nextBtn = btns[nextIndex];
+        if (nextBtn) {
+          const targetScroll = nextBtn.offsetLeft - (tabScrollRef.current.clientWidth / 2) + (nextBtn.clientWidth / 2);
+          tabScrollRef.current.scrollTo({ left: Math.max(0, targetScroll), behavior: 'smooth' });
+        }
+      }
+    } else {
+      const prevIndex = (currentIndex - 1 + RECOMMEND_TABS.length) % RECOMMEND_TABS.length;
+      setRecommendSlideDirection('left');
+      setActiveTab(RECOMMEND_TABS[prevIndex]);
+      if (tabScrollRef.current) {
+        const btns = tabScrollRef.current.querySelectorAll('button');
+        const prevBtn = btns[prevIndex];
+        if (prevBtn) {
+          const targetScroll = prevBtn.offsetLeft - (tabScrollRef.current.clientWidth / 2) + (prevBtn.clientWidth / 2);
+          tabScrollRef.current.scrollTo({ left: Math.max(0, targetScroll), behavior: 'smooth' });
+        }
+      }
+    }
+  };
+
+  const handleProductTouchStart = (e: React.TouchEvent) => {
+    productTouchStartXRef.current = e.targetTouches[0].clientX;
+    productTouchEndXRef.current = e.targetTouches[0].clientX;
+  };
+
+  const handleProductTouchMove = (e: React.TouchEvent) => {
+    productTouchEndXRef.current = e.targetTouches[0].clientX;
+  };
+
+  const handleProductTouchEnd = () => {
+    const delta = productTouchStartXRef.current - productTouchEndXRef.current;
+    if (delta > 45) {
+      slideToNextTab('next');
+    } else if (delta < -45) {
+      slideToNextTab('prev');
+    }
   };
 
   const currentRecommendList = RECOMMENDATIONS_DATA[activeTab] || RECOMMENDATIONS_DATA['20대 여성'];
@@ -689,23 +820,101 @@ export const ShopMain = () => {
 
       {/* 4. 맞춤 추천 상품 */}
       <section className="p-5 bg-white mb-2 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
-        <h3 className="font-extrabold text-lg mb-3 text-gray-900 tracking-tight">회원님이 좋아하실 것 같은 상품</h3>
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-4 pb-1">
-          {['20대 여성', '20대 남성', '30대 여성', '30대 남성', '40대 여성'].map(tab => (
-            <button
-              key={tab}
-              type="button"
-              onClick={() => setActiveTab(tab)}
-              className={`whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold border transition-all ${activeTab === tab
-                  ? 'bg-gray-800 text-white border-gray-800 shadow-xs'
-                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-                }`}
-            >
-              {tab}
-            </button>
-          ))}
+        {/* 상단 타이틀 & 슬라이드 컨트롤러 */}
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-extrabold text-lg text-gray-900 tracking-tight">회원님이 좋아하실 것 같은 상품</h3>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] font-bold text-gray-400">
+              {RECOMMEND_TABS.indexOf(activeTab as any) + 1} / {RECOMMEND_TABS.length}
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                aria-label="이전 추천 상품 보기"
+                onClick={() => slideToNextTab('prev')}
+                className="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-black flex items-center justify-center transition active:scale-95 shadow-2xs"
+              >
+                <ChevronLeft size={14} />
+              </button>
+              <button
+                type="button"
+                aria-label="다음 추천 상품 보기"
+                onClick={() => slideToNextTab('next')}
+                className="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-black flex items-center justify-center transition active:scale-95 shadow-2xs"
+              >
+                <ChevronRight size={14} />
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+
+        {/* 연령/성별 탭 가로 슬라이더 */}
+        <div className="relative mb-4">
+          {/* 좌측 슬라이드 이동 버튼 */}
+          {canTabScrollLeft && (
+            <button
+              type="button"
+              aria-label="추천 탭 왼쪽으로 이동"
+              onClick={() => handleTabScroll('left')}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-white/95 backdrop-blur-md border border-gray-200 shadow-md flex items-center justify-center text-gray-800 hover:text-black hover:scale-105 active:scale-95 transition"
+            >
+              <ChevronLeft size={15} />
+            </button>
+          )}
+
+          {/* 우측 슬라이드 이동 버튼 */}
+          {canTabScrollRight && (
+            <button
+              type="button"
+              aria-label="추천 탭 오른쪽으로 이동"
+              onClick={() => handleTabScroll('right')}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-white/95 backdrop-blur-md border border-gray-200 shadow-md flex items-center justify-center text-gray-800 hover:text-black hover:scale-105 active:scale-95 transition"
+            >
+              <ChevronRight size={15} />
+            </button>
+          )}
+
+          {/* 좌우 그라디언트 페이드 오버레이 */}
+          <div className={`absolute left-0 top-0 bottom-1 w-6 bg-gradient-to-r from-white to-transparent pointer-events-none z-10 transition-opacity ${canTabScrollLeft ? 'opacity-100' : 'opacity-0'}`} />
+          <div className={`absolute right-0 top-0 bottom-1 w-6 bg-gradient-to-l from-white to-transparent pointer-events-none z-10 transition-opacity ${canTabScrollRight ? 'opacity-100' : 'opacity-0'}`} />
+
+          {/* 탭 버튼 가로 스크롤 컨테이너 */}
+          <div
+            ref={tabScrollRef}
+            onMouseDown={handleTabMouseDown}
+            onMouseMove={handleTabMouseMove}
+            onMouseUp={handleTabMouseUp}
+            onMouseLeave={handleTabMouseUp}
+            className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 scroll-smooth select-none cursor-grab active:cursor-grabbing px-1"
+          >
+            {RECOMMEND_TABS.map(tab => (
+              <button
+                key={tab}
+                type="button"
+                onClick={(e) => handleSelectTab(tab, e.currentTarget)}
+                className={`whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold border transition-all shrink-0 ${activeTab === tab
+                    ? 'bg-gray-800 text-white border-gray-800 shadow-xs'
+                    : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                  }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 추천 상품 그리드 (부드러운 슬라이드 전환 애니메이션 및 스와이프 제스처) */}
+        <div
+          key={activeTab}
+          onTouchStart={handleProductTouchStart}
+          onTouchMove={handleProductTouchMove}
+          onTouchEnd={handleProductTouchEnd}
+          className={`grid grid-cols-2 gap-3 transition-all ${
+            recommendSlideDirection === 'right' ? 'animate-slideInRight' :
+            recommendSlideDirection === 'left' ? 'animate-slideInLeft' :
+            'animate-fadeIn'
+          }`}
+        >
           {currentRecommendList.map((item) => {
             const isFav = favorites.includes(item.id);
             return (
