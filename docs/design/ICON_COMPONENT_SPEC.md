@@ -61,3 +61,4 @@ export interface EngravedMenuIconProps {
 - 장식용 아이콘: `title` 및 `ariaLabel`이 생략된 경우 `role="presentation"` 및 `aria-hidden="true"` 자동 부여.
 - 의미형 아이콘: `title` 또는 `ariaLabel` 제공 시 `role="img"` 및 `<title>` 태그 자동 삽입.
 - 포커스 시: 부모 인터랙티브 요소의 포커스 링과 연동되어 뭉개짐 없이 선명한 외곽선 유지.
+

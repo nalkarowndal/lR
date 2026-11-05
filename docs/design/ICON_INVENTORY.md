@@ -58,3 +58,4 @@
 | `ADM-04` | `ShopAdmin` | `<i class="handshake">` | FontAwesome | 위탁 판매 관리 | 16x16 | #ffffff | 외부 웹폰트 종속 | Admin (Dark Gunmetal) | `EngravedAdminHandshake`| Complete | Pass |
 | `ADM-05` | `ShopAdmin` | `<i class="excel">` | FontAwesome | 엑셀 일괄 업로드 | 16x16 | #ffffff | 외부 웹폰트 종속 | Admin (Dark Gunmetal) | `EngravedAdminExcel` | Complete | Pass |
 | `ADM-06` | `ShopAdmin` | `Send` / `Upload` | Lucide | 구인 요청 등록/발송 | 16x16 | #ffffff | 일반 루시드 아이콘 | Admin (Dark Gunmetal) | `EngravedAdminSend` | Complete | Pass |
+

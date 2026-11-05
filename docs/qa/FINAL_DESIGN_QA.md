@@ -75,3 +75,4 @@ dist/assets/index-Bloh0bbQ.js   574.32 kB │ gzip: 137.43 kB
    - `admin/EngravedAdminIcons.tsx`
 5. **테스트 스위트 (`frontend/tests/`)**:
    - `frontend/tests/engraved-icons.test.mjs`
+

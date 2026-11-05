@@ -41,3 +41,4 @@
 1. **호버 (Hover)**: `scale(1.04)` 변환 시 레이아웃 리플로우(Layout Reflow) 발생 없이 GPU 가속(`transform`)으로 60fps 부드러운 전환 확인.
 2. **클릭 (Active)**: `scale(0.97) translateY(0.5px)` 물리적 메탈 누름 감각 정상 작동.
 3. **SVG 필터 렌더링 부하**: `feDropShadow` 필터가 모바일 CPU에 미치는 영향 0.1ms 미만으로 지연 없음 확인.
+
