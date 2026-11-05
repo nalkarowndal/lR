@@ -5,6 +5,7 @@ import { api } from '../services/api';
 export const ShopAdmin = () => {
   const { 
     navigateTo,
+    returnFromAdmin,
     products, setProducts, 
     requests, setRequests, 
     messages, setMessages, 
@@ -433,7 +434,7 @@ export const ShopAdmin = () => {
 
             <button 
               type="button"
-              onClick={() => navigateTo('SHOP_SETTINGS')} 
+              onClick={() => returnFromAdmin('SHOP_SETTINGS')} 
               className="text-xs bg-white/10 hover:bg-white/20 border border-white/10 text-white px-4 py-2.5 rounded-xl font-bold transition shadow flex items-center gap-2 cursor-pointer active:scale-95"
             >
               <i className="fa-solid fa-mobile-screen"></i> 앱으로 돌아가기

@@ -7,7 +7,7 @@ interface ProtectedAdminViewProps {
 }
 
 export const ProtectedAdminView: React.FC<ProtectedAdminViewProps> = ({ children }) => {
-  const { user, isAuthLoading, navigateTo, setActiveOverlay } = useApp();
+  const { user, isAuthLoading, navigateTo, returnFromAdmin, setActiveOverlay } = useApp();
 
   if (isAuthLoading) {
     return (
@@ -31,7 +31,7 @@ export const ProtectedAdminView: React.FC<ProtectedAdminViewProps> = ({ children
         <div className="flex gap-3">
           <button
             type="button"
-            onClick={() => navigateTo('SHOP_SETTINGS')}
+            onClick={() => returnFromAdmin('SHOP_SETTINGS')}
             className="flex items-center gap-1.5 px-4 py-2 bg-gray-800 text-gray-300 rounded-lg text-xs font-bold hover:bg-gray-700 transition"
           >
             <ArrowLeft size={14} /> 설정으로 복귀
@@ -60,7 +60,7 @@ export const ProtectedAdminView: React.FC<ProtectedAdminViewProps> = ({ children
         </p>
         <button
           type="button"
-          onClick={() => navigateTo('SHOP_SETTINGS')}
+          onClick={() => returnFromAdmin('SHOP_SETTINGS')}
           className="flex items-center gap-1.5 px-4 py-2 bg-gray-800 text-gray-200 rounded-lg text-xs font-bold hover:bg-gray-700 transition"
         >
           <ArrowLeft size={14} /> 설정 페이지로 돌아가기

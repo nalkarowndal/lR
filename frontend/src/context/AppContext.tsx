@@ -77,6 +77,7 @@ interface AppContextType {
   transitionDirection: TransitionDirection;
   navigateTo: (view: ViewState) => void;
   goBack: (fallbackView?: ViewState) => void;
+  returnFromAdmin: (fallbackView?: ViewState) => void;
   isNavigating: boolean;
   
   activeOverlay: OverlayState;
@@ -156,33 +157,84 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setIsNavigating(true);
     setTransitionDirection('forward');
     setCurrentView(view);
-    setViewHistory(prev => [...prev, view]);
+    setViewHistory(prev => {
+      // If entering SHOP_ADMIN, record it while preserving the prior consumer navigation stack
+      if (view === 'SHOP_ADMIN') {
+        const cleaned = prev.filter(v => v !== 'SHOP_ADMIN');
+        return [...cleaned, 'SHOP_ADMIN'];
+      }
+      // If navigating to a consumer view, purge SHOP_ADMIN from history
+      const cleaned = prev.filter(v => v !== 'SHOP_ADMIN');
+      if (cleaned.length > 0 && cleaned[cleaned.length - 1] === view) {
+        return cleaned;
+      }
+      return [...cleaned, view];
+    });
 
     setTimeout(() => {
       setIsNavigating(false);
     }, 280);
   }, [currentView]);
 
-  // Go back with reverse animation
-  const goBack = useCallback((fallbackView: ViewState = 'SHOP_MAIN') => {
+  // Return from Admin dashboard to the consumer app cleanly without leaving SHOP_ADMIN in back-history
+  const returnFromAdmin = useCallback((fallbackView: ViewState = 'SHOP_SETTINGS') => {
     setIsNavigating(true);
     setTransitionDirection('backward');
 
     setViewHistory(prev => {
-      if (prev.length <= 1) {
-        setCurrentView(fallbackView);
-        return [fallbackView];
+      // Filter out all SHOP_ADMIN occurrences
+      const cleaned = prev.filter(v => v !== 'SHOP_ADMIN');
+      if (cleaned.length > 0) {
+        const lastView = cleaned[cleaned.length - 1];
+        setCurrentView(lastView);
+        return cleaned;
       }
-      const nextHistory = prev.slice(0, -1);
-      const targetView = nextHistory[nextHistory.length - 1];
-      setCurrentView(targetView);
-      return nextHistory;
+      // Fallback if history had no previous views
+      setCurrentView(fallbackView);
+      return fallbackView === 'SHOP_MAIN' ? ['SHOP_MAIN'] : ['SHOP_MAIN', fallbackView];
     });
 
     setTimeout(() => {
       setIsNavigating(false);
     }, 250);
   }, []);
+
+  // Go back with reverse animation (never navigate back into administrative views)
+  const goBack = useCallback((fallbackView: ViewState = 'SHOP_MAIN') => {
+    setIsNavigating(true);
+    setTransitionDirection('backward');
+
+    setViewHistory(prev => {
+      // 1. Remove all admin views from history stack - back button in consumer app must never open admin
+      let validHistory = prev.filter(v => v !== 'SHOP_ADMIN');
+
+      // 2. Remove currentView from the top of the stack to navigate to the previous view
+      if (validHistory.length > 0 && validHistory[validHistory.length - 1] === currentView) {
+        validHistory.pop();
+      } else if (validHistory.length > 1) {
+        validHistory.pop();
+      }
+
+      // 3. Remove consecutive duplicate of currentView if any
+      while (validHistory.length > 0 && validHistory[validHistory.length - 1] === currentView) {
+        validHistory.pop();
+      }
+
+      // If no valid history remains, land on fallbackView
+      if (validHistory.length === 0) {
+        setCurrentView(fallbackView);
+        return [fallbackView];
+      }
+
+      const targetView = validHistory[validHistory.length - 1];
+      setCurrentView(targetView);
+      return validHistory;
+    });
+
+    setTimeout(() => {
+      setIsNavigating(false);
+    }, 250);
+  }, [currentView]);
 
   const checkUserAuth = async (): Promise<User | null> => {
     try {
@@ -381,9 +433,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       (window as any).__lrNavigate = navigateTo;
+      (window as any).__lrReturnFromAdmin = returnFromAdmin;
+      (window as any).__lrGoBack = goBack;
       (window as any).__lrSetOverlay = setActiveOverlay;
     }
-  }, [navigateTo, setActiveOverlay]);
+  }, [navigateTo, returnFromAdmin, goBack, setActiveOverlay]);
 
   useEffect(() => {
     refreshData();
@@ -397,7 +451,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AppContext.Provider value={{ 
-      currentView, setCurrentView, transitionDirection, navigateTo, goBack, isNavigating,
+      currentView, setCurrentView, transitionDirection, navigateTo, goBack, returnFromAdmin, isNavigating,
       activeOverlay, setActiveOverlay,
       user, setUser, isAuthLoading, logoutUser, checkUserAuth,
       userSettings, updateUserSettings,
