@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { getDatabase } from '../db/database.js';
 import { hashPassword, verifyPassword, generateSessionToken, generateResetToken } from '../utils/crypto.js';
 import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from '../schemas/auth.schemas.js';
+import { parseCookies } from '../middlewares/auth.js';
 import { config } from '../config/env.js';
 
 export function register(req: Request, res: Response, next: NextFunction) {
@@ -127,20 +128,37 @@ export function getMe(req: Request, res: Response) {
     });
   }
 
+  const db = getDatabase();
+  const sessionRow = db.prepare(`
+    SELECT token FROM sessions 
+    WHERE user_id = ? AND expires_at > datetime('now') 
+    ORDER BY created_at DESC LIMIT 1
+  `).get(req.user.id) as { token: string } | undefined;
+
   return res.json({
     success: true,
-    user: req.user
+    user: req.user,
+    token: sessionRow?.token
   });
 }
 
 export function logout(req: Request, res: Response, next: NextFunction) {
   try {
+    let token: string | undefined;
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.substring(7).trim();
+      token = authHeader.substring(7).trim();
+    } else if (req.headers.cookie) {
+      const cookies = parseCookies(req.headers.cookie);
+      token = cookies.lr_session || cookies.lr_token;
+    }
+
+    if (token) {
       const db = getDatabase();
       db.prepare('DELETE FROM sessions WHERE token = ?').run(token);
     }
+
+    res.clearCookie('lr_session', { path: '/' });
 
     return res.json({
       success: true,

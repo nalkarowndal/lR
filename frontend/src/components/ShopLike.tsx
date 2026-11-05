@@ -109,7 +109,33 @@ export const ShopLike = () => {
     }
   };
 
-  // 소셜 간편 로그인 안내 (공식 연동 준비 상태 명시)
+  // 카카오 OAuth 2.0 실제 연동 처리
+  const handleKakaoLogin = async () => {
+    setLoggingInProvider('카카오');
+    setErrorMsg('');
+
+    try {
+      // 1. 서버의 카카오 연동 설정 상태 확인
+      const status = await api.getKakaoStatus();
+      if (!status?.configured) {
+        setLoggingInProvider(null);
+        showToast(
+          '카카오 REST API 키 설정이 필요합니다. docs/auth/KAKAO_LOGIN_SETUP.md를 확인해주세요.',
+          'info'
+        );
+        return;
+      }
+
+      // 2. 카카오 OAuth 인가 화면으로 리다이렉트
+      const apiBaseUrl = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:4000/api/v1';
+      window.location.href = `${apiBaseUrl}/auth/kakao`;
+    } catch (err: any) {
+      setLoggingInProvider(null);
+      setErrorMsg('카카오 로그인 서버 연결에 실패했습니다. 백엔드 서버 상태를 확인해주세요.');
+    }
+  };
+
+  // 기타 소셜 간편 로그인 안내 (공식 연동 준비 상태 명시)
   const handleSocialLogin = (provider: string) => {
     setLoggingInProvider(provider);
     setTimeout(() => {
@@ -198,7 +224,7 @@ export const ShopLike = () => {
             {/* Kakao Official Button */}
             <button
               type="button"
-              onClick={() => handleSocialLogin('카카오')}
+              onClick={handleKakaoLogin}
               disabled={!!loggingInProvider}
               className="w-full bg-[#FEE500] hover:bg-[#FADA0A] active:scale-[0.99] text-black text-[15px] font-extrabold py-3.5 rounded-xl flex items-center justify-center gap-2.5 mb-3 shadow-xs transition-all disabled:opacity-50"
             >

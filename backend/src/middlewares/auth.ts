@@ -19,16 +19,36 @@ declare global {
   }
 }
 
+export function parseCookies(cookieHeader?: string): Record<string, string> {
+  if (!cookieHeader) return {};
+  const cookies: Record<string, string> = {};
+  for (const part of cookieHeader.split(';')) {
+    const [key, ...vals] = part.trim().split('=');
+    if (key && vals.length > 0) {
+      try {
+        cookies[key] = decodeURIComponent(vals.join('='));
+      } catch {
+        cookies[key] = vals.join('=');
+      }
+    }
+  }
+  return cookies;
+}
+
 /**
- * Parses Bearer token from Authorization header and attaches req.user if session is valid.
+ * Parses Bearer token from Authorization header or HttpOnly cookie (lr_session)
+ * and attaches req.user if session is valid.
  */
 export function authenticate(req: Request, res: Response, next: NextFunction) {
+  let token: string | undefined;
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return next();
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.substring(7).trim();
+  } else if (req.headers.cookie) {
+    const cookies = parseCookies(req.headers.cookie);
+    token = cookies.lr_session || cookies.lr_token;
   }
 
-  const token = authHeader.substring(7).trim();
   if (!token) return next();
 
   try {

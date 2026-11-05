@@ -209,6 +209,12 @@ export const ShopMyPage: React.FC = () => {
                         </span>
                       ) : '일반 회원'}
                     </span>
+                    {(user.oauth_accounts?.includes('kakao') || user.is_oauth_user) && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FEE500] text-black border border-yellow-300 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-black/70 inline-block" />
+                        카카오 계정
+                      </span>
+                    )}
                   </div>
                   <p className="text-xs text-gray-500 mt-1">{user.email}</p>
                   {user.phone && <p className="text-[11px] text-gray-400 mt-0.5">{user.phone}</p>}

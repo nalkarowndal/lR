@@ -29,6 +29,8 @@ export interface User {
   role: 'USER' | 'ADMIN';
   phone?: string;
   avatar_url?: string;
+  oauth_accounts?: string[];
+  is_oauth_user?: boolean;
 }
 
 export interface RecruitRequest {
@@ -247,7 +249,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           name: res.profile.name,
           role: res.profile.role,
           phone: res.profile.phone,
-          avatar_url: res.profile.avatar_url
+          avatar_url: res.profile.avatar_url,
+          oauth_accounts: res.profile.oauth_accounts,
+          is_oauth_user: res.profile.is_oauth_user
         };
         setUser(authedUser);
         if (res.profile.settings) {

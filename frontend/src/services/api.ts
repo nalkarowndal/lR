@@ -3,7 +3,7 @@
  * Provides typed REST API access with transparent fallback to local state if backend is offline.
  */
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:4000/api/v1';
+export const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:4000/api/v1';
 
 export function getAuthToken(): string | null {
   try {
@@ -42,6 +42,7 @@ async function fetchJson<T>(path: string, options: RequestInit = {}): Promise<T>
   }
 
   const res = await fetch(`${API_BASE_URL}${path}`, {
+    credentials: 'include',
     ...options,
     headers
   });
@@ -111,6 +112,22 @@ export const api = {
     return fetchJson<{ success: boolean; message: string }>('/auth/reset-password', {
       method: 'POST',
       body: JSON.stringify(payload)
+    });
+  },
+
+  // Kakao OAuth 2.0 Endpoints
+  getKakaoStatus: async () => {
+    return fetchJson<{
+      success: boolean;
+      configured: boolean;
+      redirectUri: string;
+      hasClientSecret: boolean;
+    }>('/auth/kakao/status');
+  },
+
+  unlinkKakao: async () => {
+    return fetchJson<{ success: boolean; message: string }>('/auth/kakao/unlink', {
+      method: 'POST'
     });
   },
 

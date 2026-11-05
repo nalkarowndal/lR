@@ -74,6 +74,11 @@ export function getMyProfile(req: Request, res: Response, next: NextFunction) {
       SELECT count(*) as count FROM sell_requests WHERE user_id = ?
     `).get(req.user.id) as any)?.count || 0;
 
+    // Query linked OAuth accounts
+    const oauthRows = (db.prepare(`
+      SELECT provider, created_at FROM user_oauth_accounts WHERE user_id = ?
+    `).all?.(req.user.id) || []) as { provider: string; created_at: string }[];
+
     return res.json({
       success: true,
       profile: {
@@ -84,6 +89,8 @@ export function getMyProfile(req: Request, res: Response, next: NextFunction) {
         phone: userRow.phone || '',
         avatar_url: userRow.avatar_url || '',
         created_at: userRow.created_at,
+        oauth_accounts: oauthRows.map(r => r.provider),
+        is_oauth_user: oauthRows.length > 0,
         settings: {
           service_notifications: Boolean(settings.service_notifications),
           marketing_notifications: Boolean(settings.marketing_notifications),

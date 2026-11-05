@@ -224,6 +224,32 @@ function initSchema(db: DatabaseSync) {
     );
   `);
 
+  // 16. User OAuth Accounts Table (Kakao, etc.)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS user_oauth_accounts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      provider TEXT NOT NULL,
+      provider_user_id TEXT NOT NULL,
+      profile_data TEXT DEFAULT '{}',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      UNIQUE(provider, provider_user_id)
+    );
+  `);
+
+  // 17. OAuth States Table (CSRF & Single-use replay protection)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS oauth_states (
+      state TEXT PRIMARY KEY,
+      provider TEXT NOT NULL,
+      redirect_uri TEXT NOT NULL,
+      return_to TEXT DEFAULT '/',
+      expires_at TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `);
+
   // Non-destructive Migrations for existing database instances
   try {
     db.exec(`ALTER TABLE products ADD COLUMN image_url TEXT;`);
@@ -234,10 +260,11 @@ function initSchema(db: DatabaseSync) {
   } catch {}
 
   try {
-    db.exec(`ALTER TABLE sell_requests ADD COLUMN user_id INTEGER;
+    db.exec(`ALTER TABLE sell_requests ADD COLUMN user_id INTEGER;`);
   } catch {}
+
   try {
-    db.exec(ALTER TABLE sell_requests ADD COLUMN phone TEXT DEFAULT '';);`);
+    db.exec(`ALTER TABLE sell_requests ADD COLUMN phone TEXT DEFAULT '';`);
   } catch {}
 
   // Seed default legal documents if empty
