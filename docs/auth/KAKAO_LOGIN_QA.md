@@ -49,6 +49,9 @@
 2. **카카오 설정 안내 및 사용자 피드백**:
    - 파일 경로: [`docs/auth/02_kakao_setup_guidance_toast.png`](file:///d:/JSW_React/8.portfolio/IIL/docs/auth/02_kakao_setup_guidance_toast.png)
    - 검증 내용: 가짜 시뮬레이션 없이 실제 `.env` 설정 필요성을 사용자에게 명확히 안내하는 고품질 토스트 알림 확인.
+3. **카카오 공식 인증 화면 실시간 이동 (Live E2E Verification)**:
+   - 파일 경로: [`docs/auth/03_kakao_official_login_page.png`](file:///d:/JSW_React/8.portfolio/IIL/docs/auth/03_kakao_official_login_page.png)
+   - 검증 내용: 실제 제공된 REST API 키 및 Redirect URI(`http://localhost:4000/api/v1/auth/kakao/callback`)가 적용된 상태에서 버튼 클릭 시 `https://accounts.kakao.com/login` 공식 로그인 화면으로 정상 이동함 확인.
 
 ---
 
@@ -56,4 +59,4 @@
 
 luxuryRental 프로젝트의 카카오 OAuth 2.0 연동 시스템은 가짜 성공 팝업이나 임의의 모의 우회가 아닌, **실제 카카오 개발자 콘솔 및 공식 카카오 인증 서버와 통신할 수 있는 완전한 OAuth 2.0 표준 규격 기반으로 개발**되었습니다.
 
-서버 비밀키가 누락된 환경에서도 친절한 가이드라인을 제공하며, 보안 및 회귀 테스트 전체가 100% 무결점으로 통과되었습니다.
+사용자가 등록한 실제 카카오 REST API 키가 적용되어 브라우저에서 버튼 클릭 시 즉시 카카오 공식 계정 로그인 화면으로 전환되며, 보안 및 회귀 테스트 전체가 100% 무결점으로 통과되었습니다.
