@@ -389,44 +389,9 @@ export const ShopCategory = () => {
       {/* 3-B. 브랜드 뷰 */}
       {mainTab === 'BRAND' && (
         <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
-          {/* 상단 타이틀 & 좌우 이동 컨트롤 */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <h2 className="font-black text-lg text-gray-950 tracking-tight">인기 브랜드 ({brands.length})</h2>
-              <button
-                type="button"
-                onClick={() => setIsAutoScrollActive(prev => !prev)}
-                className={`text-[10px] font-bold px-2 py-0.5 rounded-full border transition-all flex items-center gap-1 ${
-                  isAutoScrollActive 
-                    ? 'bg-amber-50 text-amber-900 border-amber-300 shadow-2xs' 
-                    : 'bg-gray-100 text-gray-500 border-gray-200'
-                }`}
-                title={isAutoScrollActive ? '좌우 자동 이동 멈춤' : '좌우 자동 이동 시작'}
-              >
-                <span className={`w-1.5 h-1.5 rounded-full ${isAutoScrollActive ? 'bg-amber-500 animate-pulse' : 'bg-gray-400'}`} />
-                {isAutoScrollActive ? '좌우 슬라이드' : '슬라이드 정지'}
-              </button>
-            </div>
-            
-            {/* 좌우 이동 퀵 컨트롤 버튼 */}
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                aria-label="이전 브랜드 보기"
-                onClick={() => handleBrandScroll('left')}
-                className="w-7 h-7 rounded-full bg-white border border-gray-200 hover:border-gray-400 hover:bg-gray-50 text-gray-700 hover:text-black flex items-center justify-center transition shadow-2xs active:scale-95"
-              >
-                <ChevronLeft size={15} />
-              </button>
-              <button
-                type="button"
-                aria-label="다음 브랜드 보기"
-                onClick={() => handleBrandScroll('right')}
-                className="w-7 h-7 rounded-full bg-white border border-gray-200 hover:border-gray-400 hover:bg-gray-50 text-gray-700 hover:text-black flex items-center justify-center transition shadow-2xs active:scale-95"
-              >
-                <ChevronRight size={15} />
-              </button>
-            </div>
+          {/* 상단 타이틀 */}
+          <div className="mb-3">
+            <h2 className="font-black text-lg text-gray-950 tracking-tight">인기 브랜드 ({brands.length})</h2>
           </div>
           
           {/* 인기 브랜드 모노그램 칩 가로 스크롤 & 좌우 이동 슬라이더 */}
