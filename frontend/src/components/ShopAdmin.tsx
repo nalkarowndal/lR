@@ -97,6 +97,23 @@ export const ShopAdmin = () => {
   }, [modal]);
 
   // ESC 키로 모달 닫기
+  // Reset modals on tab transitions to prevent lingering overlays across admin views
+  useEffect(() => {
+    setGalleryProduct(null);
+    setShowWorkerModal(false);
+    setExcelModalOpen(false);
+  }, [mainTab, recruitTab]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__lrCloseAdminModals = () => {
+        setGalleryProduct(null);
+        setShowWorkerModal(false);
+        setExcelModalOpen(false);
+      };
+    }
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -549,8 +566,16 @@ export const ShopAdmin = () => {
 
             {/* 🌟 상품 이미지 갤러리 관리 모달 */}
             {galleryProduct && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-                <div className="bg-slate-900 border border-white/15 rounded-3xl p-6 max-w-lg w-full shadow-2xl text-white animate-scaleUp">
+              <div 
+                onClick={(e) => {
+                  if (e.target === e.currentTarget) setGalleryProduct(null);
+                }}
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md cursor-pointer"
+              >
+                <div 
+                  onClick={(e) => e.stopPropagation()}
+                  className="bg-slate-900 border border-white/15 rounded-3xl p-6 max-w-lg w-full shadow-2xl text-white animate-scaleUp cursor-default"
+                >
                   <div className="flex justify-between items-center pb-4 border-b border-white/10 mb-4">
                     <div>
                       <span className="text-[10px] text-gray-400">상품 ID #{galleryProduct.id}</span>
@@ -659,13 +684,22 @@ export const ShopAdmin = () => {
                       <span>대표 이미지로 설정</span>
                     </label>
 
-                    <button 
-                      type="submit" 
-                      disabled={isUploading}
-                      className="w-full bg-white text-black hover:bg-gray-200 py-3 rounded-xl font-black text-xs transition disabled:opacity-50 shadow-sm"
-                    >
-                      {isUploading ? '등록 처리 중...' : '이미지 추가 등록'}
-                    </button>
+                    <div className="flex gap-2">
+                      <button 
+                        type="submit" 
+                        disabled={isUploading}
+                        className="flex-1 bg-white text-black hover:bg-gray-200 py-2.5 rounded-xl font-black text-xs transition disabled:opacity-50 shadow-sm"
+                      >
+                        {isUploading ? '등록 처리 중...' : '이미지 추가 등록'}
+                      </button>
+                      <button 
+                        type="button" 
+                        onClick={() => setGalleryProduct(null)}
+                        className="px-4 bg-white/10 hover:bg-white/20 text-white py-2.5 rounded-xl font-bold text-xs transition border border-white/10"
+                      >
+                        닫기
+                      </button>
+                    </div>
                   </form>
                 </div>
               </div>

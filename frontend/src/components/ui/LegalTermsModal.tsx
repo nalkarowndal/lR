@@ -107,6 +107,7 @@ export const LegalTermsModal = ({
           )}
           <button
             type="button"
+            data-testid="legal-modal-close"
             onClick={onClose}
             className={`${onAgree ? 'px-4' : 'w-full'} py-3 border border-gray-200 hover:bg-gray-50 active:scale-[0.99] text-gray-700 text-xs font-bold rounded-xl transition`}
           >

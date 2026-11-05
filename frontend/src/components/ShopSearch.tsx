@@ -5,7 +5,7 @@ import { useToast } from '../context/ToastContext';
 import { Modal } from './ui/Modal';
 import { ProductImage } from './ui/ProductImage';
 import { SEARCH_CATALOG, type CatalogProduct } from '../data/catalog';
-import { calculateRentalPriceDetails } from '../utils/pricing';
+import { calculateRentalPriceDetails, formatProductPrice, getStatusBadgeConfig } from '../utils/pricing';
 import { api } from '../services/api';
 
 export const ShopSearch = () => {
@@ -115,16 +115,20 @@ export const ShopSearch = () => {
 
         if (isCurrent && res?.success && Array.isArray(res.data) && res.data.length > 0) {
           const validServerItems = res.data.filter((item: any) => item.image_url);
-          const mapped: CatalogProduct[] = validServerItems.map((item: any) => ({
-            id: item.id,
-            brand: item.brand,
-            title: item.title,
-            price: typeof item.price === 'number' ? `${item.price.toLocaleString()}원` : String(item.price),
-            category: item.category || 'bag',
-            imageUrl: item.image_url || undefined,
-            tag: item.tag || (item.type === 'RENT' ? '렌트' : '구매'),
-            imageStatus: 'READY' as const
-          }));
+          const mapped: CatalogProduct[] = validServerItems.map((item: any) => {
+            const isBuy = item.type === 'BUY';
+            const formattedPrice = formatProductPrice(item.price, item.type, item.unit);
+            return {
+              id: item.id,
+              brand: item.brand,
+              title: item.title,
+              price: formattedPrice,
+              category: item.category || 'bag',
+              imageUrl: item.image_url || undefined,
+              tag: item.tag || (isBuy ? '구매 가능' : '렌탈 가능'),
+              imageStatus: 'READY' as const
+            };
+          });
 
           const combined = [...localMatches];
           for (const sItem of mapped) {
@@ -357,11 +361,14 @@ export const ShopSearch = () => {
                             className={isFav ? 'text-red-500' : 'text-gray-400'}
                           />
                         </button>
-                        {item.tag && (
-                          <div className="absolute bottom-0 w-full bg-black/60 backdrop-blur-xs text-white text-center text-[10px] py-1 font-bold z-10">
-                            {item.tag}
-                          </div>
-                        )}
+                        {item.tag && (() => {
+                          const badge = getStatusBadgeConfig(item.tag);
+                          return (
+                            <div className={`absolute bottom-0 w-full backdrop-blur-xs text-center text-[10px] py-1 font-bold z-10 ${badge ? badge.className : 'bg-black/60 text-white'}`}>
+                              {badge ? badge.label : item.tag}
+                            </div>
+                          );
+                        })()}
                       </div>
                       <span className="font-extrabold text-xs text-gray-900 group-hover:text-indigo-600 transition-colors">{item.brand}</span>
                       <span className="text-[11px] text-gray-600 truncate">{item.title}</span>

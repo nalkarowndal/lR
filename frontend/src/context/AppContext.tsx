@@ -11,7 +11,7 @@ export type ViewState =
   | 'RECRUIT_APP';
 
 export type Role = 'STORE' | 'ADMIN';
-export type OverlayState = 'SEARCH' | 'LOGIN' | 'REGISTER' | 'FORGOT_PASSWORD' | 'PROFILE_EDIT' | null;
+export type OverlayState = 'SEARCH' | 'LOGIN' | 'REGISTER' | 'FORGOT_PASSWORD' | 'PASSWORD_RESET' | 'PROFILE_EDIT' | null;
 export type TransitionDirection = 'forward' | 'backward' | 'none';
 
 export interface UserSettings {
@@ -435,7 +435,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       (window as any).__lrNavigate = navigateTo;
       (window as any).__lrReturnFromAdmin = returnFromAdmin;
       (window as any).__lrGoBack = goBack;
-      (window as any).__lrSetOverlay = setActiveOverlay;
+      (window as any).__lrSetOverlay = (overlay: any) => {
+        if (overlay === 'PASSWORD_RESET') {
+          setActiveOverlay('FORGOT_PASSWORD');
+        } else {
+          setActiveOverlay(overlay);
+        }
+      };
     }
   }, [navigateTo, returnFromAdmin, goBack, setActiveOverlay]);
 

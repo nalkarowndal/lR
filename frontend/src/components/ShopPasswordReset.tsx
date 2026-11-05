@@ -10,7 +10,7 @@ export const ShopPasswordReset = () => {
   const dialogRef = useRef<HTMLDivElement>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
 
-  const isOpen = activeOverlay === 'FORGOT_PASSWORD';
+  const isOpen = activeOverlay === 'FORGOT_PASSWORD' || activeOverlay === 'PASSWORD_RESET';
 
   const [step, setStep] = useState<'REQUEST' | 'RESET'>('REQUEST');
   const [email, setEmail] = useState('');
@@ -193,7 +193,7 @@ export const ShopPasswordReset = () => {
               disabled={isLoading}
               className="w-full bg-gray-950 hover:bg-black active:scale-[0.98] text-white py-3.5 rounded-xl font-bold text-sm transition shadow-sm disabled:opacity-50"
             >
-              {isLoading ? '확인 중...' : '재설정 안내 받기'}
+              {isLoading ? '확인 중...' : '재설정 링크 받기'}
             </button>
           </form>
         ) : (

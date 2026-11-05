@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search, ShoppingCart, Settings, Heart, User, Home, List, ChevronRight,
   ShieldCheck, Smartphone, Trash2, CheckCircle2, X, PackageCheck, ArrowRight
@@ -185,11 +185,30 @@ export const ShopMain = () => {
 
   // Cart & Mock Order state
   const [cartStep, setCartStep] = useState<'CART' | 'SHIPPING' | 'ORDER_COMPLETE'>('CART');
-  const [recipientName, setRecipientName] = useState('');
+  const [recipientName, setRecipientName] = useState('김럭셔리');
   const [recipientPhone, setRecipientPhone] = useState('010-8842-1920');
   const [shippingAddress, setShippingAddress] = useState('서울특별시 강남구 압구정로 142 럭셔리타워 5층');
   const [deliveryNote, setDeliveryNote] = useState('부재 시 문 앞 보관 후 문자 부탁드립니다.');
   const [completedOrder, setCompletedOrder] = useState<any | null>(null);
+
+  // Phase 6 모달 격리 및 자동 QA 제어 전역 훅
+  useEffect(() => {
+    (window as any).__lrCloseShopModals = () => {
+      setServiceInfoModal(null);
+      setSelectedProduct(null);
+      setCartModalOpen(false);
+      setAppDownloadModalOpen(false);
+      setActiveLegalDoc(null);
+      setCartStep('CART');
+    };
+    (window as any).__lrSetLegalDoc = (docType: 'TERMS_OF_SERVICE' | 'PRIVACY_POLICY' | null) => {
+      setActiveLegalDoc(docType);
+    };
+    return () => {
+      delete (window as any).__lrCloseShopModals;
+      delete (window as any).__lrSetLegalDoc;
+    };
+  }, []);
 
   const calculateRentalPrice = (basePriceStr: string, days: number) => {
     return calculateRentalPriceDetails(basePriceStr, undefined, days).currentPrice;
@@ -328,8 +347,16 @@ export const ShopMain = () => {
         });
         break;
       case '70% 할인':
+        setServiceInfoModal({
+          title: '70% 웰컴 할인 혜택',
+          desc: '신규 가입 고객님께 첫 렌탈 70% 할인 쿠폰을 즉시 지급합니다. 결제 시 쿠폰을 선택하시면 자동 적용됩니다.'
+        });
+        break;
       case '오늘신규입고':
-        navigateTo('SHOP_CATEGORY');
+        setServiceInfoModal({
+          title: '오늘 신규 입고 상품 안내',
+          desc: '오늘 새롭게 입고된 샤넬, 에르메스, 롤렉스 최신 룩북 상품을 확인해보세요. 매일 오전 10시 실시간 큐레이션이 업데이트됩니다.'
+        });
         break;
       case '베이직멤버십':
         setServiceInfoModal({
@@ -350,7 +377,10 @@ export const ShopMain = () => {
         });
         break;
       case '바이백':
-        navigateTo('SHOP_SELL');
+        setServiceInfoModal({
+          title: '명품 바이백(Buy-Back) 보증',
+          desc: '렌트 이용 중 마음에 드는 상품을 구매 전환하시거나, 소장하신 명품을 최고가에 즉시 위탁 판매하실 수 있습니다.'
+        });
         break;
       case '친구 초대': {
         const inviteCode = 'LUXURY-VIP-2026';
@@ -1016,6 +1046,7 @@ export const ShopMain = () => {
                   <div className="flex gap-2 pt-2">
                     <button
                       type="button"
+                      data-testid="cart-checkout-btn"
                       onClick={handleStartCheckout}
                       className="flex-1 py-3 bg-gray-950 text-white rounded-xl font-bold text-xs hover:bg-black active:scale-[0.98] transition shadow-md"
                     >
@@ -1113,6 +1144,7 @@ export const ShopMain = () => {
                 </button>
                 <button
                   type="button"
+                  data-testid="order-submit-btn"
                   onClick={handleCompleteOrder}
                   className="flex-1 py-3 bg-gray-950 text-white rounded-xl font-bold text-xs hover:bg-black active:scale-[0.98] transition shadow-md"
                 >
@@ -1168,7 +1200,11 @@ export const ShopMain = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setCartModalOpen(false)}
+                  data-testid="order-continue-btn"
+                  onClick={() => {
+                    setCartModalOpen(false);
+                    setCartStep('CART');
+                  }}
                   className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold text-xs hover:bg-gray-200 transition"
                 >
                   쇼핑 계속하기
@@ -1382,6 +1418,7 @@ export const ShopMain = () => {
             </button>
             <button
               type="button"
+              data-testid="service-info-close"
               onClick={() => setServiceInfoModal(null)}
               className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold text-xs hover:bg-gray-200 transition"
             >

@@ -95,3 +95,72 @@ export function calculateRentalPriceDetails(
     formattedDailyRate: `${formatKRW(dailyRate)}/일`
   };
 }
+
+/**
+ * Formats product pricing with strict separation between BUY and RENT models:
+ * - BUY products: "구매가 ₩{amount}" (NEVER displays "/일")
+ * - RENT products: "{amount}원{unit}" (e.g. "55,000원/1일" or "24,500원/3일")
+ */
+export function formatProductPrice(
+  price: string | number,
+  type: 'RENT' | 'BUY' | string = 'RENT',
+  unit?: string | null
+): string {
+  const numeric = parseNumericPrice(price);
+  const isBuy = String(type).toUpperCase() === 'BUY';
+
+  if (isBuy) {
+    return `구매가 ₩${numeric.toLocaleString('ko-KR')}`;
+  }
+
+  const safeUnit = unit ? (unit.startsWith('/') ? unit : `/${unit}`) : '/1일';
+  return `${numeric.toLocaleString('ko-KR')}원${safeUnit}`;
+}
+
+export interface StatusBadgeConfig {
+  label: string;
+  className: string;
+}
+
+/**
+ * Unified status badge theme configuration across the luxury commerce platform:
+ * - 렌탈 가능: Emerald
+ * - 구매 가능: Indigo
+ * - 예약 마감: Zinc/Dark
+ * - 품절: Rose
+ * - 판매 완료: Slate
+ * - 검수 중: Amber
+ * - 이미지 준비 중: Gray
+ */
+export function getStatusBadgeConfig(tag: string | null | undefined): StatusBadgeConfig | null {
+  if (!tag) return null;
+  const trimmed = tag.trim();
+  switch (trimmed) {
+    case '렌탈 가능':
+    case '렌트':
+      return { label: '렌탈 가능', className: 'bg-emerald-600/90 text-white' };
+    case '구매 가능':
+    case '구매':
+    case '구매전용':
+      return { label: '구매 가능', className: 'bg-indigo-600/90 text-white' };
+    case '예약 마감':
+    case '마감임박':
+      return { label: '예약 마감', className: 'bg-zinc-800/90 text-zinc-200' };
+    case '품절':
+      return { label: '품절', className: 'bg-rose-700/90 text-white' };
+    case '판매 완료':
+      return { label: '판매 완료', className: 'bg-slate-700/90 text-slate-200' };
+    case '검수 중':
+      return { label: '검수 중', className: 'bg-amber-600/90 text-white' };
+    case '이미지 준비 중':
+      return { label: '이미지 준비 중', className: 'bg-gray-600/90 text-gray-200' };
+    case '앱전용':
+      return { label: '앱전용', className: 'bg-violet-600/90 text-white' };
+    case '프리미엄':
+    case '최고급':
+    case 'N':
+      return { label: trimmed, className: 'bg-[#A68A56]/95 text-white' };
+    default:
+      return { label: trimmed, className: 'bg-black/60 text-white' };
+  }
+}

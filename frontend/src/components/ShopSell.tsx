@@ -103,6 +103,7 @@ export const ShopSell = () => {
         applicantPhone
       );
 
+      setConfirmModal({ isOpen: false, brand: null });
       setReceiptModal({
         isOpen: true,
         receiptCode,

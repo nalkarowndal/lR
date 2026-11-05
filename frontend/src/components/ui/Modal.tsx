@@ -62,10 +62,10 @@ export const Modal = ({
     >
       <div 
         ref={modalRef}
-        className={`bg-white rounded-2xl w-full ${widthClasses} shadow-2xl overflow-hidden animate-scaleUp border border-gray-100/80`}
+        className={`bg-white rounded-2xl w-full ${widthClasses} max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-scaleUp border border-gray-100/80`}
       >
         {title && (
-          <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-gray-100">
+          <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-gray-100 shrink-0">
             <h3 className="font-extrabold text-base text-gray-950 tracking-tight">{title}</h3>
             {showCloseButton && (
               <button 
@@ -79,7 +79,7 @@ export const Modal = ({
             )}
           </div>
         )}
-        <div className="p-5">{children}</div>
+        <div className="p-5 overflow-y-auto scrollbar-thin">{children}</div>
       </div>
     </div>
   );

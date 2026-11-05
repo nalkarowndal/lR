@@ -296,4 +296,42 @@ function initSchema(db: DatabaseSync) {
   } catch (err) {
     console.warn('[Database] Legal docs initialization note:', err);
   }
+
+  // 6. Ensure products 1-26 have verified photoreal studio assets
+  try {
+    const assetBackfill = [
+      { id: 1, img: '/assets/products/bags/saint_laurent_le5a7.jpg' },
+      { id: 2, img: '/assets/products/bags/balenciaga_le_city.jpg' },
+      { id: 3, img: '/assets/products/bags/chanel_caviar_hobo.jpg' },
+      { id: 4, img: '/assets/products/bags/chanel_classic_flap.jpg' },
+      { id: 5, img: '/assets/products/bags/maison_margiela_5ac.jpg' },
+      { id: 6, img: '/assets/products/bags/prada_renylon_belt.jpg' },
+      { id: 7, img: '/assets/products/bags/bottega_cassette.jpg' },
+      { id: 8, img: '/assets/products/clothing/ami_heart_knit.jpg' },
+      { id: 9, img: '/assets/products/bags/chanel_22_mini.jpg' },
+      { id: 10, img: '/assets/products/bags/hermes_evelyne_tpm.jpg' },
+      { id: 11, img: '/assets/products/bags/celine_triomphe.jpg' },
+      { id: 12, img: '/assets/products/bags/dior_lady_djoy.jpg' },
+      { id: 13, img: '/assets/products/bags/thombrowne_clutch.jpg' },
+      { id: 14, img: '/assets/products/bags/gucci_gg_supreme.jpg' },
+      { id: 15, img: '/assets/products/watches/rolex_submariner.jpg' },
+      { id: 16, img: '/assets/products/bags/saint_laurent_backpack.jpg' },
+      { id: 17, img: '/assets/products/bags/hermes_birkin_25.jpg' },
+      { id: 18, img: '/assets/products/bags/louisvuitton_capucines_bb.jpg' },
+      { id: 19, img: '/assets/products/bags/chanel_classic_medium.jpg' },
+      { id: 20, img: '/assets/products/jewelry/vancleef_alhambra.jpg' },
+      { id: 21, img: '/assets/products/clothing/louisvuitton_scarf.jpg' },
+      { id: 22, img: '/assets/products/bags/louisvuitton_speedy.jpg' },
+      { id: 23, img: '/assets/products/bags/louisvuitton_pouch_black.jpg' },
+      { id: 24, img: '/assets/products/bags/louisvuitton_epi_mirabeau.jpg' },
+      { id: 25, img: '/assets/products/bags/louisvuitton_nn14_canvas.jpg' },
+      { id: 26, img: '/assets/products/bags/louisvuitton_neonoe_bb.jpg' }
+    ];
+    const updateAssetStmt = db.prepare('UPDATE products SET image_url = ? WHERE id = ? AND (image_url IS NULL OR image_url = \'\')');
+    for (const item of assetBackfill) {
+      updateAssetStmt.run(item.img, item.id);
+    }
+  } catch (err) {
+    console.warn('[Database] Product asset backfill note:', err);
+  }
 }
