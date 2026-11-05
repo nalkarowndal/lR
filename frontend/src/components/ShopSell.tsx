@@ -9,13 +9,33 @@ export const ShopSell = () => {
   const [selectedBrand, setSelectedBrand] = useState<{ ko: string; en: string } | null>(null);
   const [showDirectModal, setShowDirectModal] = useState(false);
   const [directBrandName, setDirectBrandName] = useState('');
+  const [directCategory, setDirectCategory] = useState<'bag' | 'clothing' | 'shoes' | 'jewelry'>('bag');
+
+  // 명품 위탁·판매 신청서 모달 상태
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; brand: { ko: string; en: string } | null }>({
     isOpen: false,
     brand: null
   });
-  const [sellModal, setSellModal] = useState<{ isOpen: boolean; message: string }>({
+  const [sellCategory, setSellCategory] = useState<'bag' | 'clothing' | 'shoes' | 'jewelry'>('bag');
+  const [itemCondition, setItemCondition] = useState<'S' | 'A' | 'B'>('S');
+  const [saleMethod, setSaleMethod] = useState<'CONSIGN' | 'BUYOUT'>('CONSIGN');
+  const [hasGuaranteeCard, setHasGuaranteeCard] = useState(true);
+  const [hasDustBag, setHasDustBag] = useState(true);
+  const [hasOriginalBox, setHasOriginalBox] = useState(true);
+
+  // 위탁 판매 접수 완료 모달 상태
+  const [receiptModal, setReceiptModal] = useState<{
+    isOpen: boolean;
+    receiptCode: string;
+    brandName: string;
+    category: string;
+    applicantPhone: string;
+  }>({
     isOpen: false,
-    message: ''
+    receiptCode: '',
+    brandName: '',
+    category: '',
+    applicantPhone: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -68,6 +88,10 @@ export const ShopSell = () => {
     setIsSubmitting(true);
     setGuestPhoneError('');
 
+    const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const randSuffix = Math.floor(1000 + Math.random() * 9000);
+    const receiptCode = `SELL-${todayStr}-${randSuffix}`;
+
     try {
       const applicantName = user ? user.name : (guestName.trim() || '고객');
       const applicantPhone = user ? (user.phone || '') : guestPhone.trim();
@@ -78,9 +102,12 @@ export const ShopSell = () => {
         applicantPhone
       );
 
-      setSellModal({
+      setReceiptModal({
         isOpen: true,
-        message: `'${brand.ko}' 위탁 판매 신청이 정상 접수되었습니다. 감정팀이 ${applicantPhone ? `'${applicantPhone}' 번호로 ` : ''}안내 연락을 드립니다.`
+        receiptCode,
+        brandName: brand.ko,
+        category: sellCategory === 'bag' ? '가방' : sellCategory === 'clothing' ? '의류' : sellCategory === 'shoes' ? '슈즈' : '시계/주얼리',
+        applicantPhone: applicantPhone || '등록 연락처'
       });
       setGuestPhone('');
       setGuestName('');
@@ -100,48 +127,187 @@ export const ShopSell = () => {
     if (!name) return;
     setShowDirectModal(false);
     setSelectedBrand({ ko: name, en: 'Custom' });
+    setSellCategory(directCategory);
     setConfirmModal({ isOpen: true, brand: { ko: name, en: 'Custom' } });
     setDirectBrandName('');
   };
 
   return (
     <div className="flex flex-col h-full bg-white select-none relative">
-      {/* 🌟 판매 신청 사전 확인 모달 */}
+      {/* 🌟 1. 신규 브랜드 직접 등록 모달 */}
+      {showDirectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-extrabold text-base text-gray-900">신규 브랜드 직접 등록</h3>
+              <button type="button" onClick={() => setShowDirectModal(false)} className="text-gray-400 hover:text-black">
+                <X size={20} />
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 mb-4">목록에 없는 명품 브랜드명을 직접 등록하시면, 전문 감정팀 검수 후 위탁 및 매입 절차가 진행됩니다.</p>
+            <form onSubmit={handleDirectRegister} className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-gray-700 block mb-1.5">브랜드명 (국문/영문)</label>
+                <input 
+                  type="text" 
+                  value={directBrandName}
+                  onChange={(e) => setDirectBrandName(e.target.value)}
+                  placeholder="예: 발렉스트라, 모이나, 델보..." 
+                  required
+                  className="w-full border border-gray-300 focus:border-black rounded-xl p-3 text-sm outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-gray-700 block mb-1.5">상품 대표 카테고리</label>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {[
+                    { id: 'bag', label: '가방' },
+                    { id: 'clothing', label: '의류' },
+                    { id: 'shoes', label: '슈즈' },
+                    { id: 'jewelry', label: '시계/주얼리' }
+                  ].map(cat => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setDirectCategory(cat.id as any)}
+                      className={`py-2 rounded-xl text-xs font-bold border transition ${
+                        directCategory === cat.id
+                          ? 'bg-gray-950 text-white border-gray-950'
+                          : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                      }`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button 
+                  type="button" 
+                  onClick={() => setShowDirectModal(false)}
+                  className="flex-1 border border-gray-200 py-3 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition"
+                >
+                  취소
+                </button>
+                <button 
+                  type="submit" 
+                  className="flex-1 bg-gray-900 text-white py-3 rounded-xl text-sm font-bold hover:bg-black transition"
+                >
+                  신청서 작성
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 🌟 2. 명품 위탁·판매 신청서 모달 */}
       {confirmModal.isOpen && confirmModal.brand && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl p-6 max-w-xs w-full shadow-2xl text-center flex flex-col items-center animate-fadeIn">
-            <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mb-3">
-              <AlertCircle size={24} />
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center flex flex-col items-center animate-fadeIn max-h-[90vh] overflow-y-auto scrollbar-hide">
+            <div className="w-11 h-11 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2.5">
+              <AlertCircle size={22} />
             </div>
-            <h3 className="font-extrabold text-base text-gray-900 mb-1">위탁 판매 신청 확인</h3>
-            <p className="text-xs text-gray-500 mb-4">
-              선택하신 <span className="font-bold text-gray-900">'{confirmModal.brand.ko} ({confirmModal.brand.en})'</span> 브랜드의 명품 위탁 판매를 접수하시겠습니까?
+            <h3 className="font-extrabold text-base text-gray-900 mb-1">명품 위탁·판매 신청서</h3>
+            <p className="text-xs text-gray-500 mb-3">
+              <span className="font-bold text-gray-900">'{confirmModal.brand.ko} ({confirmModal.brand.en})'</span> 상품 정보를 확인해주세요.
             </p>
-            <div className="w-full bg-gray-50 rounded-xl p-3 text-left text-[11px] text-gray-600 space-y-1 mb-4">
-              <div className="flex items-center gap-1.5 font-bold text-gray-800">
-                <Check size={12} className="text-emerald-600" /> 감정팀 무료 방문·택배 수거
-              </div>
-              <div className="flex items-center gap-1.5 font-bold text-gray-800">
-                <Check size={12} className="text-emerald-600" /> 공인 명품 감정원 정품 인증
-              </div>
-              <div className="flex items-center gap-1.5 font-bold text-gray-800">
-                <Check size={12} className="text-emerald-600" /> 월간 렌탈 정산 수익 보장
+
+            {/* 품목 카테고리 선택 */}
+            <div className="w-full text-left mb-3">
+              <label className="text-[11px] font-bold text-gray-700 block mb-1">상품 카테고리</label>
+              <div className="grid grid-cols-4 gap-1.5">
+                {[
+                  { id: 'bag', label: '가방' },
+                  { id: 'clothing', label: '의류' },
+                  { id: 'shoes', label: '슈즈' },
+                  { id: 'jewelry', label: '시계/주얼리' }
+                ].map(cat => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setSellCategory(cat.id as any)}
+                    className={`py-1.5 rounded-lg text-xs font-bold border transition ${
+                      sellCategory === cat.id
+                        ? 'bg-gray-950 text-white border-gray-950'
+                        : 'bg-white text-gray-700 border-gray-200'
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* 회원 신청자 정보 또는 비회원 연락처 입력 */}
+            {/* 상품 상태 선택 */}
+            <div className="w-full text-left mb-3">
+              <label className="text-[11px] font-bold text-gray-700 block mb-1">상품 상태 (외관/사용감)</label>
+              <div className="grid grid-cols-3 gap-1.5">
+                {[
+                  { id: 'S', label: 'S급 (미사용급)' },
+                  { id: 'A', label: 'A급 (미세사용감)' },
+                  { id: 'B', label: 'B급 (자연스런사용감)' }
+                ].map(cond => (
+                  <button
+                    key={cond.id}
+                    type="button"
+                    onClick={() => setItemCondition(cond.id as any)}
+                    className={`py-1.5 rounded-lg text-[11px] font-bold border transition ${
+                      itemCondition === cond.id
+                        ? 'bg-indigo-600 text-white border-indigo-600'
+                        : 'bg-white text-gray-700 border-gray-200'
+                    }`}
+                  >
+                    {cond.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 부속품 유무 체크박스 */}
+            <div className="w-full text-left mb-3 bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-[11px] space-y-1.5">
+              <span className="font-bold text-gray-700 block mb-1">보유 부속품 체크</span>
+              <label className="flex items-center gap-2 cursor-pointer text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={hasGuaranteeCard}
+                  onChange={(e) => setHasGuaranteeCard(e.target.checked)}
+                  className="w-3.5 h-3.5 accent-black rounded"
+                />
+                <span>정품 보증서 / 개런티 카드</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={hasDustBag}
+                  onChange={(e) => setHasDustBag(e.target.checked)}
+                  className="w-3.5 h-3.5 accent-black rounded"
+                />
+                <span>오리지널 더스트백</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={hasOriginalBox}
+                  onChange={(e) => setHasOriginalBox(e.target.checked)}
+                  className="w-3.5 h-3.5 accent-black rounded"
+                />
+                <span>브랜드 하드케이스 / 박스</span>
+              </label>
+            </div>
+
+            {/* 신청자 정보 */}
             {user ? (
-              <div className="w-full bg-gray-100/70 border border-gray-200 rounded-xl p-2.5 mb-4 text-left">
+              <div className="w-full bg-gray-100/70 border border-gray-200 rounded-xl p-2.5 mb-3 text-left">
                 <p className="text-[11px] text-gray-500 font-medium">신청 회원</p>
                 <p className="text-xs font-bold text-gray-900 mt-0.5">
                   {user.name} <span className="text-gray-500 font-normal">({user.phone || user.email})</span>
                 </p>
               </div>
             ) : (
-              <div className="w-full text-left space-y-2 mb-4">
-                <div className="bg-amber-50/80 border border-amber-200/80 rounded-xl p-2.5 text-[11px] text-amber-900 leading-tight">
-                  <span className="font-bold">비회원 안내:</span> 감정팀의 안내 및 무료 수거 방문을 위해 연락처를 입력해주세요.
-                </div>
+              <div className="w-full text-left space-y-2 mb-3">
                 <div>
                   <label className="text-[11px] font-bold text-gray-700 block mb-1">신청자 성명 (선택)</label>
                   <input 
@@ -175,7 +341,7 @@ export const ShopSell = () => {
               </div>
             )}
 
-            <div className="flex gap-2 w-full">
+            <div className="flex gap-2 w-full pt-1">
               <button 
                 type="button"
                 onClick={() => {
@@ -192,25 +358,45 @@ export const ShopSell = () => {
                 onClick={handleConfirmSell}
                 className="flex-1 bg-gray-950 hover:bg-black text-white py-3 rounded-xl font-bold text-xs transition disabled:opacity-50"
               >
-                {isSubmitting ? '접수중...' : '신청하기'}
+                {isSubmitting ? '접수중...' : '위탁 신청 완료'}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* 🌟 판매 신청 확인 모달 */}
-      {sellModal.isOpen && (
+      {/* 🌟 3. 위탁 판매 접수 완료 모달 */}
+      {receiptModal.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
           <div className="bg-white rounded-2xl p-6 max-w-xs w-full shadow-2xl text-center flex flex-col items-center animate-fadeIn">
             <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
               <Check size={24} className="stroke-[3]" />
             </div>
-            <h3 className="font-extrabold text-base text-gray-900 mb-2">위탁 판매 신청 안내</h3>
-            <p className="text-xs text-gray-600 mb-6 leading-relaxed">{sellModal.message}</p>
+            <h3 className="font-extrabold text-base text-gray-900 mb-1">위탁 판매 접수 완료</h3>
+            <p className="text-xs text-emerald-600 font-bold mb-3">접수번호: {receiptModal.receiptCode}</p>
+
+            <div className="w-full bg-gray-50 rounded-xl p-3 text-left text-xs text-gray-700 space-y-1.5 mb-4 border border-gray-100">
+              <div className="flex justify-between">
+                <span className="text-gray-400">신청 브랜드</span>
+                <span className="font-bold text-gray-900">{receiptModal.brandName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">상품 분류</span>
+                <span className="font-bold text-gray-900">{receiptModal.category}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">안내 연락처</span>
+                <span className="font-bold text-gray-900">{receiptModal.applicantPhone}</span>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-gray-500 mb-5 leading-relaxed">
+              접수 확인 문자가 발송되었습니다. 24시간 내 전문 감정팀이 안심 수거 키트를 무료로 발송해 드립니다.
+            </p>
+
             <button 
               type="button"
-              onClick={() => setSellModal({ isOpen: false, message: '' })}
+              onClick={() => setReceiptModal({ isOpen: false, receiptCode: '', brandName: '', category: '', applicantPhone: '' })}
               className="w-full bg-gray-900 hover:bg-black text-white py-3 rounded-xl font-bold text-sm transition"
             >
               확인
@@ -235,47 +421,6 @@ export const ShopSell = () => {
             >
               확인
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* 🌟 직접 등록 모달 */}
-      {showDirectModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-extrabold text-base text-gray-900">브랜드 직접 등록</h3>
-              <button type="button" onClick={() => setShowDirectModal(false)} className="text-gray-400 hover:text-black">
-                <X size={20} />
-              </button>
-            </div>
-            <p className="text-xs text-gray-500 mb-4">등록되지 않은 브랜드명을 직접 입력해주시면 전문 감정팀 검수 후 판매 절차가 진행됩니다.</p>
-            <form onSubmit={handleDirectRegister} className="space-y-4">
-              <input 
-                type="text" 
-                value={directBrandName}
-                onChange={(e) => setDirectBrandName(e.target.value)}
-                placeholder="예: 발렉스트라, 모이나..." 
-                required
-                className="w-full border border-gray-300 focus:border-black rounded-xl p-3.5 text-sm outline-none"
-              />
-              <div className="flex gap-2">
-                <button 
-                  type="button" 
-                  onClick={() => setShowDirectModal(false)}
-                  className="flex-1 border border-gray-200 py-3 rounded-xl text-sm font-bold text-gray-600"
-                >
-                  취소
-                </button>
-                <button 
-                  type="submit" 
-                  disabled={isSubmitting}
-                  className="flex-1 bg-gray-900 text-white py-3 rounded-xl text-sm font-bold hover:bg-black disabled:opacity-50"
-                >
-                  {isSubmitting ? '접수 중...' : '등록 신청'}
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}

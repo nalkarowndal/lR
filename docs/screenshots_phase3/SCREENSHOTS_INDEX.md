@@ -3,7 +3,7 @@
 본 디렉토리(`docs/screenshots_phase3/`)는 LuxuryRental 웹 애플리케이션의 **모든 화면, 모달, 인터랙션, 상태 변화, 관리자 대시보드 및 5대 반응형 뷰포트**를 **1.5x Retina 고해상도**로 자동 캡처한 전체 스크린샷 모음입니다.
 
 **총 캡처 수량**: **81개**
-**생성 일시**: 2026-11-05T00:22:34.005Z
+**생성 일시**: 2026-11-05T01:00:43.332Z
 
 ---
 
@@ -44,7 +44,7 @@
 | 5 | <img src="./16_product_detail_add_to_cart_toast.png" width="120" alt="장바구니 담기 완료 토스트" /> | `16_product_detail_add_to_cart_toast.png` | **장바구니 담기 완료 토스트** | 장바구니 추가 성공 안내 토스트 및 모달 닫힘 | `440x920 Mobile` |
 | 6 | <img src="./17_cart_header_badge.png" width="120" alt="헤더 장바구니 실시간 수량 배지" /> | `17_cart_header_badge.png` | **헤더 장바구니 실시간 수량 배지** | 장바구니 아이콘 우측 상단 인디고 원형 배지에 수량(1) 실시간 반영 | `440x920 Mobile` |
 | 7 | <img src="./18_cart_modal_view.png" width="120" alt="장바구니 팝업 모달" /> | `18_cart_modal_view.png` | **장바구니 팝업 모달** | 담긴 렌탈 상품 정보, 렌탈 기간, 보증금 0원 프로모션, 무료 왕복 특송 배송비, 총 예상 대여료 계산 요약 | `440x920 Mobile` |
-| 8 | <img src="./19_cart_modal_checkout_toast.png" width="120" alt="렌탈 주문 완료 토스트" /> | `19_cart_modal_checkout_toast.png` | **렌탈 주문 완료 토스트** | 렌탈 주문 신청 접수 완료 토스트 및 장바구니 모달 자동 닫힘 | `440x920 Mobile` |
+| 8 | <img src="./19_cart_modal_checkout_toast.png" width="120" alt="렌탈 주문 배송 정보 입력 화면" /> | `19_cart_modal_checkout_toast.png` | **렌탈 주문 배송 정보 입력 화면** | 수령인 성명, 휴대폰 번호, 배송지 주소, 배송 메모 입력 및 VIP 왕복 특송 무료 혜택 | `440x920 Mobile` |
 
 ---
 
@@ -150,7 +150,7 @@
 | 4 | <img src="./67_admin_recruit_workers_db_and_sms_modal.png" width="120" alt="근무자 DB 및 단체 문자 발송 모달" /> | `67_admin_recruit_workers_db_and_sms_modal.png` | **근무자 DB 및 단체 문자 발송 모달** | 체크박스로 선택된 매장 근무자 대상 맞춤 공지 SMS 발송 모달 | `1920x1080 Desktop` |
 | 5 | <img src="./68_admin_recruit_chat_interaction.png" width="120" alt="실시간 소통 및 채팅 상호작용" /> | `68_admin_recruit_chat_interaction.png` | **실시간 소통 및 채팅 상호작용** | 매장 관리자 및 본사 총괄 담당자 간 실시간 업무 지시 및 상태 공유 채팅 | `1920x1080 Desktop` |
 | 6 | <img src="./69_admin_role_switch_headquarters.png" width="120" alt="본사 총괄 관리자(ADMIN) 모드 전환" /> | `69_admin_role_switch_headquarters.png` | **본사 총괄 관리자(ADMIN) 모드 전환** | 전국 매장 구인 현황 집계 및 본사 전용 관리 도구(엑셀 업로드, 채용 확정 등록) 활성화 | `1920x1080 Desktop` |
-| 7 | <img src="./70_admin_excel_upload_modal.png" width="120" alt="엑셀 구인현황 대량 업로드 모달" /> | `70_admin_excel_upload_modal.png` | **엑셀 구인현황 대량 업로드 모달** | CSV/Excel 대량 일괄 등록 팝업 모달 | `1920x1080 Desktop` |
+| 7 | <img src="./70_admin_excel_upload_modal.png" width="120" alt="35개 매장 구인 현황 엑셀 일괄 업로드 모달" /> | `70_admin_excel_upload_modal.png` | **35개 매장 구인 현황 엑셀 일괄 업로드 모달** | 35개 매장 TO 데이터 미리보기 및 데이터베이스 일괄 반영 모달 | `1920x1080 Desktop` |
 | 8 | <img src="./71_admin_hire_result_modal.png" width="120" alt="채용 결과 등록 팝업 모달" /> | `71_admin_hire_result_modal.png` | **채용 결과 등록 팝업 모달** | 최종 합격자 확정 및 문자 통보 모달 | `1920x1080 Desktop` |
 | 9 | <img src="./72_admin_shop_management_table.png" width="120" alt="쇼핑몰 상품 관리 테이블" /> | `72_admin_shop_management_table.png` | **쇼핑몰 상품 관리 테이블** | 서버 DB와 연동된 명품 렌탈 상품 목록, 브랜드, 1일/3일 대여료, 이미지 갤러리 관리 버튼 | `1920x1080 Desktop` |
 | 10 | <img src="./73_admin_shop_add_product_modal.png" width="120" alt="신규 명품 상품 등록 모달" /> | `73_admin_shop_add_product_modal.png` | **신규 명품 상품 등록 모달** | 신규 상품 즉시 등록 및 DB 반영 확인 알림 모달 | `1920x1080 Desktop` |

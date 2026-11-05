@@ -21,6 +21,7 @@ export const ShopRegister = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   // Granular Terms Consent State
+  const [ageConsentAgreed, setAgeConsentAgreed] = useState(false);
   const [serviceTermsAgreed, setServiceTermsAgreed] = useState(false);
   const [privacyPolicyAgreed, setPrivacyPolicyAgreed] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
@@ -32,14 +33,16 @@ export const ShopRegister = () => {
   const [errorMsg, setErrorMsg] = useState('');
   const [successRegistered, setSuccessRegistered] = useState(false);
 
-  const allAgreed = serviceTermsAgreed && privacyPolicyAgreed && marketingConsent;
+  const allAgreed = ageConsentAgreed && serviceTermsAgreed && privacyPolicyAgreed && marketingConsent;
 
   const handleToggleAll = () => {
     if (allAgreed) {
+      setAgeConsentAgreed(false);
       setServiceTermsAgreed(false);
       setPrivacyPolicyAgreed(false);
       setMarketingConsent(false);
     } else {
+      setAgeConsentAgreed(true);
       setServiceTermsAgreed(true);
       setPrivacyPolicyAgreed(true);
       setMarketingConsent(true);
@@ -119,8 +122,8 @@ export const ShopRegister = () => {
     e.preventDefault();
     setErrorMsg('');
 
-    if (!serviceTermsAgreed || !privacyPolicyAgreed) {
-      setErrorMsg('필수 항목([필수] 서비스 이용약관, [필수] 개인정보 수집 및 이용)에 모두 동의해주세요.');
+    if (!ageConsentAgreed || !serviceTermsAgreed || !privacyPolicyAgreed) {
+      setErrorMsg('필수 항목([필수] 만 14세 이상 확인, [필수] 서비스 이용약관, [필수] 개인정보 수집 및 이용)에 모두 동의해주세요.');
       return;
     }
 
@@ -309,34 +312,50 @@ export const ShopRegister = () => {
 
           {/* Granular Legal Terms Agreement Section */}
           <div className="pt-4 pb-2 border-t border-gray-100">
-            {/* 전체 동의 버튼 */}
-            <div 
-              onClick={handleToggleAll}
+            {/* 전체 동의 Accessible Checkbox */}
+            <label 
               className="p-3.5 rounded-xl bg-gray-50 hover:bg-gray-100/80 cursor-pointer flex items-center justify-between border border-gray-200/70 transition mb-3"
             >
               <div className="flex items-center gap-2.5">
-                {allAgreed ? (
-                  <CheckSquare size={19} className="text-black" />
-                ) : (
-                  <Square size={19} className="text-gray-400" />
-                )}
+                <input
+                  type="checkbox"
+                  checked={allAgreed}
+                  onChange={handleToggleAll}
+                  className="w-4 h-4 accent-black rounded cursor-pointer"
+                  aria-label="모든 약관에 전체 동의합니다"
+                />
                 <span className="text-xs font-black text-gray-900">
                   모든 약관에 전체 동의합니다
                 </span>
               </div>
               <span className="text-[11px] text-gray-400">선택 포함</span>
-            </div>
+            </label>
 
             {/* 개별 약관 목록 */}
             <div className="space-y-2.5 px-1">
-              {/* 1. 서비스 이용약관 (필수) */}
+              {/* 1. 만 14세 이상 확인 (필수) */}
+              <div className="flex items-center justify-between text-xs">
+                <label className="flex items-center gap-2 cursor-pointer flex-1">
+                  <input 
+                    type="checkbox"
+                    checked={ageConsentAgreed}
+                    onChange={(e) => setAgeConsentAgreed(e.target.checked)}
+                    className="w-4 h-4 accent-black rounded cursor-pointer"
+                  />
+                  <span className="text-gray-700">
+                    <span className="text-rose-600 font-bold">[필수]</span> 만 14세 이상입니다 (본인 확인)
+                  </span>
+                </label>
+              </div>
+
+              {/* 2. 서비스 이용약관 (필수) */}
               <div className="flex items-center justify-between text-xs">
                 <label className="flex items-center gap-2 cursor-pointer flex-1">
                   <input 
                     type="checkbox"
                     checked={serviceTermsAgreed}
                     onChange={(e) => setServiceTermsAgreed(e.target.checked)}
-                    className="w-4 h-4 accent-black rounded"
+                    className="w-4 h-4 accent-black rounded cursor-pointer"
                   />
                   <span className="text-gray-700">
                     <span className="text-rose-600 font-bold">[필수]</span> 서비스 이용약관 동의
@@ -352,14 +371,14 @@ export const ShopRegister = () => {
                 </button>
               </div>
 
-              {/* 2. 개인정보 수집 및 이용 (필수) */}
+              {/* 3. 개인정보 수집 및 이용 (필수) */}
               <div className="flex items-center justify-between text-xs">
                 <label className="flex items-center gap-2 cursor-pointer flex-1">
                   <input 
                     type="checkbox"
                     checked={privacyPolicyAgreed}
                     onChange={(e) => setPrivacyPolicyAgreed(e.target.checked)}
-                    className="w-4 h-4 accent-black rounded"
+                    className="w-4 h-4 accent-black rounded cursor-pointer"
                   />
                   <span className="text-gray-700">
                     <span className="text-rose-600 font-bold">[필수]</span> 개인정보 수집 및 이용 동의
@@ -375,14 +394,14 @@ export const ShopRegister = () => {
                 </button>
               </div>
 
-              {/* 3. 마케팅 정보 수신 (선택) */}
+              {/* 4. 마케팅 정보 수신 (선택) */}
               <div className="flex items-center justify-between text-xs">
                 <label className="flex items-center gap-2 cursor-pointer flex-1">
                   <input 
                     type="checkbox"
                     checked={marketingConsent}
                     onChange={(e) => setMarketingConsent(e.target.checked)}
-                    className="w-4 h-4 accent-black rounded"
+                    className="w-4 h-4 accent-black rounded cursor-pointer"
                   />
                   <span className="text-gray-600">
                     <span className="text-gray-400 font-semibold">[선택]</span> 혜택·이벤트 및 신상품 알림 수신

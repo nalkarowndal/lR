@@ -19,6 +19,24 @@ export const ShopMyPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'FAVORITES' | 'RENTALS' | 'SELLS'>('FAVORITES');
   const [sellRequests, setSellRequests] = useState<any[]>([]);
   const [isLoadingSells, setIsLoadingSells] = useState(false);
+  const [orders, setOrders] = useState<any[]>(() => {
+    try {
+      const saved = localStorage.getItem('luxury_orders');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Re-read orders whenever activeTab changes
+  useEffect(() => {
+    if (activeTab === 'RENTALS') {
+      try {
+        const saved = localStorage.getItem('luxury_orders');
+        setOrders(saved ? JSON.parse(saved) : []);
+      } catch {}
+    }
+  }, [activeTab]);
 
   // Profile Edit Modal State
   const [showEditModal, setShowEditModal] = useState(false);
@@ -213,7 +231,7 @@ export const ShopMyPage: React.FC = () => {
                 className={`p-2.5 rounded-xl transition ${activeTab === 'RENTALS' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}
               >
                 <p className="text-xs font-bold">렌탈/주문</p>
-                <p className="text-sm font-black mt-0.5">0</p>
+                <p className="text-sm font-black mt-0.5">{orders.length}</p>
               </button>
               <button
                 type="button"
@@ -293,7 +311,7 @@ export const ShopMyPage: React.FC = () => {
               activeTab === 'RENTALS' ? 'border-black text-black' : 'border-transparent text-gray-400 hover:text-gray-600'
             }`}
           >
-            <ShoppingBag size={15} /> 이용 중인 렌탈 (0)
+            <ShoppingBag size={15} /> 이용 중인 렌탈 ({orders.length})
           </button>
           <button
             type="button"
@@ -366,21 +384,72 @@ export const ShopMyPage: React.FC = () => {
           </div>
         )}
 
-        {/* Tab 2: Rentals (Honest Empty State as instructed) */}
+        {/* Tab 2: Rentals & Orders */}
         {activeTab === 'RENTALS' && (
-          <div className="bg-white rounded-2xl p-8 border border-gray-100 text-center">
-            <div className="w-12 h-12 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-3">
-              <PackageCheck size={22} />
-            </div>
-            <h3 className="text-sm font-bold text-gray-800 mb-1">이용 중인 렌탈 상품이 없습니다</h3>
-            <p className="text-xs text-gray-400 mb-4">특별한 날, 원하는 명품을 부담 없이 렌탈하여 사용해보세요.</p>
-            <button
-              type="button"
-              onClick={() => navigateTo('SHOP_CATEGORY')}
-              className="px-4 py-2 bg-black text-white text-xs font-bold rounded-xl hover:bg-gray-800 transition active:scale-95"
-            >
-              렌탈 상품 둘러보기
-            </button>
+          <div>
+            {orders.length > 0 ? (
+              <div className="space-y-3.5">
+                {orders.map((order: any, idx: number) => (
+                  <div key={order.orderId || idx} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-2xs space-y-3">
+                    <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
+                      <div>
+                        <span className="text-[10px] font-bold text-gray-400">주문번호</span>
+                        <p className="text-xs font-black text-gray-900 tracking-tight">{order.orderId}</p>
+                      </div>
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+                        {order.status || '배송 준비중'}
+                      </span>
+                    </div>
+
+                    {/* Items */}
+                    <div className="space-y-2">
+                      {order.items?.map((it: any, iIdx: number) => (
+                        <div key={it.id || iIdx} className="flex items-center gap-3 bg-gray-50/70 p-2.5 rounded-xl">
+                          <div className="w-12 h-12 rounded-lg bg-white overflow-hidden shrink-0 border border-gray-100 flex items-center justify-center">
+                            <ProductImage src={it.image} alt={it.title} category={it.category} productId={it.id} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <span className="text-[10px] font-bold text-indigo-600 block leading-tight">{it.brand}</span>
+                            <h5 className="text-xs font-bold text-gray-900 truncate">{it.title}</h5>
+                            <span className="text-[11px] text-gray-500 font-medium">{it.days ? `${it.days}일 렌탈` : '대여'} · {it.price}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Delivery & Action */}
+                    <div className="pt-1 flex items-center justify-between text-xs text-gray-500">
+                      <div>
+                        <p className="text-[11px]">배송지: <span className="font-semibold text-gray-800">{order.shippingAddress}</span></p>
+                        <p className="text-[11px]">결제액: <span className="font-black text-indigo-600">{order.formattedTotal || `${order.totalAmount?.toLocaleString()}원`}</span></p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => showToast(`운송장 조회: 우체국 VIP 특송 (준비 중)`, 'info')}
+                        className="px-3 py-1.5 bg-gray-900 text-white font-bold text-[11px] rounded-lg hover:bg-black transition shrink-0"
+                      >
+                        배송 조회
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl p-8 border border-gray-100 text-center">
+                <div className="w-12 h-12 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <PackageCheck size={22} />
+                </div>
+                <h3 className="text-sm font-bold text-gray-800 mb-1">이용 중인 렌탈 상품이 없습니다</h3>
+                <p className="text-xs text-gray-400 mb-4">특별한 날, 원하는 명품을 부담 없이 렌탈하여 사용해보세요.</p>
+                <button
+                  type="button"
+                  onClick={() => navigateTo('SHOP_CATEGORY')}
+                  className="px-4 py-2 bg-black text-white text-xs font-bold rounded-xl hover:bg-gray-800 transition active:scale-95"
+                >
+                  렌탈 상품 둘러보기
+                </button>
+              </div>
+            )}
           </div>
         )}
 

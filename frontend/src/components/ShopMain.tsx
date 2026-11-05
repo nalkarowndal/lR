@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Search, ShoppingCart, Settings, Heart, User, Home, List, ChevronRight,
-  ShieldCheck, Smartphone, Trash2, CheckCircle2, X
+  ShieldCheck, Smartphone, Trash2, CheckCircle2, X, PackageCheck, ArrowRight
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
@@ -15,6 +15,7 @@ import {
 import { ProductImage } from './ui/ProductImage';
 import { LegalTermsModal } from './ui/LegalTermsModal';
 import { RENT_NEW_ARRIVALS } from '../data/catalog';
+import { calculateRentalPriceDetails, parseNumericPrice, formatKRW } from '../utils/pricing';
 
 // ==========================================
 // 장바구니 아이템 타입 정의
@@ -182,24 +183,25 @@ export const ShopMain = () => {
     }
   });
 
-  const parseNumericPrice = (pStr: string) => {
-    const digits = pStr.replace(/[^0-9]/g, '');
-    return digits ? parseInt(digits, 10) : 40000;
-  };
+  // Cart & Mock Order state
+  const [cartStep, setCartStep] = useState<'CART' | 'SHIPPING' | 'ORDER_COMPLETE'>('CART');
+  const [recipientName, setRecipientName] = useState('');
+  const [recipientPhone, setRecipientPhone] = useState('010-8842-1920');
+  const [shippingAddress, setShippingAddress] = useState('서울특별시 강남구 압구정로 142 럭셔리타워 5층');
+  const [deliveryNote, setDeliveryNote] = useState('부재 시 문 앞 보관 후 문자 부탁드립니다.');
+  const [completedOrder, setCompletedOrder] = useState<any | null>(null);
 
   const calculateRentalPrice = (basePriceStr: string, days: number) => {
-    const base = parseNumericPrice(basePriceStr);
-    const multiplier = days === 3 ? 1 : days === 7 ? 2.1 : days === 15 ? 4 : 7;
-    return Math.round(base * multiplier);
+    return calculateRentalPriceDetails(basePriceStr, undefined, days).currentPrice;
   };
 
   const handleAddToCart = (product: NonNullable<typeof selectedProduct>, days: number) => {
-    const calculatedFee = calculateRentalPrice(product.price, days);
+    const details = calculateRentalPriceDetails(product.price, product.original, days);
     const newItem: CartItem = {
       id: product.id,
       brand: product.brand,
       title: product.title,
-      price: `${calculatedFee.toLocaleString()}원`,
+      price: details.formattedCurrentPrice,
       days,
       image: product.image,
       category: product.category
@@ -214,13 +216,30 @@ export const ShopMain = () => {
   };
 
   const handleRentNow = (product: NonNullable<typeof selectedProduct>, days: number) => {
-    if (!user) {
-      showToast('대여를 진행하려면 먼저 로그인해주세요.', 'info');
-      setActiveOverlay('LOGIN');
-      return;
-    }
-    showToast(`'${product.title}' (${days}일 대여) 렌탈 신청이 완료되었습니다! 24시간 내 배송 준비가 진행됩니다.`, 'success');
+    const details = calculateRentalPriceDetails(product.price, product.original, days);
+    const newItem: CartItem = {
+      id: product.id,
+      brand: product.brand,
+      title: product.title,
+      price: details.formattedCurrentPrice,
+      days,
+      image: product.image,
+      category: product.category
+    };
+    const updated = [...cartItems.filter(item => item.id !== product.id), newItem];
+    setCartItems(updated);
+    try {
+      localStorage.setItem('luxury_cart', JSON.stringify(updated));
+    } catch {}
     setSelectedProduct(null);
+    setCartStep('SHIPPING');
+    if (user) {
+      setRecipientName(user.name || '홍길동');
+      if (user.phone) setRecipientPhone(user.phone);
+    } else {
+      setRecipientName('VIP 고객님');
+    }
+    setCartModalOpen(true);
   };
 
   const handleRemoveFromCart = (id: string | number) => {
@@ -232,14 +251,70 @@ export const ShopMain = () => {
     showToast('장바구니에서 상품이 삭제되었습니다.', 'info');
   };
 
-  const handleCheckoutCart = () => {
+  const handleOpenCart = () => {
+    setCartStep('CART');
+    if (user && !recipientName) {
+      setRecipientName(user.name);
+      if (user.phone) setRecipientPhone(user.phone);
+    }
+    setCartModalOpen(true);
+  };
+
+  const handleStartCheckout = () => {
     if (cartItems.length === 0) return;
-    setCartItems([]);
+    if (user && !recipientName) {
+      setRecipientName(user.name);
+      if (user.phone) setRecipientPhone(user.phone);
+    } else if (!recipientName) {
+      setRecipientName('VIP 고객님');
+    }
+    setCartStep('SHIPPING');
+  };
+
+  const handleCompleteOrder = () => {
+    if (!recipientName.trim()) {
+      showToast('수령인 성명을 입력해주세요.', 'info');
+      return;
+    }
+    if (!recipientPhone.trim()) {
+      showToast('수령인 연락처를 입력해주세요.', 'info');
+      return;
+    }
+    if (!shippingAddress.trim()) {
+      showToast('배송지 주소를 입력해주세요.', 'info');
+      return;
+    }
+
+    const todayStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const randSuffix = Math.floor(1000 + Math.random() * 9000);
+    const orderId = `LR-${todayStr}-${randSuffix}`;
+    const totalAmount = cartItems.reduce((acc, it) => acc + parseNumericPrice(it.price), 0);
+
+    const newOrder = {
+      orderId,
+      createdAt: new Date().toISOString(),
+      formattedDate: new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+      items: [...cartItems],
+      totalAmount,
+      formattedTotal: `${totalAmount.toLocaleString()}원`,
+      recipientName: recipientName.trim(),
+      recipientPhone: recipientPhone.trim(),
+      shippingAddress: shippingAddress.trim(),
+      deliveryNote: deliveryNote.trim(),
+      status: '배송 준비중'
+    };
+
     try {
+      const existingStr = localStorage.getItem('luxury_orders');
+      const existing = existingStr ? JSON.parse(existingStr) : [];
+      localStorage.setItem('luxury_orders', JSON.stringify([newOrder, ...existing]));
       localStorage.removeItem('luxury_cart');
     } catch {}
-    setCartModalOpen(false);
-    showToast('대여 신청이 성공적으로 접수되었습니다! 담당 매니저가 유선으로 배송 일정을 안내해 드립니다.', 'success');
+
+    setCartItems([]);
+    setCompletedOrder(newOrder);
+    setCartStep('ORDER_COMPLETE');
+    showToast(`렌탈 주문이 정상 접수되었습니다! 주문번호: ${orderId}`, 'success');
   };
 
   const currentRecommendList = RECOMMENDATIONS_DATA[activeTab] || RECOMMENDATIONS_DATA['20대 여성'];
@@ -369,7 +444,7 @@ export const ShopMain = () => {
                 showToast('장바구니를 확인하려면 먼저 로그인해주세요.', 'info');
                 setActiveOverlay('LOGIN');
               } else {
-                setCartModalOpen(true);
+                handleOpenCart();
               }
             }}
             className="p-1.5 rounded-full hover:bg-gray-100 active:scale-95 transition relative"
@@ -856,94 +931,247 @@ export const ShopMain = () => {
         </button>
       </nav>
 
-      {/* 8. 장바구니 모달 */}
+      {/* 8. 장바구니 및 모의 주문 결제 모달 */}
       <Modal
         isOpen={cartModalOpen}
         onClose={() => setCartModalOpen(false)}
-        title={`나의 렌탈 장바구니 (${cartItems.length})`}
+        title={
+          cartStep === 'CART'
+            ? `나의 렌탈 장바구니 (${cartItems.length})`
+            : cartStep === 'SHIPPING'
+            ? '렌탈 배송지 정보 입력'
+            : '렌탈 주문 접수 완료'
+        }
       >
         <div className="space-y-4">
-          {cartItems.length === 0 ? (
-            <div className="py-8 text-center text-gray-500 space-y-3">
-              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto text-gray-400">
-                <ShoppingCart size={22} />
-              </div>
-              <p className="text-xs font-semibold">장바구니가 비어 있습니다.</p>
-              <p className="text-[11px] text-gray-400">원하시는 명품을 선택하여 장바구니에 담아보세요.</p>
-              <button
-                type="button"
-                onClick={() => {
-                  setCartModalOpen(false);
-                  navigateTo('SHOP_CATEGORY');
-                }}
-                className="mt-2 px-4 py-2 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition"
-              >
-                상품 둘러보기
-              </button>
-            </div>
-          ) : (
+          {cartStep === 'CART' && (
             <>
-              <div className="max-h-60 overflow-y-auto space-y-2.5 pr-1 scrollbar-hide">
-                {cartItems.map((cItem) => (
-                  <div key={cItem.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                    <div className="w-14 h-14 bg-white rounded-lg overflow-hidden shrink-0 border border-gray-200/60 flex items-center justify-center">
-                      <ProductImage src={cItem.image} alt={cItem.title} category={cItem.category} productId={cItem.id} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <span className="text-[10px] font-bold text-indigo-600 block leading-tight">{cItem.brand}</span>
-                      <h5 className="text-xs font-bold text-gray-900 truncate">{cItem.title}</h5>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded font-bold">{cItem.days}일 렌탈</span>
-                        <span className="text-xs font-extrabold text-gray-950">{cItem.price}</span>
+              {cartItems.length === 0 ? (
+                <div className="py-8 text-center text-gray-500 space-y-3">
+                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto text-gray-400">
+                    <ShoppingCart size={22} />
+                  </div>
+                  <p className="text-xs font-semibold">장바구니가 비어 있습니다.</p>
+                  <p className="text-[11px] text-gray-400">원하시는 명품을 선택하여 장바구니에 담아보세요.</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCartModalOpen(false);
+                      navigateTo('SHOP_CATEGORY');
+                    }}
+                    className="mt-2 px-4 py-2 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition"
+                  >
+                    상품 둘러보기
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="max-h-60 overflow-y-auto space-y-2.5 pr-1 scrollbar-hide">
+                    {cartItems.map((cItem) => (
+                      <div key={cItem.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                        <div className="w-14 h-14 bg-white rounded-lg overflow-hidden shrink-0 border border-gray-200/60 flex items-center justify-center">
+                          <ProductImage src={cItem.image} alt={cItem.title} category={cItem.category} productId={cItem.id} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-[10px] font-bold text-indigo-600 block leading-tight">{cItem.brand}</span>
+                          <h5 className="text-xs font-bold text-gray-900 truncate">{cItem.title}</h5>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-[10px] bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded font-bold">{cItem.days}일 렌탈</span>
+                            <span className="text-xs font-extrabold text-gray-950">{cItem.price}</span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          aria-label="장바구니 항목 삭제"
+                          onClick={() => handleRemoveFromCart(cItem.id)}
+                          className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg transition"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
+                    ))}
+                  </div>
+
+                  {/* Price summary */}
+                  <div className="p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl space-y-1.5 text-xs">
+                    <div className="flex justify-between text-gray-600 text-[11px]">
+                      <span>보증금</span>
+                      <span className="font-bold text-indigo-600">0원 (VIP 무보증 프로모션)</span>
                     </div>
+                    <div className="flex justify-between text-gray-600 text-[11px]">
+                      <span>배송비</span>
+                      <span className="font-bold text-gray-900">무료 (왕복 특송)</span>
+                    </div>
+                    <div className="border-t border-indigo-100 pt-2 flex justify-between font-black text-sm text-gray-950">
+                      <span>총 예상 대여료</span>
+                      <span className="text-indigo-600">
+                        {cartItems.reduce((acc, it) => acc + parseNumericPrice(it.price), 0).toLocaleString()}원
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
                     <button
                       type="button"
-                      aria-label="장바구니 항목 삭제"
-                      onClick={() => handleRemoveFromCart(cItem.id)}
-                      className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg transition"
+                      onClick={handleStartCheckout}
+                      className="flex-1 py-3 bg-gray-950 text-white rounded-xl font-bold text-xs hover:bg-black active:scale-[0.98] transition shadow-md"
                     >
-                      <Trash2 size={16} />
+                      주문서 작성으로 이동
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCartModalOpen(false)}
+                      className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold text-xs hover:bg-gray-200 transition"
+                    >
+                      계속 둘러보기
                     </button>
                   </div>
-                ))}
+                </>
+              )}
+            </>
+          )}
+
+          {cartStep === 'SHIPPING' && (
+            <div className="space-y-3.5">
+              <div className="p-3 bg-gray-50 border border-gray-100 rounded-xl">
+                <div className="flex justify-between items-center text-xs text-gray-600">
+                  <span>주문 품목 ({cartItems.length}건)</span>
+                  <span className="font-black text-indigo-600 text-sm">
+                    총 {cartItems.reduce((acc, it) => acc + parseNumericPrice(it.price), 0).toLocaleString()}원
+                  </span>
+                </div>
               </div>
 
-              {/* Price summary */}
-              <div className="p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl space-y-1.5 text-xs">
-                <div className="flex justify-between text-gray-600 text-[11px]">
-                  <span>보증금</span>
-                  <span className="font-bold text-indigo-600">0원 (VIP 무보증 프로모션)</span>
+              <div className="space-y-2.5">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                    수령인 성명 <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={recipientName}
+                    onChange={(e) => setRecipientName(e.target.value)}
+                    placeholder="수령인 성함 입력"
+                    className="w-full text-xs px-3 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-black transition"
+                  />
                 </div>
-                <div className="flex justify-between text-gray-600 text-[11px]">
-                  <span>배송비</span>
-                  <span className="font-bold text-gray-900">무료 (왕복 특송)</span>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                    휴대폰 연락처 <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    value={recipientPhone}
+                    onChange={(e) => setRecipientPhone(e.target.value)}
+                    placeholder="010-0000-0000"
+                    className="w-full text-xs px-3 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-black transition"
+                  />
                 </div>
-                <div className="border-t border-indigo-100 pt-2 flex justify-between font-black text-sm text-gray-950">
-                  <span>총 예상 대여료</span>
-                  <span className="text-indigo-600">
-                    {cartItems.reduce((acc, it) => acc + parseNumericPrice(it.price), 0).toLocaleString()}원
-                  </span>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                    배송지 주소 <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={shippingAddress}
+                    onChange={(e) => setShippingAddress(e.target.value)}
+                    placeholder="도로명 주소 및 상세 주소"
+                    className="w-full text-xs px-3 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-black transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                    배송 시 요청사항
+                  </label>
+                  <input
+                    type="text"
+                    value={deliveryNote}
+                    onChange={(e) => setDeliveryNote(e.target.value)}
+                    placeholder="예: 부재 시 문 앞 보관"
+                    className="w-full text-xs px-3 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-black transition"
+                  />
+                </div>
+              </div>
+
+              <div className="p-2.5 bg-amber-50/70 border border-amber-200/60 rounded-xl text-[11px] text-amber-900 leading-relaxed">
+                <span className="font-bold">VIP 특송 혜택:</span> 전문 보안 포장재 및 반납용 밀봉 테이프가 함께 동봉되며, 발송 및 반납 택배비는 100% 무료입니다.
+              </div>
+
+              <div className="flex gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setCartStep('CART')}
+                  className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold text-xs hover:bg-gray-200 transition"
+                >
+                  이전
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCompleteOrder}
+                  className="flex-1 py-3 bg-gray-950 text-white rounded-xl font-bold text-xs hover:bg-black active:scale-[0.98] transition shadow-md"
+                >
+                  최종 결제 및 렌탈 예약 접수
+                </button>
+              </div>
+            </div>
+          )}
+
+          {cartStep === 'ORDER_COMPLETE' && completedOrder && (
+            <div className="space-y-4 text-center py-2 animate-fadeIn">
+              <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto border border-emerald-100 shadow-xs">
+                <PackageCheck size={28} />
+              </div>
+
+              <div>
+                <span className="text-[10px] font-bold text-emerald-600 tracking-wider uppercase">Order Confirmed</span>
+                <h4 className="text-base font-black text-gray-950 mt-0.5">렌탈 주문이 완료되었습니다!</h4>
+                <p className="text-xs text-gray-500 mt-1">
+                  주문번호: <span className="font-bold text-gray-900">{completedOrder.orderId}</span>
+                </p>
+              </div>
+
+              <div className="bg-gray-50 rounded-2xl p-4 text-left border border-gray-100 space-y-2 text-xs">
+                <div className="flex justify-between text-gray-600">
+                  <span>수령인</span>
+                  <span className="font-bold text-gray-900">{completedOrder.recipientName} ({completedOrder.recipientPhone})</span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>배송지</span>
+                  <span className="font-bold text-gray-900 max-w-[200px] truncate text-right">{completedOrder.shippingAddress}</span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>결제 대여료</span>
+                  <span className="font-black text-indigo-600">{completedOrder.formattedTotal}</span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>배송 일정</span>
+                  <span className="font-bold text-emerald-700">익일 오전 10시 특송 발송 예정</span>
                 </div>
               </div>
 
               <div className="flex gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={handleCheckoutCart}
+                  onClick={() => {
+                    setCartModalOpen(false);
+                    navigateTo('SHOP_MY_PAGE');
+                  }}
                   className="flex-1 py-3 bg-gray-950 text-white rounded-xl font-bold text-xs hover:bg-black active:scale-[0.98] transition shadow-md"
                 >
-                  렌탈 주문 신청하기
+                  주문 내역 보기 (마이페이지)
                 </button>
                 <button
                   type="button"
                   onClick={() => setCartModalOpen(false)}
                   className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold text-xs hover:bg-gray-200 transition"
                 >
-                  닫기
+                  쇼핑 계속하기
                 </button>
               </div>
-            </>
+            </div>
           )}
         </div>
       </Modal>
@@ -954,119 +1182,126 @@ export const ShopMain = () => {
         onClose={() => setSelectedProduct(null)}
         title="상품 상세 정보"
       >
-        {selectedProduct && (
-          <div className="space-y-4">
-            <div className="relative aspect-square w-full bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 flex items-center justify-center">
-              <ProductImage
-                src={selectedProduct.image}
-                alt={selectedProduct.title}
-                category={selectedProduct.category}
-                productId={selectedProduct.id}
-              />
-              <div className="absolute top-2.5 right-2.5">
+        {selectedProduct && (() => {
+          const pricing = calculateRentalPriceDetails(
+            selectedProduct.price,
+            selectedProduct.original,
+            selectedDays
+          );
+
+          return (
+            <div className="space-y-4">
+              <div className="relative aspect-square w-full bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 flex items-center justify-center">
+                <ProductImage
+                  src={selectedProduct.image}
+                  alt={selectedProduct.title}
+                  category={selectedProduct.category}
+                  productId={selectedProduct.id}
+                />
+                <div className="absolute top-2.5 right-2.5">
+                  <button
+                    type="button"
+                    aria-label="관심 상품 저장"
+                    onClick={async () => {
+                      if (!user) {
+                        showToast('좋아요를 저장하려면 먼저 로그인해주세요.', 'info');
+                        setActiveOverlay('LOGIN');
+                      } else {
+                        const numId = typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10);
+                        const isNowFav = await toggleFavorite(numId);
+                        showToast(isNowFav ? '관심 상품에 추가되었습니다.' : '관심 상품에서 해제되었습니다.', 'info');
+                      }
+                    }}
+                    className="p-2 rounded-full bg-white/90 backdrop-blur-md shadow-xs hover:bg-white text-gray-400 hover:text-red-500 transition"
+                  >
+                    <Heart
+                      size={18}
+                      fill={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10)) ? '#EF4444' : 'none'}
+                      className={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10)) ? 'text-red-500' : 'text-gray-400'}
+                    />
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <span className="text-xs font-black text-indigo-600 uppercase tracking-wider">{selectedProduct.brand}</span>
+                <h4 className="text-base font-black text-gray-950 mt-0.5 leading-snug">{selectedProduct.title}</h4>
+                <div className="mt-2 flex items-baseline gap-2 flex-wrap">
+                  <span className="text-rose-500 font-extrabold text-base">{pricing.formattedDiscount}</span>
+                  <span className="font-black text-lg text-gray-950">
+                    {pricing.formattedCurrentPrice}
+                  </span>
+                  <span className="text-xs text-gray-400 font-medium">/{selectedDays}일 기준</span>
+                  <span className="text-xs text-gray-400 line-through ml-1">{pricing.formattedBasePrice}</span>
+                  <span className="text-[11px] text-indigo-700 bg-indigo-50 font-bold px-2 py-0.5 rounded-md ml-auto">
+                    1일 {pricing.formattedDailyRate}
+                  </span>
+                </div>
+              </div>
+
+              {/* 정품 인증 배지 */}
+              <div className="flex items-center gap-2.5 p-3 bg-amber-50/80 border border-amber-200/60 rounded-xl text-amber-900 text-xs font-bold">
+                <ShieldCheck size={20} className="text-amber-600 shrink-0" />
+                <div>
+                  <p className="leading-tight">한국명품감정원 100% 정품 인증 완료</p>
+                  <p className="text-[10px] text-amber-700/80 font-normal mt-0.5">정품 보증서 동봉 및 위조품 시 200% 책임 보상</p>
+                </div>
+              </div>
+
+              {/* 렌탈 기간 선택 */}
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-2">렌탈 기간 선택</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {[3, 7, 15, 30].map((days) => (
+                    <button
+                      key={days}
+                      type="button"
+                      onClick={() => setSelectedDays(days)}
+                      className={`py-2 rounded-xl text-xs font-bold border transition ${
+                        selectedDays === days
+                          ? 'bg-gray-950 text-white border-gray-950 shadow-sm'
+                          : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                      }`}
+                    >
+                      {days}일
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 액션 버튼들 */}
+              <div className="flex gap-2 pt-2">
                 <button
                   type="button"
-                  aria-label="관심 상품 저장"
-                  onClick={async () => {
-                    if (!user) {
-                      showToast('좋아요를 저장하려면 먼저 로그인해주세요.', 'info');
-                      setActiveOverlay('LOGIN');
-                    } else {
-                      const numId = typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10);
-                      const isNowFav = await toggleFavorite(numId);
-                      showToast(isNowFav ? '관심 상품에 추가되었습니다.' : '관심 상품에서 해제되었습니다.', 'info');
-                    }
-                  }}
-                  className="p-2 rounded-full bg-white/90 backdrop-blur-md shadow-xs hover:bg-white text-gray-400 hover:text-red-500 transition"
+                  onClick={() => handleAddToCart(selectedProduct, selectedDays)}
+                  className="flex-1 py-3 bg-white border border-gray-900 text-gray-950 rounded-xl font-bold text-xs hover:bg-gray-50 active:scale-[0.98] transition"
                 >
-                  <Heart
-                    size={18}
-                    fill={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10)) ? '#EF4444' : 'none'}
-                    className={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10)) ? 'text-red-500' : 'text-gray-400'}
-                  />
+                  장바구니 담기
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleRentNow(selectedProduct, selectedDays)}
+                  className="flex-1 py-3 bg-gray-950 text-white rounded-xl font-bold text-xs hover:bg-black active:scale-[0.98] transition shadow-md"
+                >
+                  바로 렌탈 신청
+                </button>
+              </div>
+
+              <div className="text-center pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedProduct(null);
+                    navigateTo('SHOP_CATEGORY');
+                  }}
+                  className="text-[11px] text-gray-500 underline hover:text-gray-800 transition"
+                >
+                  카테고리에서 다른 명품 둘러보기
                 </button>
               </div>
             </div>
-
-            <div>
-              <span className="text-xs font-black text-indigo-600 uppercase tracking-wider">{selectedProduct.brand}</span>
-              <h4 className="text-base font-black text-gray-950 mt-0.5 leading-snug">{selectedProduct.title}</h4>
-              <div className="mt-2 flex items-baseline gap-2">
-                {selectedProduct.discount && (
-                  <span className="text-rose-500 font-extrabold text-base">{selectedProduct.discount}</span>
-                )}
-                <span className="font-black text-lg text-gray-950">
-                  {calculateRentalPrice(selectedProduct.price, selectedDays).toLocaleString()}원
-                </span>
-                <span className="text-xs text-gray-400 font-medium">/{selectedDays}일 기준</span>
-                {selectedProduct.original && (
-                  <span className="text-xs text-gray-400 line-through ml-1">{selectedProduct.original}</span>
-                )}
-              </div>
-            </div>
-
-            {/* 정품 인증 배지 */}
-            <div className="flex items-center gap-2.5 p-3 bg-amber-50/80 border border-amber-200/60 rounded-xl text-amber-900 text-xs font-bold">
-              <ShieldCheck size={20} className="text-amber-600 shrink-0" />
-              <div>
-                <p className="leading-tight">한국명품감정원 100% 정품 인증 완료</p>
-                <p className="text-[10px] text-amber-700/80 font-normal mt-0.5">정품 보증서 동봉 및 위조품 시 200% 책임 보상</p>
-              </div>
-            </div>
-
-            {/* 렌탈 기간 선택 */}
-            <div>
-              <label className="block text-xs font-bold text-gray-700 mb-2">렌탈 기간 선택</label>
-              <div className="grid grid-cols-4 gap-2">
-                {[3, 7, 15, 30].map((days) => (
-                  <button
-                    key={days}
-                    type="button"
-                    onClick={() => setSelectedDays(days)}
-                    className={`py-2 rounded-xl text-xs font-bold border transition ${
-                      selectedDays === days
-                        ? 'bg-gray-950 text-white border-gray-950 shadow-sm'
-                        : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
-                    }`}
-                  >
-                    {days}일
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 액션 버튼들 */}
-            <div className="flex gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => handleAddToCart(selectedProduct, selectedDays)}
-                className="flex-1 py-3 bg-white border border-gray-900 text-gray-950 rounded-xl font-bold text-xs hover:bg-gray-50 active:scale-[0.98] transition"
-              >
-                장바구니 담기
-              </button>
-              <button
-                type="button"
-                onClick={() => handleRentNow(selectedProduct, selectedDays)}
-                className="flex-1 py-3 bg-gray-950 text-white rounded-xl font-bold text-xs hover:bg-black active:scale-[0.98] transition shadow-md"
-              >
-                바로 렌탈 신청
-              </button>
-            </div>
-
-            <div className="text-center pt-1">
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedProduct(null);
-                  navigateTo('SHOP_CATEGORY');
-                }}
-                className="text-[11px] text-gray-500 underline hover:text-gray-800 transition"
-              >
-                카테고리에서 다른 명품 둘러보기
-              </button>
-            </div>
-          </div>
-        )}
+          );
+        })()}
       </Modal>
 
       {/* 10. 앱 다운로드 안내 모달 */}

@@ -83,6 +83,7 @@ export const ShopSearch = () => {
   // 서버 실시간 상품 DB 검색 (관리자 등록 상품 포함) 및 오프라인 폴백
   const [searchResults, setSearchResults] = useState<CatalogProduct[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<'ALL' | 'bag' | 'clothing' | 'shoes' | 'jewelry_watch'>('ALL');
 
   useEffect(() => {
     const q = searchQuery.trim();
@@ -150,9 +151,19 @@ export const ShopSearch = () => {
   }, [searchQuery]);
 
   const handleKeywordClick = (word: string) => {
+    setSearchResults([]);
+    setIsSearching(true);
     setSearchQuery(word);
     inputRef.current?.focus();
   };
+
+  const filteredResults = searchResults.filter((item: CatalogProduct) => {
+    if (selectedCategory === 'ALL') return true;
+    if (selectedCategory === 'jewelry_watch') {
+      return item.category === 'jewelry' || item.category === 'watch';
+    }
+    return item.category === selectedCategory;
+  });
 
   return (
     <div 
@@ -181,7 +192,11 @@ export const ShopSearch = () => {
             ref={inputRef} 
             type="text" 
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchResults([]);
+              setIsSearching(true);
+              setSearchQuery(e.target.value);
+            }}
             placeholder="검색어를 입력해주세요" 
             className="w-full text-[15px] outline-none placeholder-gray-400 font-medium bg-transparent" 
           />
@@ -190,6 +205,7 @@ export const ShopSearch = () => {
               type="button" 
               aria-label="검색어 지우기"
               onClick={() => {
+                setSearchResults([]);
                 setSearchQuery('');
                 inputRef.current?.focus();
               }}
@@ -204,31 +220,70 @@ export const ShopSearch = () => {
       </div>
 
       {/* 검색 결과 화면 또는 추천/인기 검색어 화면 */}
-      <div className="flex-1 overflow-y-auto px-5 pt-6 pb-20 scrollbar-hide">
+      <div className="flex-1 overflow-y-auto px-5 pt-4 pb-20 scrollbar-hide">
         {searchQuery.trim().length > 0 ? (
           <div>
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-extrabold text-[16px] text-gray-900 flex items-center gap-2">
-                검색 결과 <span className="text-indigo-600 font-black">({searchResults.length})</span>
-                {isSearching && <span className="text-xs text-gray-400 font-normal">검색 중...</span>}
+            {/* 카테고리 필터 칩 */}
+            <div className="flex items-center gap-1.5 overflow-x-auto py-2 mb-3 scrollbar-hide">
+              {[
+                { id: 'ALL', label: '전체' },
+                { id: 'bag', label: '가방' },
+                { id: 'clothing', label: '의류' },
+                { id: 'shoes', label: '슈즈' },
+                { id: 'jewelry_watch', label: '주얼리/시계' },
+              ].map(cat => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat.id as any)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold shrink-0 transition ${
+                    selectedCategory === cat.id
+                      ? 'bg-gray-950 text-white shadow-xs'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-extrabold text-[15px] text-gray-900 flex items-center gap-2">
+                검색 결과 <span className="text-indigo-600 font-black">({filteredResults.length})</span>
+                {isSearching && <span className="text-xs text-gray-400 font-normal animate-pulse">검색 중...</span>}
               </h3>
               <button 
                 type="button"
-                onClick={() => setSearchQuery('')}
+                onClick={() => {
+                  setSearchResults([]);
+                  setSearchQuery('');
+                }}
                 className="text-xs text-gray-400 hover:text-gray-700 underline"
               >
                 검색어 초기화
               </button>
             </div>
 
-            {searchResults.length === 0 && !isSearching ? (
+            {isSearching ? (
+              /* 스켈레톤 로딩 */
+              <div className="grid grid-cols-2 gap-3">
+                {[1, 2, 3, 4].map(idx => (
+                  <div key={idx} className="p-2 rounded-xl bg-gray-50/70 border border-gray-100 animate-pulse space-y-2">
+                    <div className="aspect-square bg-gray-200 rounded-lg w-full" />
+                    <div className="h-3 bg-gray-200 rounded w-1/2" />
+                    <div className="h-3 bg-gray-200 rounded w-3/4" />
+                    <div className="h-4 bg-gray-200 rounded w-1/3" />
+                  </div>
+                ))}
+              </div>
+            ) : filteredResults.length === 0 ? (
               <div className="py-16 text-center">
                 <p className="text-gray-400 text-sm font-semibold mb-2">'{searchQuery}'에 대한 검색 결과가 없습니다.</p>
                 <p className="text-xs text-gray-400">정확한 브랜드명 또는 상품명을 다시 입력해보세요.</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3">
-                {searchResults.map((item: CatalogProduct) => (
+                {filteredResults.map((item: CatalogProduct) => (
                   <div key={item.id} className="flex flex-col group cursor-pointer p-2 rounded-xl hover:bg-gray-50 transition">
                     <div className="relative aspect-square bg-gray-100 rounded-xl mb-2 flex items-center justify-center overflow-hidden border border-gray-100 shadow-2xs">
                       <ProductImage 

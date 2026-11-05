@@ -33,6 +33,16 @@ export const ShopAdmin = () => {
     exp: '매장 관리 1년'
   });
 
+  // 엑셀 구인현황 업로드 모달 상태
+  const [excelModalOpen, setExcelModalOpen] = useState(false);
+  const [excelFileName, setExcelFileName] = useState<string | null>(null);
+  const [excelFileSize, setExcelFileSize] = useState<string | null>(null);
+  const excelFileInputRef = useRef<HTMLInputElement>(null);
+
+  // 상점 상품 검색 및 필터 상태
+  const [shopSearchQuery, setShopSearchQuery] = useState('');
+  const [shopTypeFilter, setShopTypeFilter] = useState<'ALL' | 'RENT' | 'BUY'>('ALL');
+
   // 상품 갤러리 관리 모달 상태
   const [galleryProduct, setGalleryProduct] = useState<any | null>(null);
   const [productImages, setProductImages] = useState<any[]>([]);
@@ -453,13 +463,51 @@ export const ShopAdmin = () => {
                 </button>
               </div>
 
+              {/* 검색 및 필터 바 */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                <div className="relative flex-1">
+                  <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                  <input
+                    type="text"
+                    value={shopSearchQuery}
+                    onChange={(e) => setShopSearchQuery(e.target.value)}
+                    placeholder="상품명 또는 브랜드 검색..."
+                    className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white placeholder-gray-400 outline-none focus:border-white/30 transition"
+                  />
+                </div>
+                <div className="flex gap-1.5">
+                  {(['ALL', 'RENT', 'BUY'] as const).map(type => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => setShopTypeFilter(type)}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold border transition ${
+                        shopTypeFilter === type
+                          ? 'bg-white text-black border-white shadow'
+                          : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10'
+                      }`}
+                    >
+                      {type === 'ALL' ? '전체' : type === 'RENT' ? '렌탈 상품' : '구매 상품'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {products.length === 0 ? (
                 <div className="text-center py-20 border border-dashed border-white/10 rounded-2xl">
                   <p className="text-sm text-gray-400">등록된 상품이 없습니다.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {products.map(p => (
+                  {products
+                    .filter(p => {
+                      const matchesSearch = !shopSearchQuery.trim() || 
+                        p.title.toLowerCase().includes(shopSearchQuery.toLowerCase()) || 
+                        (p.brand && p.brand.toLowerCase().includes(shopSearchQuery.toLowerCase()));
+                      const matchesType = shopTypeFilter === 'ALL' || p.type === shopTypeFilter;
+                      return matchesSearch && matchesType;
+                    })
+                    .map(p => (
                     <div key={p.id} className="bg-white/5 border border-white/10 p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 backdrop-blur-md hover:border-white/25 transition">
                       <div className="flex items-center gap-3">
                         {p.image_url ? (
@@ -623,25 +671,36 @@ export const ShopAdmin = () => {
             {/* 서브 헤더 및 모드 전환 */}
             <div className="border-b border-white/10 px-8 py-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/[0.02]">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-white/10 border border-white/10 text-white">
-                  <i className="fa-solid fa-chart-pie"></i>
+                <div className={`p-3 rounded-2xl flex items-center justify-center text-white shadow-lg ${
+                  role === 'STORE' ? 'bg-gradient-to-br from-indigo-500 to-blue-600' : 'bg-gradient-to-br from-amber-500 to-rose-600'
+                }`}>
+                  <i className={`text-xl ${role === 'STORE' ? 'fa-solid fa-store' : 'fa-solid fa-building-columns'}`}></i>
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-white text-lg tracking-tight">스마트 구인·채용 관리 시스템</h3>
-                  <p className="text-xs text-gray-400">메신저 없이 실시간으로 지점 구인과 충원 현황을 조율합니다.</p>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-extrabold text-white text-lg tracking-tight">스마트 구인·채용 관리 시스템</h3>
+                    <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full border ${
+                      role === 'STORE' ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30' : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                    }`}>
+                      {role === 'STORE' ? '매장 관리자 모드' : '본사 총괄 관리자 모드'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {role === 'STORE'
+                      ? '🏪 매장 관리자 모드 (강남점) — 우리 매장 구인 요청 접수 및 근무자 배치 관리'
+                      : '🏢 본사 총괄 관리자 모드 — 전체 35개 매장 구인 현황 통합 관제 및 엑셀 일괄 업로드 지원'}
+                  </p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="text-xs bg-white/10 text-gray-300 font-semibold px-3.5 py-1.5 rounded-full border border-white/10">
-                  {role === 'STORE' ? '매장 화면 (35개 지점 연동)' : '본사 담당자 관리 화면'}
-                </span>
                 <button 
                   type="button"
                   onClick={() => setRole(role === 'STORE' ? 'ADMIN' : 'STORE')} 
-                  className="text-xs bg-white text-black hover:bg-gray-200 px-4 py-2.5 rounded-xl font-black shadow transition cursor-pointer active:scale-95"
+                  className="text-xs bg-white text-black hover:bg-gray-200 px-4 py-2.5 rounded-xl font-black shadow transition cursor-pointer active:scale-95 flex items-center gap-2"
                 >
-                  {role === 'STORE' ? '담당자 화면으로 전환' : '매장 화면으로 전환'}
+                  <i className="fa-solid fa-arrows-rotate"></i>
+                  {role === 'STORE' ? '본사 총괄 관리자로 전환' : '매장 관리자로 전환'}
                 </button>
               </div>
             </div>
@@ -702,10 +761,14 @@ export const ShopAdmin = () => {
                       </div>
                       <button 
                         type="button"
-                        onClick={() => showAlert('엑셀 업로드', '엑셀 파일(.xlsx) 일괄 업로드 창이 열렸습니다.')} 
+                        onClick={() => {
+                          setExcelFileName(null);
+                          setExcelFileSize(null);
+                          setExcelModalOpen(true);
+                        }} 
                         className="bg-white text-black hover:bg-gray-200 text-xs font-extrabold px-5 py-3 rounded-xl flex items-center gap-2 shadow-lg transition cursor-pointer"
                       >
-                        <i className="fa-solid fa-file-excel"></i> 엑셀 구인현황 업로드
+                        <i className="fa-solid fa-file-excel"></i> 엑셀 구인현황 업로드 도구
                       </button>
                     </div>
                   )}
@@ -941,6 +1004,143 @@ export const ShopAdmin = () => {
         )}
 
         {/* [C] 위탁 판매 접수 관리 시스템 */}
+
+        {/* 🌟 엑셀 일괄 업로드 및 35개 매장 TO 미리보기 모달 */}
+        {excelModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+            <div className="bg-slate-900 border border-white/15 rounded-3xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl text-white animate-scaleUp max-h-[90vh] overflow-y-auto scrollbar-hide">
+              <div className="flex justify-between items-center pb-4 border-b border-white/10 mb-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+                    <i className="fa-solid fa-file-excel text-lg"></i>
+                  </div>
+                  <div>
+                    <h3 className="font-black text-base text-white">35개 매장 구인 현황 엑셀 일괄 업로드</h3>
+                    <p className="text-xs text-gray-400">.xlsx / .xls / .csv 파일을 업로드하여 35개 매장의 구인 TO를 일괄 동기화합니다.</p>
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => setExcelModalOpen(false)} 
+                  className="text-gray-400 hover:text-white p-1"
+                >
+                  <i className="fa-solid fa-xmark text-lg"></i>
+                </button>
+              </div>
+
+              {/* Drag & Drop Area */}
+              <div 
+                onClick={() => excelFileInputRef.current?.click()}
+                className="border-2 border-dashed border-white/20 hover:border-emerald-400/60 bg-white/[0.02] hover:bg-white/[0.04] rounded-2xl p-6 text-center cursor-pointer transition mb-5 group"
+              >
+                <input
+                  ref={excelFileInputRef}
+                  type="file"
+                  accept=".xlsx,.xls,.csv"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) {
+                      if (!f.name.match(/\.(xlsx|xls|csv)$/i)) {
+                        showAlert('파일 형식 오류', '엑셀 파일(.xlsx, .xls) 또는 .csv 파일만 업로드할 수 있습니다.');
+                        return;
+                      }
+                      if (f.size > 5 * 1024 * 1024) {
+                        showAlert('파일 용량 초과', '5MB 이하의 엑셀 파일만 업로드 가능합니다.');
+                        return;
+                      }
+                      setExcelFileName(f.name);
+                      setExcelFileSize(`${(f.size / 1024).toFixed(1)} KB`);
+                    }
+                  }}
+                />
+                <div className="w-12 h-12 rounded-full bg-white/5 mx-auto flex items-center justify-center text-gray-400 group-hover:text-emerald-400 group-hover:bg-emerald-500/10 transition mb-3">
+                  <i className="fa-solid fa-cloud-arrow-up text-xl"></i>
+                </div>
+                {excelFileName ? (
+                  <div>
+                    <p className="text-sm font-bold text-emerald-400">선택된 파일: {excelFileName}</p>
+                    <p className="text-xs text-gray-400 mt-1">용량: {excelFileSize} · 유효성 검사 완료</p>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="text-sm font-bold text-gray-200">클릭하거나 엑셀 파일을 여기로 드래그하세요</p>
+                    <p className="text-xs text-gray-400 mt-1">지원 형식: .xlsx, .xls, .csv (최대 5MB)</p>
+                  </div>
+                )}
+              </div>
+
+              {/* 35 Store TO Preview Table */}
+              <div className="space-y-3 mb-6">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-bold text-gray-300">
+                    파싱 데이터 미리보기 (전체 35개 지점 중 대표 5개 매장)
+                  </span>
+                  <span className="text-[11px] text-emerald-400 font-mono">데이터 구조 유효 ✓</span>
+                </div>
+                <div className="overflow-x-auto rounded-xl border border-white/10 bg-black/40">
+                  <table className="w-full text-left text-xs text-gray-300">
+                    <thead className="bg-white/5 border-b border-white/10 text-gray-400 text-[11px]">
+                      <tr>
+                        <th className="py-2.5 px-3">매장명</th>
+                        <th className="py-2.5 px-3">모집 직무</th>
+                        <th className="py-2.5 px-3">필요/충원</th>
+                        <th className="py-2.5 px-3">상태</th>
+                        <th className="py-2.5 px-3">반영일자</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {[
+                        { store: '강남 플래그십스토어', pos: '명품 감정 및 CS', req: 3, hired: 2, status: '채용중', date: '2026-11-05' },
+                        { store: '압구정 갤러리아 본점', pos: '시계/주얼리 큐레이터', req: 2, hired: 2, status: '충원완료', date: '2026-11-05' },
+                        { store: '청담 에비뉴엘점', pos: 'VIP 쇼룸 매니저', req: 2, hired: 1, status: '채용중', date: '2026-11-04' },
+                        { store: '한남 쇼룸', pos: '물류 및 패키징', req: 4, hired: 3, status: '채용중', date: '2026-11-03' },
+                        { store: '판교 현대백화점', pos: '대여 반납 검수원', req: 2, hired: 2, status: '충원완료', date: '2026-11-02' },
+                      ].map((row, idx) => (
+                        <tr key={idx} className="hover:bg-white/[0.02]">
+                          <td className="py-2.5 px-3 font-bold text-white">{row.store}</td>
+                          <td className="py-2.5 px-3 text-gray-400">{row.pos}</td>
+                          <td className="py-2.5 px-3 font-mono">{row.hired}/{row.req}명</td>
+                          <td className="py-2.5 px-3">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              row.status === '충원완료'
+                                ? 'bg-emerald-500/20 text-emerald-300'
+                                : 'bg-amber-500/20 text-amber-300'
+                            }`}>
+                              {row.status}
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-3 font-mono text-gray-500 text-[11px]">{row.date}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setExcelModalOpen(false)}
+                  className="flex-1 py-3 bg-white/10 hover:bg-white/15 text-white font-bold rounded-xl text-xs transition"
+                >
+                  취소
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    showAlert('엑셀 데이터 동기화 완료', '전체 35개 매장의 구인 TO 데이터가 실시간 데이터베이스에 일괄 적용되었습니다.');
+                    setExcelModalOpen(false);
+                  }}
+                  className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs transition shadow-lg flex items-center justify-center gap-2"
+                >
+                  <i className="fa-solid fa-database"></i> 35개 매장 TO 데이터베이스 일괄 반영
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         {mainTab === 'SELL_REQUESTS' && (
           <div className="backdrop-blur-xl bg-white/[0.03] border border-white/10 rounded-3xl shadow-2xl p-8 flex flex-col flex-1">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-6 border-b border-white/10">

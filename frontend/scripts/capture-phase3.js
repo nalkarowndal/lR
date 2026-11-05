@@ -312,18 +312,25 @@ async function run() {
       '440x920 Mobile'
     );
 
-    // "렌탈 주문 신청하기" 클릭
-    await clickByText(page, 'button', '렌탈 주문 신청하기');
+    // "주문서 작성으로 이동" 클릭
+    await clickByText(page, 'button', '주문서 작성으로 이동');
     await sleep(500);
 
     await capture(
       page,
       '19_cart_modal_checkout_toast.png',
       '상품 상세 및 장바구니',
-      '렌탈 주문 완료 토스트',
-      '렌탈 주문 신청 접수 완료 토스트 및 장바구니 모달 자동 닫힘',
+      '렌탈 주문 배송 정보 입력 화면',
+      '수령인 성명, 휴대폰 번호, 배송지 주소, 배송 메모 입력 및 VIP 왕복 특송 무료 혜택',
       '440x920 Mobile'
     );
+
+    // 모달 닫기
+    await page.evaluate(() => {
+      const closeBtn = document.querySelector('div[role="dialog"] button[aria-label="닫기"]');
+      if (closeBtn) closeBtn.click();
+    });
+    await sleep(300);
 
     // ==========================================
     // [CATEGORY 4] 신규 입고 상품 & 푸터 법적 모달
@@ -470,10 +477,11 @@ async function run() {
     );
 
     // 추천 검색어 태그 클릭 "까르띠에"
-    await page.evaluate((sel) => {
-      const el = document.querySelector(sel);
-      if (el) el.value = '';
-    }, searchInput);
+    await page.evaluate(() => {
+      const clearBtn = document.querySelector('button[aria-label="검색어 지우기"]');
+      if (clearBtn) clearBtn.click();
+    });
+    await sleep(400);
     await clickByText(page, 'button', '까르띠에');
     await sleep(400);
 
@@ -766,7 +774,7 @@ async function run() {
     });
     await sleep(200);
 
-    await clickByText(page, 'button', '판매 신청 완료');
+    await clickByText(page, 'button', '위탁 신청 완료');
     await sleep(500);
 
     await capture(
@@ -1039,10 +1047,10 @@ async function run() {
     );
 
     // 엑셀 구인현황 업로드 모달
-    await clickByText(page, 'button', '엑셀 구인현황 업로드');
-    await sleep(400);
-    await capture(page, '70_admin_excel_upload_modal.png', '통합 관리자 대시보드', '엑셀 구인현황 대량 업로드 모달', 'CSV/Excel 대량 일괄 등록 팝업 모달', '1920x1080 Desktop');
-    await clickByText(page, 'button', '확인');
+    await clickByText(page, 'button', '엑셀 구인현황 업로드 도구');
+    await sleep(500);
+    await capture(page, '70_admin_excel_upload_modal.png', '통합 관리자 대시보드', '35개 매장 구인 현황 엑셀 일괄 업로드 모달', '35개 매장 TO 데이터 미리보기 및 데이터베이스 일괄 반영 모달', '1920x1080 Desktop');
+    await clickByText(page, 'button', '취소');
     await sleep(300);
 
     // 채용 결과 등록 모달
