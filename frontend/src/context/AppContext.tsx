@@ -379,6 +379,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__lrNavigate = navigateTo;
+      (window as any).__lrSetOverlay = setActiveOverlay;
+    }
+  }, [navigateTo, setActiveOverlay]);
+
+  useEffect(() => {
     refreshData();
   }, []);
 
