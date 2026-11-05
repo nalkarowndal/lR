@@ -64,3 +64,4 @@ export function formatProductPrice(
    - 수령인, 배송지, 결제 대여료, 익일 오전 10시 특송 발송 예정 안내.
    - `localStorage`에 주문 내역 저장 및 장바구니 초기화 완료.
    - 닫기 버튼: `'쇼핑 계속하기'`
+

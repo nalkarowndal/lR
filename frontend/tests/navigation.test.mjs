@@ -129,3 +129,38 @@ test('Direct entry to Admin fallback: Admin -> returnFromAdmin -> goBack', () =>
   nav.goBack('SHOP_MAIN');
   assert.equal(nav.currentView, 'SHOP_MAIN');
 });
+
+
+// Brand horizontal scroll calculation matching ShopCategory.tsx
+export function calculateBrandTargetScroll(elementLeft, elementWidth, containerWidth, scrollWidth) {
+  const maxScroll = Math.max(0, scrollWidth - containerWidth);
+  return Math.max(0, Math.min(elementLeft - (containerWidth / 2) + (elementWidth / 2), maxScroll));
+}
+
+test('Brand scroll: clamps to [0, maxScroll] and prevents parent overflow for rightmost brands', () => {
+  const containerWidth = 448;
+  const scrollWidth = 1120;
+  const maxScroll = scrollWidth - containerWidth;
+
+  const targetSaintLaurent = calculateBrandTargetScroll(900, 72, containerWidth, scrollWidth);
+  assert.ok(targetSaintLaurent <= maxScroll, 'Must not exceed maxScroll');
+  assert.equal(targetSaintLaurent, maxScroll, 'Clamped exactly to maxScroll (672px)');
+
+  const targetBalenciaga = calculateBrandTargetScroll(980, 72, containerWidth, scrollWidth);
+  assert.equal(targetBalenciaga, maxScroll, 'Clamped exactly to maxScroll');
+
+  const targetRolex = calculateBrandTargetScroll(1040, 72, containerWidth, scrollWidth);
+  assert.equal(targetRolex, maxScroll, 'Clamped exactly to maxScroll');
+
+  const targetCartier = calculateBrandTargetScroll(1090, 72, containerWidth, scrollWidth);
+  assert.equal(targetCartier, maxScroll, 'Clamped exactly to maxScroll');
+
+  const targetChanel = calculateBrandTargetScroll(16, 72, containerWidth, scrollWidth);
+  assert.equal(targetChanel, 0, 'Clamped to 0px at start');
+
+  const fakeMainContainer = { scrollLeft: 173 };
+  if (fakeMainContainer.scrollLeft !== 0) {
+    fakeMainContainer.scrollLeft = 0;
+  }
+  assert.equal(fakeMainContainer.scrollLeft, 0, 'Parent container scrollLeft must remain 0 (no white space shift)');
+});

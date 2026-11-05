@@ -71,3 +71,4 @@ Phase 5에서 제기된 검색 결과 상품 이미지 누락(샤넬 검색 시 
 5. **판매 완료**: 슬레이트 (`bg-slate-100 text-slate-500 border-slate-200`)
 6. **검수 중**: 앰버 (`bg-amber-50 text-amber-700 border-amber-200`)
 7. **이미지 준비 중**: 그레이 (`bg-gray-100 text-gray-500 border-gray-200`)
+

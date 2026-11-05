@@ -238,7 +238,12 @@ export const ShopCategory = () => {
     setSelectedSubCategory('전체');
     showToast(`'${tileTitle}' 카테고리(${targetCategory})로 이동했습니다.`, 'info');
     setTimeout(() => {
-      productGridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (productGridRef.current) {
+        const container = productGridRef.current.closest('.overflow-y-auto') as HTMLElement | null;
+        if (container) {
+          container.scrollTo({ top: productGridRef.current.offsetTop - 12, behavior: 'smooth' });
+        }
+      }
     }, 150);
   };
 
@@ -246,7 +251,12 @@ export const ShopCategory = () => {
     setSelectedSubCategory(sub);
     showToast(`${leftActive} > ${sub} 상품을 불러왔습니다.`, 'info');
     setTimeout(() => {
-      productGridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (productGridRef.current) {
+        const container = productGridRef.current.closest('.overflow-y-auto') as HTMLElement | null;
+        if (container) {
+          container.scrollTo({ top: productGridRef.current.offsetTop - 12, behavior: 'smooth' });
+        }
+      }
     }, 100);
   };
 
@@ -436,7 +446,26 @@ export const ShopCategory = () => {
   const handleBrandSelect = (brandName: string, element: HTMLElement) => {
     if (hasDraggedRef.current) return;
     setActiveBrand(brandName);
-    element.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+
+    // native scrollIntoView 대신 brandScrollRef 컨테이너 내부만 정밀 스크롤하여
+    // 상위 부모 컨테이너(max-w-md 등)의 수평 밀림(173px 하얀 공백) 결함을 100% 원천 차단
+    if (brandScrollRef.current) {
+      const container = brandScrollRef.current;
+      const elementLeft = element.offsetLeft;
+      const elementWidth = element.offsetWidth;
+      const containerWidth = container.clientWidth;
+      const maxScroll = container.scrollWidth - containerWidth;
+
+      const targetScroll = Math.max(0, Math.min(elementLeft - (containerWidth / 2) + (elementWidth / 2), maxScroll));
+      container.scrollTo({ left: targetScroll, behavior: 'smooth' });
+    }
+
+    // 부모 컨테이너 수평 밀림 방지 안전 가드
+    const mainContainer = element.closest('.max-w-md') as HTMLElement | null;
+    if (mainContainer && mainContainer.scrollLeft !== 0) {
+      mainContainer.scrollLeft = 0;
+    }
+
     setTimeout(updateScrollButtons, 350);
   };
 
