@@ -1,0 +1,57 @@
+name: D2-3 Integrated Icon Visual QA
+
+on:
+  push:
+    branches: [qa/d2-3-integrated-icon-visual]
+  pull_request:
+    paths:
+      - '.github/workflows/d2-3-icon-qa.yml'
+      - 'frontend/qa/d2-3-harness.html'
+      - 'frontend/qa/d2-3-harness.tsx'
+      - 'frontend/scripts/qa-d2-3-integrated.mjs'
+      - 'frontend/tests/d2-3-integrated-icons.test.mjs'
+
+permissions:
+  contents: read
+
+jobs:
+  integrated-visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: D1 and D2-1 regressions
+        run: npm run test:d2
+      - name: D2-2 and D2-3 regressions
+        run: node --test tests/d2-2-sitewide-icons.test.mjs tests/d2-3-integrated-icons.test.mjs
+      - name: TypeScript and Vite production build
+        run: npm run build
+      - name: Lint QA harness and icon library
+        run: npx oxlint src/components/icons/BoutiqueD22Icons.tsx qa/d2-3-harness.tsx
+      - name: Install Korean fonts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y fonts-noto-cjk
+      - name: Production preview guest journeys
+        run: node scripts/qa-d2-2-browser.mjs
+      - name: Integrated optical and isolated mock visual QA
+        run: node scripts/qa-d2-3-integrated.mjs
+      - name: Upload D2-3 QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: d2-3-integrated-icon-qa
+          path: |
+            frontend/qa/d2-2-screens/
+            frontend/qa/d2-3-evidence/
+          if-no-files-found: warn
