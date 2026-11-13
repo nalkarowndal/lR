@@ -1,7 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
 
 const root = new URL('../', import.meta.url);
 const read = path => readFileSync(new URL(path, root), 'utf8');
@@ -19,7 +18,7 @@ test('Main header uses engraved D22 vectors and maintains 40px accessible action
   assert.equal((header.match(/w-10 h-10/g) || []).length, 3);
   assert.match(header, /focus-visible:outline/);
   const nav = main.split('aria-label="하단 네비게이션"')[1].split('</nav>')[0];
-  assert.equal((nav.match(/<button\\b/g) || []).length, 5);
+  assert.equal((nav.match(/<button\b/g) || []).length, 5);
   assert.doesNotMatch(nav, /<D22/);
 });
 
