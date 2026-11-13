@@ -7,6 +7,17 @@ Original icon paths used in `frontend/src/components/icons/BoutiqueD1Icons.tsx`:
 - `icons/regular/handbag.svg`
 - `icons/regular/shopping-bag-arrow-up.svg`
 
+Additional paths used in `frontend/src/components/icons/BoutiqueD2Icons.tsx`:
+- `icons/regular/gift.svg`
+- `icons/regular/shirt.svg`
+- `icons/regular/percentage.svg`
+- `icons/regular/box.svg`
+- `icons/regular/credit-card.svg`
+- `icons/regular/shield-check.svg`
+- `icons/regular/crown.svg`
+- `icons/regular/refresh-double.svg`
+- `icons/regular/mail.svg`
+
 The icon geometry remains Iconoir's original geometry. luxuryRental adds only visual treatments.
 
 MIT License

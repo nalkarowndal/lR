@@ -7,11 +7,13 @@ import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { Modal } from './ui/Modal';
 import {
-  LuxuryGiftIcon,
-  MenuHangerIcon, MenuTagIcon, MenuClockIcon, MenuMembershipIcon,
-  MenuCareIcon, MenuVipIcon, MenuBuybackIcon, MenuInviteIcon,
   LuxuryLuggageIcon, LuxuryJewelryIcon
 } from './ui/LuxuryIcons';
+import {
+  D2EventGiftIcon, D2RentMenuIcon, D2DiscountMenuIcon, D2ArrivalMenuIcon,
+  D2MembershipMenuIcon, D2CareMenuIcon, D2VipMenuIcon,
+  D2BuybackMenuIcon, D2InviteMenuIcon,
+} from './icons/BoutiqueD2Icons';
 import { D1RentIcon, D1BuyIcon, D1SellIcon } from './icons/BoutiqueD1Icons';
 import { ProductImage } from './ui/ProductImage';
 import { LegalTermsModal } from './ui/LegalTermsModal';
@@ -722,17 +724,16 @@ export const ShopMain = () => {
           role="button"
           tabIndex={0}
           onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setActiveOverlay('REGISTER')}
-          className="bg-gradient-to-r from-gray-900 via-zinc-900 to-indigo-950 text-white p-5 rounded-2xl flex justify-between items-center shadow-md mb-6 relative overflow-hidden cursor-pointer hover:opacity-95 active:scale-[0.99] transition"
+          className="bg-gradient-to-r from-[#272522] via-[#222220] to-[#373027] text-white p-5 rounded-2xl flex justify-between items-center shadow-md mb-6 relative overflow-hidden cursor-pointer hover:opacity-95 active:scale-[0.99] transition"
         >
           <div className="relative z-10">
             <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded font-bold tracking-wider">EVENT</span>
             <h4 className="font-extrabold text-lg mt-1 tracking-tight">회원가입 이벤트</h4>
             <p className="text-xs text-gray-300 mt-0.5">간단하게 가입하고 가볍게 쇼핑!</p>
           </div>
-          <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center shadow-inner relative z-10">
-            <LuxuryGiftIcon className="w-7 h-7 text-amber-300" />
+          <div className="w-12 h-12 flex items-center justify-center relative z-10" aria-hidden="true">
+            <D2EventGiftIcon className="w-10 h-10" />
           </div>
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl pointer-events-none" />
         </div>
 
         {/* 리본즈만의 서비스 */}
@@ -757,14 +758,14 @@ export const ShopMain = () => {
         {/* 8-Grid 프리미엄 각인 아이콘 메뉴 */}
         <div className="grid grid-cols-4 gap-y-6 gap-x-2 text-center bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
           {[
-            { icon: <MenuHangerIcon />, title: '렌트 소개' },
-            { icon: <MenuTagIcon />, title: '70% 할인' },
-            { icon: <MenuClockIcon />, title: '오늘신규입고' },
-            { icon: <MenuMembershipIcon />, title: '베이직멤버십' },
-            { icon: <MenuCareIcon />, title: '렌트잇 케어' },
-            { icon: <MenuVipIcon />, title: 'VIP' },
-            { icon: <MenuBuybackIcon />, title: '바이백' },
-            { icon: <MenuInviteIcon />, title: '친구 초대' }
+            { icon: <D2RentMenuIcon className="w-7 h-7" />, title: '렌트 소개' },
+            { icon: <D2DiscountMenuIcon className="w-7 h-7" />, title: '70% 할인' },
+            { icon: <D2ArrivalMenuIcon className="w-7 h-7" />, title: '오늘신규입고' },
+            { icon: <D2MembershipMenuIcon className="w-7 h-7" />, title: '베이직멤버십' },
+            { icon: <D2CareMenuIcon className="w-7 h-7" />, title: '렌트잇 케어' },
+            { icon: <D2VipMenuIcon className="w-7 h-7" />, title: 'VIP' },
+            { icon: <D2BuybackMenuIcon className="w-7 h-7" />, title: '바이백' },
+            { icon: <D2InviteMenuIcon className="w-7 h-7" />, title: '친구 초대' }
           ].map((menu, idx) => (
             <div
               key={idx}
@@ -774,7 +775,7 @@ export const ShopMain = () => {
               onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleMenuClick(menu.title)}
               className="flex flex-col items-center gap-2 cursor-pointer group active:scale-95 transition-transform"
             >
-              <div className="w-12 h-12 bg-[#FAF9F6] rounded-2xl flex items-center justify-center border border-[#EAE6DD] shadow-2xs group-hover:bg-[#F2EFE9] group-hover:border-[#B49A67]/50 group-hover:shadow-xs transition-all">
+              <div className="w-12 h-12 flex items-center justify-center transition-transform duration-200 group-hover:-translate-y-0.5" aria-hidden="true">
                 {menu.icon}
               </div>
               <span className="text-[11px] font-bold text-gray-800 group-hover:text-black transition-colors">{menu.title}</span>

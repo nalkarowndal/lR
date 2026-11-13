@@ -1,0 +1,52 @@
+name: D2 Boutique Icon QA
+
+on:
+  push:
+    branches:
+      - design/d2-boutique-event-service-icons
+  pull_request:
+    paths:
+      - '.github/workflows/d2-icon-qa.yml'
+      - 'frontend/src/components/icons/BoutiqueD2Icons.tsx'
+      - 'frontend/src/components/ShopMain.tsx'
+      - 'frontend/scripts/qa-d1-browser.mjs'
+      - 'frontend/tests/d2-boutique-icons.test.mjs'
+      - 'frontend/package.json'
+
+permissions:
+  contents: read
+
+jobs:
+  d2-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: D1 and D2 icon regressions
+        run: npm run test:d2
+      - name: TypeScript and Vite production build
+        run: npm run build
+      - name: D2 component and main page lint
+        run: npx oxlint src/components/icons/BoutiqueD2Icons.tsx src/components/ShopMain.tsx
+      - name: Korean font for mobile screenshot
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y fonts-noto-cjk
+      - name: Chrome visual QA 360 390 430 px and optical board
+        run: node scripts/qa-d1-browser.mjs
+      - name: Upload D2 screenshot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: d2-browser-qa-screens
+          path: frontend/qa/d2-screens/
+          if-no-files-found: warn
