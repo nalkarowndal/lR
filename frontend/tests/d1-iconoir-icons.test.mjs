@@ -65,7 +65,7 @@ test('Refined Atelier crown has real clipped inner-cut shading and restrained me
 
 test('Boutique style retains bold graphite legibility without external white halo', () => {
   const code = read('src/components/icons/BoutiqueD1Icons.tsx');
-  assert.match(code, /stroke="#302D29" strokeWidth="1\.73"/);
+  assert.match(code, /stroke="#302D29" strokeWidth="1\.52"/);
   assert.match(code, /stroke="#AA9372"/);
   assert.doesNotMatch(code, /stroke="#FBF8F3" strokeWidth="2\.3"/);
 });
