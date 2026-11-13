@@ -1,9 +1,8 @@
-import { D22Sell as EngravedAdminHandshake, D22PlusCircle as EngravedAdminPlus, D22Refresh as EngravedAdminRefresh, D22ShoppingBag as EngravedBagIcon, D22Profile as EngravedProfileCrest } from './icons/BoutiqueD22Icons';
+import { D22BadgeCheck as EngravedShieldAdmin, D22Sell as EngravedAdminHandshake, D22PlusCircle as EngravedAdminPlus, D22Refresh as EngravedAdminRefresh, D22ShoppingBag as EngravedBagIcon, D22Profile as EngravedProfileCrest } from './icons/BoutiqueD22Icons';
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
-import {
-  EngravedShieldAdmin } from './ui/LuxuryIcons';
+
 
 export const ShopAdmin = () => {
   const { 
