@@ -65,6 +65,6 @@ test('Bottom navigation remains the original five buttons', () => {
   // D2-4 extends the bundled icon family to the main header only.
   assert.match(main, /BoutiqueD22Icons/);
   const bottomNavOnly = nav.slice(0, nav.indexOf('</nav>'));
-  assert.equal((bottomNavOnly.match(/<button\\b/g) || []).length, 5);
+  assert.equal((bottomNavOnly.match(/<button\b/g) || []).length, 5);
   assert.doesNotMatch(bottomNavOnly, /<D22/);
 });
