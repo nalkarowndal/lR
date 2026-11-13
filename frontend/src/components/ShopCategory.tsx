@@ -1,8 +1,6 @@
+import { D22ChevronLeft as ChevronLeft, D22MessageCircle as MessageCircle, D22ShoppingCart as ShoppingCart, D22ChevronRight as ChevronRight, D22Heart as Heart, D22ShieldCheck as ShieldCheck, D22PackageCheck as PackageCheck, D22Trash2 as Trash2 } from './icons/BoutiqueD22Icons';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { 
-  ChevronLeft, MessageCircle, ShoppingCart, ChevronRight, Heart, 
-  ShieldCheck, PackageCheck, Trash2 
-} from 'lucide-react';
+
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { BrandMonogram } from './ui/LuxuryIcons';
