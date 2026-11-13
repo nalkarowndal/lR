@@ -34,12 +34,14 @@ async function awaitPreview() {
 }
 
 const vite = spawn('npm', ['run', 'preview', '--', '--host', '127.0.0.1', '--port', String(port), '--strictPort'], {
-  cwd: process.cwd(), stdio: 'pipe', shell: process.platform === 'win32',
+  cwd: process.cwd(), stdio: 'ignore', detached: process.platform !== 'win32', shell: process.platform === 'win32',
 });
 let browser;
 const metrics = [];
 try {
+  console.log('D1 QA: waiting for preview server');
   await awaitPreview();
+  console.log('D1 QA: launching Chrome');
   browser = await puppeteer.launch({
     headless: true,
     executablePath: chromeBinary(),
@@ -64,6 +66,7 @@ try {
     await page.setViewport({ width, height: 844, deviceScaleFactor: 1 });
     const pageErrors = [];
     page.on('pageerror', e => pageErrors.push(String(e.message || e)));
+    console.log('D1 QA: viewport', width);
     await page.goto(base, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await new Promise(r => setTimeout(r, 5200));
     const result = await page.evaluate(() => {
@@ -99,6 +102,10 @@ try {
   await writeFile(resolve(outDir, 'd1-browser-qa.json'), JSON.stringify({ status: 'fail', reason: String(error), metrics }, null, 2));
   throw error;
 } finally {
-  if (browser) await browser.close();
-  vite.kill('SIGTERM');
+  if (browser) {
+    await Promise.race([browser.close(), new Promise(resolve => setTimeout(resolve, 6000))]);
+  }
+  if (vite.pid && process.platform !== 'win32') {
+    try { process.kill(-vite.pid, 'SIGTERM'); } catch { vite.kill('SIGTERM'); }
+  } else vite.kill('SIGTERM');
 }
