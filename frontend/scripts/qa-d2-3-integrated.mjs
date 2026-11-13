@@ -67,19 +67,20 @@ async function render(browser,view,width,height){
     const duplicates=defs.filter((id,i)=>defs.indexOf(id)!==i);
     return {
       allIcons:icons.length,visibleIcons:visible.length,uniqueGlyphs:[...new Set(visible.map(i=>i.getAttribute('data-d1-glyph')||i.getAttribute('data-d2-glyph')||i.getAttribute('data-d22-glyph')))],
-      duplicates,documentWidth:document.documentElement.scrollWidth,
+      duplicates,legacyFontIcons:document.querySelectorAll('i[class*="fa-"]').length,documentWidth:document.documentElement.scrollWidth,
       visibleWidth:window.innerWidth,hasMockIdentity:Boolean(document.querySelector('#qa-authenticated-component'))
     };
   });
   results.push({view,width,...state,pageErrors});
   if(state.duplicates.length)throw new Error(`Duplicate SVG gradient IDs on ${view}: ${state.duplicates.join(',')}`);
   if(pageErrors.length)throw new Error(`Uncaught React errors in ${view}: ${JSON.stringify(pageErrors)}`);
+  if(state.legacyFontIcons)throw new Error(`Legacy Font Awesome icon nodes remain in ${view}: ${state.legacyFontIcons}`);
   if(view==='gallery'){
     if(state.visibleIcons<150)throw new Error('Optical gallery has too few real rendered icon samples: '+state.visibleIcons);
     const sizes=await page.$$eval('[data-qa-phase="d1"][data-qa-row="crown"] svg',elements=>elements.map(e=>Math.round(e.getBoundingClientRect().width)));
     if(JSON.stringify(sizes)!==JSON.stringify([16,20,24,32,48,72]))throw new Error('Missing optical sizes: '+sizes.join(','));
   }else{
-    const min=view==='admin'?4:6;
+    const min=view==='admin'?10:6;
     if(state.visibleIcons<min)throw new Error(`${view} rendered only ${state.visibleIcons} icons; minimum ${min}`);
     if(state.documentWidth>width+3)warnings.push(`${view} at ${width}px overflows viewport (${state.documentWidth}px); review responsive layout`);
   }
