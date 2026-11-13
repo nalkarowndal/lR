@@ -38,23 +38,14 @@
         margin-top: -30px;
       }
       .native-splash-emblem {
-        width: 88px;
-        height: 88px;
-        border-radius: 50%;
-        border: 1px solid rgba(197, 168, 128, 0.3);
-        background: linear-gradient(180deg, #1E2024 0%, #121316 100%);
+        width: 96px;
+        height: 96px;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 0 30px rgba(197, 168, 128, 0.15);
-        position: relative;
-      }
-      .native-splash-emblem::after {
-        content: '';
-        position: absolute;
-        inset: 5px;
-        border-radius: 50%;
-        border: 1px solid rgba(197, 168, 128, 0.2);
+        background: transparent;
+        border: none;
+        box-shadow: none;
       }
       .native-splash-title {
         margin-top: 24px;
@@ -107,14 +98,19 @@
       </div>
       <div class="native-splash-center">
         <div class="native-splash-emblem">
-          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M4 17.5C4 16.95 4.45 16.5 5 16.5H19C19.55 16.5 20 16.95 20 17.5V18.5C20 19.05 19.55 19.5 19 19.5H5C4.45 19.5 4 19.05 4 18.5V17.5Z" fill="#C5A880" stroke="#7D653E" stroke-width="0.6"/>
-            <path d="M4.5 16.5L3.5 8.5L8.5 12.5L12 5.5L15.5 12.5L20.5 8.5L19.5 16.5H4.5Z" fill="#C5A880" stroke="#7D653E" stroke-width="0.8" stroke-linejoin="round"/>
-            <circle cx="3.5" cy="8.5" r="1.2" fill="#FFFDF8" stroke="#B49A67" stroke-width="0.5"/>
-            <circle cx="8.5" cy="12.5" r="1" fill="#FFFDF8" stroke="#B49A67" stroke-width="0.5"/>
-            <circle cx="12" cy="5.5" r="1.5" fill="#FFFDF8" stroke="#B49A67" stroke-width="0.6"/>
-            <circle cx="15.5" cy="12.5" r="1" fill="#FFFDF8" stroke="#B49A67" stroke-width="0.5"/>
-            <circle cx="20.5" cy="8.5" r="1.2" fill="#FFFDF8" stroke="#B49A67" stroke-width="0.5"/>
+          <!-- Original Iconoir crown.svg path, atelier gold finish; MIT notice in docs/design/ICONOIR_LICENSE.md -->
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="native-d1-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#F2E2BF"/>
+                <stop offset="40%" stop-color="#D7BA83"/>
+                <stop offset="72%" stop-color="#B08D57"/>
+                <stop offset="100%" stop-color="#E6CEA0"/>
+              </linearGradient>
+            </defs>
+            <path d="M19.2 17L21 7L14.7 10L12 7L9.3 10L3 7L4.8 17H19.2Z" stroke="#30271B" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" opacity=".9" transform="translate(0.12 0.26)"/>
+            <path d="M19.2 17L21 7L14.7 10L12 7L9.3 10L3 7L4.8 17H19.2Z" stroke="url(#native-d1-gold)" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M19.2 17L21 7L14.7 10L12 7L9.3 10L3 7L4.8 17H19.2Z" stroke="#FFF4D6" stroke-width=".32" stroke-linecap="round" stroke-linejoin="round" opacity=".38" transform="translate(-0.16 -0.18)"/>
           </svg>
         </div>
         <div class="native-splash-title">LUXURY RENTAL</div>
