@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Search, ShoppingCart, Settings, Heart, User, Home, List, ChevronRight, ChevronLeft,
+  ShoppingCart, Heart, User, Home, List, ChevronRight, ChevronLeft,
   ShieldCheck, Smartphone, Trash2, CheckCircle2, X, PackageCheck, ArrowRight
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
@@ -15,6 +15,7 @@ import {
   D2BuybackMenuIcon, D2InviteMenuIcon,
 } from './icons/BoutiqueD2Icons';
 import { D1RentIcon, D1BuyIcon, D1SellIcon } from './icons/BoutiqueD1Icons';
+import { D22Search, D22ShoppingCart, D22Settings } from './icons/BoutiqueD22Icons';
 import { ProductImage } from './ui/ProductImage';
 import { LegalTermsModal } from './ui/LegalTermsModal';
 import { RENT_NEW_ARRIVALS } from '../data/catalog';
@@ -578,14 +579,14 @@ export const ShopMain = () => {
         >
           LUXURYRENTAL
         </h1>
-        <div className="flex items-center gap-3 text-gray-800">
+        <div className="flex items-center gap-1.5 text-gray-800">
           <button
             type="button"
             aria-label="상품 검색 열기"
             onClick={() => setActiveOverlay('SEARCH')}
-            className="p-1.5 rounded-full hover:bg-gray-100 active:scale-95 transition"
+            className="inline-flex w-10 h-10 shrink-0 items-center justify-center rounded-xl border border-[#E3D9C9] bg-[#F7F5F1] text-[#302D29] shadow-[inset_0_1px_0_#fff,0_1px_2px_rgba(48,45,41,0.06)] hover:bg-[#F0EBE2] hover:border-[#BFA984] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8C744D] active:scale-95 transition"
           >
-            <Search size={22} />
+            <D22Search size={21} />
           </button>
 
           <button
@@ -599,9 +600,9 @@ export const ShopMain = () => {
                 handleOpenCart();
               }
             }}
-            className="p-1.5 rounded-full hover:bg-gray-100 active:scale-95 transition relative"
+            className="relative inline-flex w-10 h-10 shrink-0 items-center justify-center rounded-xl border border-[#E3D9C9] bg-[#F7F5F1] text-[#302D29] shadow-[inset_0_1px_0_#fff,0_1px_2px_rgba(48,45,41,0.06)] hover:bg-[#F0EBE2] hover:border-[#BFA984] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8C744D] active:scale-95 transition"
           >
-            <ShoppingCart size={22} />
+            <D22ShoppingCart size={21} />
             {cartItems.length > 0 && (
               <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold animate-scaleUp">
                 {cartItems.length}
@@ -613,9 +614,9 @@ export const ShopMain = () => {
             type="button"
             aria-label="설정 센터로 이동"
             onClick={() => navigateTo('SHOP_SETTINGS')}
-            className="text-gray-700 bg-gray-100 p-1.5 rounded-full hover:bg-gray-200 active:scale-95 transition shadow-sm"
+            className="inline-flex w-10 h-10 shrink-0 items-center justify-center rounded-xl border border-[#E3D9C9] bg-[#F7F5F1] text-[#302D29] shadow-[inset_0_1px_0_#fff,0_1px_2px_rgba(48,45,41,0.06)] hover:bg-[#F0EBE2] hover:border-[#BFA984] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8C744D] active:scale-95 transition"
           >
-            <Settings size={21} />
+            <D22Settings size={21} />
           </button>
         </div>
       </header>
