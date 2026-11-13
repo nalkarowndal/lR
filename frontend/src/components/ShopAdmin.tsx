@@ -1,4 +1,4 @@
-import { D22BadgeCheck as EngravedShieldAdmin, D22Sell as EngravedAdminHandshake, D22PlusCircle as EngravedAdminPlus, D22Refresh as EngravedAdminRefresh, D22ShoppingBag as EngravedBagIcon, D22Profile as EngravedProfileCrest } from './icons/BoutiqueD22Icons';
+import { D22BadgeCheck as EngravedShieldAdmin, D22Sell as EngravedAdminHandshake, D22PlusCircle as EngravedAdminPlus, D22Refresh as EngravedAdminRefresh, D22ShoppingBag as EngravedBagIcon, D22Profile as EngravedProfileCrest }, D22Icon, D22CheckCircle2, D22Search, D22X, D22Edit3, D22MessageCircle, D22Clock, D22UploadCloud from './icons/BoutiqueD22Icons';
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
@@ -326,7 +326,7 @@ export const ShopAdmin = () => {
         <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fadeIn">
           <div className="backdrop-blur-2xl bg-zinc-900/90 border border-white/20 w-full max-w-md p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center">
             <div className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mb-4 text-white shadow-inner">
-              <i className="fa-solid fa-circle-check text-xl text-emerald-400"></i>
+              <D22CheckCircle2 size={24} finish="atelier" />
             </div>
             <h3 className="text-lg font-black text-white mb-2">{modal.title}</h3>
             <p className="text-xs text-gray-300 mb-6 leading-relaxed whitespace-pre-line">{modal.message}</p>
@@ -457,7 +457,7 @@ export const ShopAdmin = () => {
               onClick={() => returnFromAdmin('SHOP_SETTINGS')} 
               className="shrink-0 whitespace-nowrap self-end sm:self-auto text-xs bg-white/10 hover:bg-white/20 border border-white/10 text-white px-4 py-2.5 rounded-xl font-bold transition shadow flex items-center gap-2 cursor-pointer active:scale-95"
             >
-              <i className="fa-solid fa-mobile-screen"></i> 앱으로 돌아가기
+              <D22Icon glyph="smartphone-device" size={16} finish="atelier" /> 앱으로 돌아가기
             </button>
           </div>
         </div>
@@ -487,7 +487,7 @@ export const ShopAdmin = () => {
               {/* 검색 및 필터 바 */}
               <div className="flex flex-col sm:flex-row gap-3 mb-6">
                 <div className="relative flex-1">
-                  <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                  <D22Search size={16} finish="atelier" className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
                     value={shopSearchQuery}
@@ -535,7 +535,7 @@ export const ShopAdmin = () => {
                           <img src={p.image_url} alt={p.title} className="w-10 h-10 rounded-lg object-cover bg-black/40 border border-white/10 shrink-0" />
                         ) : (
                           <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-gray-400 shrink-0">
-                            <i className="fa-regular fa-image"></i>
+                            <D22Icon glyph="media-image" size={18} finish="atelier" />
                           </div>
                         )}
                         <div>
@@ -551,7 +551,7 @@ export const ShopAdmin = () => {
                         onClick={() => openGalleryModal(p)}
                         className="text-xs bg-white/10 hover:bg-white/20 text-white font-bold px-3 py-1.5 rounded-lg border border-white/10 transition flex items-center gap-1.5 cursor-pointer"
                       >
-                        <i className="fa-solid fa-images"></i> 갤러리 관리
+                        <D22Icon glyph="media-image-list" size={16} finish="atelier" /> 갤러리 관리
                       </button>
                     </div>
                   ))}
@@ -583,7 +583,7 @@ export const ShopAdmin = () => {
                       onClick={() => setGalleryProduct(null)} 
                       className="text-gray-400 hover:text-white p-1"
                     >
-                      <i className="fa-solid fa-xmark text-lg"></i>
+                      <D22X size={20} finish="atelier" />
                     </button>
                   </div>
 
@@ -714,7 +714,7 @@ export const ShopAdmin = () => {
                 <div className={`p-3 rounded-2xl flex items-center justify-center text-white shadow-lg ${
                   role === 'STORE' ? 'bg-gradient-to-br from-indigo-500 to-blue-600' : 'bg-gradient-to-br from-amber-500 to-rose-600'
                 }`}>
-                  <i className={`text-xl ${role === 'STORE' ? 'fa-solid fa-store' : 'fa-solid fa-building-columns'}`}></i>
+                  <D22Icon glyph={role === 'STORE' ? 'shop' : 'building'} size={24} finish="atelier" />
                 </div>
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
@@ -739,7 +739,7 @@ export const ShopAdmin = () => {
                   onClick={() => setRole(role === 'STORE' ? 'ADMIN' : 'STORE')} 
                   className="text-xs bg-white text-black hover:bg-gray-200 px-4 py-2.5 rounded-xl font-black shadow transition cursor-pointer active:scale-95 flex items-center gap-2"
                 >
-                  <i className="fa-solid fa-arrows-rotate"></i>
+                  <EngravedAdminRefresh size={16} finish="boutique" />
                   {role === 'STORE' ? '본사 총괄 관리자로 전환' : '매장 관리자로 전환'}
                 </button>
               </div>
@@ -754,7 +754,7 @@ export const ShopAdmin = () => {
                   recruitTab === 'dashboard' ? 'border-white text-white' : 'border-transparent text-gray-400 hover:text-white'
                 }`}
               >
-                <i className="fa-solid fa-table-columns"></i> 채용 현황 및 접수 리스트
+                <D22Icon glyph="view-grid" size={16} finish="atelier" /> 채용 현황 및 접수 리스트
               </button>
               {role === 'STORE' && (
                 <button 
@@ -764,7 +764,7 @@ export const ShopAdmin = () => {
                     recruitTab === 'request' ? 'border-white text-white' : 'border-transparent text-gray-400 hover:text-white'
                   }`}
                 >
-                  <i className="fa-solid fa-file-pen"></i> 신규 구인 요청 작성
+                  <D22Edit3 size={16} finish="atelier" /> 신규 구인 요청 작성
                 </button>
               )}
               <button 
@@ -774,7 +774,7 @@ export const ShopAdmin = () => {
                   recruitTab === 'workers' ? 'border-white text-white' : 'border-transparent text-gray-400 hover:text-white'
                 }`}
               >
-                <i className="fa-solid fa-users-gear"></i> 근무자 DB & 단체 문자
+                <D22Icon glyph="group" size={16} finish="atelier" /> 근무자 DB & 단체 문자
               </button>
               <button 
                 type="button"
@@ -783,7 +783,7 @@ export const ShopAdmin = () => {
                   recruitTab === 'chat' ? 'border-white text-white' : 'border-transparent text-gray-400 hover:text-white'
                 }`}
               >
-                <i className="fa-solid fa-comments"></i> 실시간 소통 및 채팅
+                <D22MessageCircle size={16} finish="atelier" /> 실시간 소통 및 채팅
               </button>
             </div>
 
@@ -808,7 +808,7 @@ export const ShopAdmin = () => {
                         }} 
                         className="bg-white text-black hover:bg-gray-200 text-xs font-extrabold px-5 py-3 rounded-xl flex items-center gap-2 shadow-lg transition cursor-pointer"
                       >
-                        <i className="fa-solid fa-file-excel"></i> 엑셀 구인현황 업로드 도구
+                        <D22Icon glyph="table" size={16} finish="boutique" /> 엑셀 구인현황 업로드 도구
                       </button>
                     </div>
                   )}
@@ -832,7 +832,7 @@ export const ShopAdmin = () => {
                   {/* 요청 리스트 */}
                   <div className="bg-white/5 border border-white/10 p-8 rounded-2xl backdrop-blur-md">
                     <h4 className="font-black text-white text-base mb-6 flex items-center gap-2">
-                      <i className="fa-solid fa-list-check text-gray-300"></i> 
+                      <D22CheckCircle2 size={18} finish="atelier" /> 
                       {role === 'STORE' ? '우리 매장 구인 신청 및 충원 현황 명단' : '전체 35개 매장 구인 요청 실시간 접수 리스트'}
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -844,8 +844,8 @@ export const ShopAdmin = () => {
                               <span className="font-black text-base text-white">{req.storeName}</span>
                               <span className="text-xs text-gray-400">| {req.section}</span>
                             </div>
-                            <p className="text-xs text-gray-300"><i className="fa-regular fa-clock mr-1"></i> 일정: {req.date} ({req.time} / 휴게 {req.breakTime})</p>
-                            {req.partner && <p className="text-xs text-indigo-300 font-semibold mt-1"><i className="fa-solid fa-user-plus mr-1"></i> 지인파트너: {req.partner}</p>}
+                            <p className="text-xs text-gray-300"><D22Clock size={13} finish="atelier" className="inline-block align-middle mr-1" /> 일정: {req.date} ({req.time} / 휴게 {req.breakTime})</p>
+                            {req.partner && <p className="text-xs text-indigo-300 font-semibold mt-1"><D22Icon glyph="user-plus" size={13} finish="atelier" className="inline-block align-middle mr-1" /> 지인파트너: {req.partner}</p>}
                           </div>
                           
                           <div className="flex items-center justify-between pt-4 border-t border-white/10">
@@ -967,7 +967,7 @@ export const ShopAdmin = () => {
                         onClick={() => showAlert('단체 문자 발송', `선택된 ${selectedWorkersCount}명의 근무자 대상 단체 문자 발송이 완료되었습니다.`)} 
                         className="bg-white text-black hover:bg-gray-200 text-xs font-black px-4 py-2.5 rounded-xl flex items-center gap-2 shadow cursor-pointer transition active:scale-95"
                       >
-                        <i className="fa-solid fa-paper-plane"></i> 선택 대상 단체 문자 발송
+                        <D22Icon glyph="send" size={16} finish="boutique" /> 선택 대상 단체 문자 발송
                       </button>
                     </div>
                     <div className="space-y-3">
@@ -1033,7 +1033,7 @@ export const ShopAdmin = () => {
                       onClick={handleSendMessage} 
                       className="bg-white text-black hover:bg-gray-200 px-6 py-3.5 rounded-xl font-black flex items-center gap-2 shadow-lg transition cursor-pointer active:scale-95"
                     >
-                      <i className="fa-solid fa-paper-plane"></i> 전송
+                      <D22Icon glyph="send" size={16} finish="boutique" /> 전송
                     </button>
                   </div>
                 </div>
@@ -1052,7 +1052,7 @@ export const ShopAdmin = () => {
               <div className="flex justify-between items-center pb-4 border-b border-white/10 mb-5">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
-                    <i className="fa-solid fa-file-excel text-lg"></i>
+                    <D22Icon glyph="table" size={20} finish="atelier" />
                   </div>
                   <div>
                     <h3 className="font-black text-base text-white">35개 매장 구인 현황 엑셀 일괄 업로드</h3>
@@ -1064,7 +1064,7 @@ export const ShopAdmin = () => {
                   onClick={() => setExcelModalOpen(false)} 
                   className="text-gray-400 hover:text-white p-1"
                 >
-                  <i className="fa-solid fa-xmark text-lg"></i>
+                  <D22X size={20} finish="atelier" />
                 </button>
               </div>
 
@@ -1095,7 +1095,7 @@ export const ShopAdmin = () => {
                   }}
                 />
                 <div className="w-12 h-12 rounded-full bg-white/5 mx-auto flex items-center justify-center text-gray-400 group-hover:text-emerald-400 group-hover:bg-emerald-500/10 transition mb-3">
-                  <i className="fa-solid fa-cloud-arrow-up text-xl"></i>
+                  <D22UploadCloud size={24} finish="atelier" />
                 </div>
                 {excelFileName ? (
                   <div>
@@ -1175,7 +1175,7 @@ export const ShopAdmin = () => {
                   }}
                   className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs transition shadow-lg flex items-center justify-center gap-2"
                 >
-                  <i className="fa-solid fa-database"></i> 35개 매장 TO 데이터베이스 일괄 반영
+                  <D22Icon glyph="database" size={16} finish="atelier" /> 35개 매장 TO 데이터베이스 일괄 반영
                 </button>
               </div>
             </div>
@@ -1204,7 +1204,7 @@ export const ShopAdmin = () => {
               <div className="py-20 text-center text-sm text-gray-400">위탁 판매 신청 내역을 불러오는 중...</div>
             ) : adminSellRequests.length === 0 ? (
               <div className="py-24 text-center border border-dashed border-white/10 rounded-2xl text-gray-400">
-                <i className="fa-solid fa-inbox text-3xl mb-3 block text-gray-500"></i>
+                <D22Icon glyph="archive" size={32} finish="atelier" className="mx-auto mb-3" />
                 접수된 위탁 판매 신청 내역이 없습니다.
               </div>
             ) : (
