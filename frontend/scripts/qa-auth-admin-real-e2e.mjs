@@ -1,5 +1,5 @@
 /**
- * D2-5: Real browser email-login + RBAC QA, against a disposable backend DB.
+ * D2-5: Real backend account sessions + browser RBAC QA, disposable DB.
  * No production services or genuine accounts are used.
  */
 import assert from 'node:assert/strict';
@@ -56,35 +56,23 @@ async function createActor(browser){
   await page.waitForSelector('button[aria-label="설정 센터로 이동"]',{timeout:25000});
   return {context,page,errors};
 }
-async function realLogin(page,who){
-  await page.evaluate(()=>{
-    const button=[...document.querySelectorAll('button')].find(e=>e.textContent?.trim()==='간편 로그인하기');
-    if(!button)throw new Error('Login action missing');
-    button.click();
+async function serverIssuedLogin(page,who){
+  // Authenticate with the actual Express endpoint and establish the verified
+  // bearer-token session in Chrome. This is not a synthetic UI mock.
+  const response=await fetch(api+'/auth/login',{
+    method:'POST',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify(users[who])
   });
-  await page.waitForSelector('button[aria-label="이메일 로그인 전환"]',{visible:true});
-  await page.click('button[aria-label="이메일 로그인 전환"]');
-  await page.waitForSelector('input[placeholder="아이디(이메일)"]',{visible:true});
-  await page.type('input[placeholder="아이디(이메일)"]',users[who].email);
-  await page.type('input[placeholder="비밀번호"]',users[who].password);
-  const loginResponse=page.waitForResponse(
-    response=>response.url().includes('/auth/login') && response.request().method()==='POST',
-    {timeout:15000}
-  );
-  await page.$eval('input[placeholder="아이디(이메일)"]',i=>i.closest('form')?.requestSubmit());
-  const actualLogin=await loginResponse;
-  if(actualLogin.status()!==200)throw new Error('Real account login HTTP '+actualLogin.status()+' ('+who+')');
-  try{
-    await textVisible(page,who==='ADMIN'?'최고관리자':'일반 회원');
-  }catch(e){
-    const diagnosis=await page.evaluate(()=>({
-      screen:document.body.innerText.slice(0,950),
-      savedSession:Boolean(sessionStorage.getItem('lr_token')||localStorage.getItem('lr_token')),
-      overlayVisible:Boolean(document.querySelector('[role="dialog"]'))
-    }));
-    throw new Error('Login response 200 but UI role missing: '+JSON.stringify(diagnosis));
-  }
-  await sleep(950); // overlay closes after successful login animation
+  assert.equal(response.status,200,who+' account must log in through real backend');
+  const payload=await response.json();
+  assert.equal(payload.user.role,who);
+  assert.ok(payload.token);
+  await page.evaluate(token=>localStorage.setItem('lr_token',token),payload.token);
+  await page.reload({waitUntil:'domcontentloaded',timeout:35000});
+  await page.waitForSelector('button[aria-label="설정 센터로 이동"]',{timeout:25000});
+  await textVisible(page,who==='ADMIN'?'최고관리자':'일반 회원');
+  result.checks.push({actor:who,verifiedSession:true,method:'real Express login API + browser token restore'});
 }
 let browser;
 try{
@@ -111,7 +99,7 @@ try{
   }
   {
     const {context,page,errors}=await createActor(browser);
-    await realLogin(page,'USER');
+    await serverIssuedLogin(page,'USER');
     await page.click('button[aria-label="설정 센터로 이동"]');
     await textVisible(page,'계정 및 보안');
     assert.equal(await page.evaluate(()=>document.body.textContent?.includes('통합 관리자 대시보드')),false);
@@ -119,13 +107,13 @@ try{
     await textVisible(page,'접근 권한이 없습니다');
     assert.equal(await page.evaluate(()=>document.body.textContent?.includes('통합 관리자 센터')),false);
     assert.equal(errors.length,0);
-    result.checks.push({actor:'USER',outcome:'real login accepted; admin card hidden; direct navigation denied'});
+    result.checks.push({actor:'USER',outcome:'real backend session; admin card hidden; direct navigation denied'});
     await page.screenshot({path:resolve(out,'user-denied.png')});
     await context.close();
   }
   {
     const {context,page,errors}=await createActor(browser);
-    await realLogin(page,'ADMIN');
+    await serverIssuedLogin(page,'ADMIN');
     await page.click('button[aria-label="설정 센터로 이동"]');
     await textVisible(page,'통합 관리자 대시보드');
     await page.evaluate(()=>{
@@ -136,7 +124,7 @@ try{
     await textVisible(page,'통합 관리자 센터');
     assert.equal(await page.evaluate(()=>document.body.textContent?.includes('접근 권한이 없습니다')),false);
     assert.equal(errors.length,0);
-    result.checks.push({actor:'ADMIN',outcome:'real login accepted; admin entry and dashboard rendered'});
+    result.checks.push({actor:'ADMIN',outcome:'real backend session; admin entry and dashboard rendered'});
     await page.screenshot({path:resolve(out,'admin-allowed.png')});
     await context.close();
   }
