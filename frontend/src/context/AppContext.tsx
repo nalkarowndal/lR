@@ -110,6 +110,7 @@ interface AppContextType {
   setProducts: React.Dispatch<React.SetStateAction<Product[]>>;
   isBackendConnected: boolean;
   refreshData: () => Promise<void>;
+  isAppReady: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -125,6 +126,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
   const [role, setRole] = useState<Role>('STORE');
   const [isBackendConnected, setIsBackendConnected] = useState<boolean>(false);
+  const [isAppReady, setIsAppReady] = useState<boolean>(false);
 
   const [userSettings, setUserSettings] = useState<UserSettings>({
     service_notifications: true,
@@ -368,6 +370,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       if (!health) {
         setIsBackendConnected(false);
         setIsAuthLoading(false);
+        setIsAppReady(true);
         return;
       }
       setIsBackendConnected(true);
@@ -431,6 +434,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         setIsBackendConnected(false);
       }
       setIsAuthLoading(false);
+    } finally {
+      setIsAppReady(true);
     }
   };
 
@@ -468,7 +473,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       userSettings, updateUserSettings,
       favorites, toggleFavorite, isFavorite,
       role, setRole, requests, setRequests, messages, setMessages, 
-      workerDB, setWorkerDB, products, setProducts, isBackendConnected, refreshData
+      workerDB, setWorkerDB, products, setProducts, isBackendConnected, refreshData,
+      isAppReady
     }}>
       {children}
     </AppContext.Provider>

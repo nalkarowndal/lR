@@ -6,9 +6,134 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- index.html의 <head> 내부 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <title>luxuryrental</title>
+    <title>LuxuryRental - Curated Luxury Living</title>
+    <style>
+      /* Tier 1 Native Inline Splash Screen: 0ms instant display before JS bundle loads */
+      #native-splash {
+        position: fixed;
+        inset: 0;
+        background-color: #0B0C0E;
+        background-image: radial-gradient(circle at 50% 45%, rgba(197, 168, 128, 0.09) 0%, rgba(11, 12, 14, 0) 70%);
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        padding: 40px 24px;
+        box-sizing: border-box;
+        transition: opacity 0.35s ease, transform 0.35s ease;
+        user-select: none;
+      }
+      .native-splash-frame {
+        position: absolute;
+        inset: 16px;
+        border: 1px solid rgba(197, 168, 128, 0.15);
+        border-radius: 16px;
+        pointer-events: none;
+      }
+      .native-splash-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: -30px;
+      }
+      .native-splash-emblem {
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        border: 1px solid rgba(197, 168, 128, 0.3);
+        background: linear-gradient(180deg, #1E2024 0%, #121316 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 30px rgba(197, 168, 128, 0.15);
+        position: relative;
+      }
+      .native-splash-emblem::after {
+        content: '';
+        position: absolute;
+        inset: 5px;
+        border-radius: 50%;
+        border: 1px solid rgba(197, 168, 128, 0.2);
+      }
+      .native-splash-title {
+        margin-top: 24px;
+        font-family: Georgia, 'Playfair Display', serif;
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: #DFCDAF;
+        text-align: center;
+      }
+      .native-splash-slogan {
+        margin-top: 8px;
+        font-size: 10px;
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        color: #A68F68;
+        text-align: center;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      .native-splash-bar {
+        width: 80px;
+        height: 2px;
+        background: #1E2024;
+        border-radius: 2px;
+        margin-top: 32px;
+        overflow: hidden;
+        position: relative;
+      }
+      .native-splash-bar::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        width: 32px;
+        background: linear-gradient(90deg, transparent, #E8D7B8, transparent);
+        animation: native-shimmer 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+      @keyframes native-shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(250%); }
+      }
+    </style>
   </head>
   <body>
+    <!-- Tier 1 0ms Native Splash -->
+    <div id="native-splash">
+      <div class="native-splash-frame"></div>
+      <div style="font-size: 9px; letter-spacing: 0.35em; color: rgba(197, 168, 128, 0.7); font-family: monospace; text-transform: uppercase;">
+        HAUTE COUTURE ARCHIVE
+      </div>
+      <div class="native-splash-center">
+        <div class="native-splash-emblem">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 17.5C4 16.95 4.45 16.5 5 16.5H19C19.55 16.5 20 16.95 20 17.5V18.5C20 19.05 19.55 19.5 19 19.5H5C4.45 19.5 4 19.05 4 18.5V17.5Z" fill="#C5A880" stroke="#7D653E" stroke-width="0.6"/>
+            <path d="M4.5 16.5L3.5 8.5L8.5 12.5L12 5.5L15.5 12.5L20.5 8.5L19.5 16.5H4.5Z" fill="#C5A880" stroke="#7D653E" stroke-width="0.8" stroke-linejoin="round"/>
+            <circle cx="3.5" cy="8.5" r="1.2" fill="#FFFDF8" stroke="#B49A67" stroke-width="0.5"/>
+            <circle cx="8.5" cy="12.5" r="1" fill="#FFFDF8" stroke="#B49A67" stroke-width="0.5"/>
+            <circle cx="12" cy="5.5" r="1.5" fill="#FFFDF8" stroke="#B49A67" stroke-width="0.6"/>
+            <circle cx="15.5" cy="12.5" r="1" fill="#FFFDF8" stroke="#B49A67" stroke-width="0.5"/>
+            <circle cx="20.5" cy="8.5" r="1.2" fill="#FFFDF8" stroke="#B49A67" stroke-width="0.5"/>
+          </svg>
+        </div>
+        <div class="native-splash-title">LUXURY RENTAL</div>
+        <div class="native-splash-slogan">Curated Luxury Living</div>
+        <div class="native-splash-bar"></div>
+      </div>
+      <div style="font-size: 8px; letter-spacing: 0.25em; color: #7A6B53; text-transform: uppercase; font-family: monospace;">
+        PARIS · MILAN · SEOUL · TOKYO
+      </div>
+    </div>
+    <script>
+      try {
+        if (sessionStorage.getItem('lr_splash_viewed') === 'true' || location.search.includes('splash=false') || location.search.includes('code=') || location.search.includes('oauth=')) {
+          var ns = document.getElementById('native-splash');
+          if (ns) ns.remove();
+        }
+      } catch (e) {}
+    </script>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

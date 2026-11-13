@@ -215,6 +215,12 @@ export const ShopMain = () => {
   };
 
   const handleAddToCart = (product: NonNullable<typeof selectedProduct>, days: number) => {
+    if (!user) {
+      showToast('로그인이 필요한 서비스입니다. 먼저 로그인해 주세요.', 'info');
+      setSelectedProduct(null);
+      setActiveOverlay('LOGIN');
+      return;
+    }
     const details = calculateRentalPriceDetails(product.price, product.original, days);
     const newItem: CartItem = {
       id: product.id,
@@ -235,6 +241,12 @@ export const ShopMain = () => {
   };
 
   const handleRentNow = (product: NonNullable<typeof selectedProduct>, days: number) => {
+    if (!user) {
+      showToast('로그인이 필요한 서비스입니다. 먼저 로그인해 주세요.', 'info');
+      setSelectedProduct(null);
+      setActiveOverlay('LOGIN');
+      return;
+    }
     const details = calculateRentalPriceDetails(product.price, product.original, days);
     const newItem: CartItem = {
       id: product.id,
@@ -281,6 +293,12 @@ export const ShopMain = () => {
 
   const handleStartCheckout = () => {
     if (cartItems.length === 0) return;
+    if (!user) {
+      showToast('로그인이 필요한 서비스입니다. 먼저 로그인해 주세요.', 'info');
+      setCartModalOpen(false);
+      setActiveOverlay('LOGIN');
+      return;
+    }
     if (user && !recipientName) {
       setRecipientName(user.name);
       if (user.phone) setRecipientPhone(user.phone);

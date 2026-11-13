@@ -1,0 +1,58 @@
+[
+  {
+    "id": "01",
+    "title": "스플래시 화면 인트로 & 메인 큐레이션 상호작용",
+    "webm": "videos/01_splash_and_main_interaction.webm",
+    "gif": "videos/01_splash_and_main_interaction.gif",
+    "desc": "골드 로고 스플래시 화면 진입, 메인 화면 슬라이드 전환, 20대/30대 추천 탭 전환, 상품 상세 모달 오픈 및 대여 일수(5일/7일) 가격 실시간 계산"
+  },
+  {
+    "id": "02",
+    "title": "카테고리 뷰 & 14대 명품 브랜드 필터링 상호작용",
+    "webm": "videos/02_category_and_brands_interaction.webm",
+    "gif": "videos/02_category_and_brands_interaction.gif",
+    "desc": "여성/남성/아동 서브탭 전환, LNB 품목별 카테고리 전환, 브랜드별 탭 진입 및 샤넬/구찌/에르메스 브랜드 필터 칩 반응형 렌더링"
+  },
+  {
+    "id": "03",
+    "title": "실시간 통합 검색 & 키워드 필터링 상호작용",
+    "webm": "videos/03_search_flow_interaction.webm",
+    "gif": "videos/03_search_flow_interaction.gif",
+    "desc": "슬라이딩 검색 오버레이 오픈, 실시간 검색어 1~10위 클릭, 키워드 타이핑 검색 및 카테고리 태그 필터링, 검색 결과 상품 상세 팝업"
+  },
+  {
+    "id": "04",
+    "title": "비로그인 가드 & 공식 소셜 로그인·약관 모달",
+    "webm": "videos/04_auth_guard_and_login_interaction.webm",
+    "gif": "videos/04_auth_guard_and_login_interaction.gif",
+    "desc": "비로그인 상품 담기 시 안내 토스트 및 로그인 창 자동 전환, 카카오/구글 공식 버튼, 이메일 로그인 탭, 회원가입 세부 약관 4단 체크박스 상호작용"
+  },
+  {
+    "id": "05",
+    "title": "장바구니 & 모의 주문 결제 프로세스 상호작용",
+    "webm": "videos/05_cart_and_checkout_interaction.webm",
+    "gif": "videos/05_cart_and_checkout_interaction.gif",
+    "desc": "로그인 후 상품 장바구니 추가, 장바구니 모달 슬라이드, 대여 일수/수량 증감 및 합계 자동 계산, 주문서 작성 단계 이동"
+  },
+  {
+    "id": "06",
+    "title": "마이페이지 & 공통 설정 토글 상호작용",
+    "webm": "videos/06_mypage_and_settings_interaction.webm",
+    "gif": "videos/06_mypage_and_settings_interaction.gif",
+    "desc": "마이페이지 VIP 프로필 카드, 아바타 변경 모달, 찜 목록 탭 전환, 설정 페이지 알림 및 애니메이션 감소 토글 스위치 인터랙션"
+  },
+  {
+    "id": "07",
+    "title": "내 상품 판매 & 위탁 신청 폼 상호작용",
+    "webm": "videos/07_sell_request_flow_interaction.webm",
+    "gif": "videos/07_sell_request_flow_interaction.gif",
+    "desc": "내 상품 판매 페이지 진입, 브랜드 검색(고야드) 및 실시간 필터링, 상품 상태/희망가 입력 폼 작성 및 위탁 신청 제출 완료"
+  },
+  {
+    "id": "08",
+    "title": "통합 관리자 RECRUIT 대시보드 & 쇼핑몰 관리 상호작용",
+    "webm": "videos/08_admin_recruit_and_shop_interaction.webm",
+    "gif": "videos/08_admin_recruit_and_shop_interaction.gif",
+    "desc": "매장/본사 관리자 역할 전환, TO 변경 요청, 근무자 DB 조회, 실시간 채팅 메시지 발송, 쇼핑몰 상품 관리 및 앱 복귀 전체 관리 플로우"
+  }
+]

@@ -6,6 +6,8 @@ import fs from 'fs';
 import { config } from './config/env.js';
 import { apiRouter } from './routes/index.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import { handleGoogleCallback } from './controllers/google.controller.js';
+import { handleKakaoCallback } from './controllers/kakao.controller.js';
 
 export const app = express();
 
@@ -53,6 +55,10 @@ if (config.nodeEnv === 'development') {
 
 // Routes
 app.use('/api/v1', apiRouter);
+
+// Top-level OAuth Callback Aliases (for Google & Kakao direct redirect configurations)
+app.get(['/auth/google/callback', '/oauth/google/callback', '/api/auth/google/callback'], handleGoogleCallback);
+app.get(['/auth/kakao/callback', '/oauth/kakao/callback', '/api/auth/kakao/callback'], handleKakaoCallback);
 
 // 404 Handler
 app.use((_req, res) => {

@@ -5,6 +5,7 @@ import { useToast } from '../context/ToastContext';
 import { api, setAuthToken } from '../services/api';
 import {
   KakaoOfficialSymbol,
+  GoogleOfficialSymbol,
   AppleOfficialSymbol,
   NaverOfficialSymbol,
   PaycoOfficialSymbol
@@ -20,6 +21,9 @@ export const ShopLike = () => {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [loginType, setLoginType] = useState<'SOCIAL' | 'EMAIL'>('SOCIAL');
 
+  // Social login timeout and reset reference
+  const socialTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Email form state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,8 +35,48 @@ export const ShopLike = () => {
   // 'LOGIN' 상태일 때만 화면에 노출 및 슬라이드
   const isOpen = activeOverlay === 'LOGIN';
 
+  // 1. 브라우저 뒤로가기(bfcache 복원), 탭 복귀, 포커스 시 소셜 로그인 대기 상태 자동 해제
+  useEffect(() => {
+    const handleResetLoading = () => {
+      if (socialTimeoutRef.current) {
+        clearTimeout(socialTimeoutRef.current);
+        socialTimeoutRef.current = null;
+      }
+      setLoggingInProvider(null);
+      setIsLoading(false);
+    };
+
+    // bfcache(Back-Forward Cache)에서 복원될 때 발생하는 표준 이벤트
+    window.addEventListener('pageshow', handleResetLoading);
+    // 페이지 이동 직전 상태 저장 대비 이벤트
+    window.addEventListener('pagehide', handleResetLoading);
+    // 탭 전환 및 브라우저 창 복귀 이벤트
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        handleResetLoading();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleResetLoading);
+
+    return () => {
+      if (socialTimeoutRef.current) {
+        clearTimeout(socialTimeoutRef.current);
+      }
+      window.removeEventListener('pageshow', handleResetLoading);
+      window.removeEventListener('pagehide', handleResetLoading);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleResetLoading);
+    };
+  }, []);
+
   useEffect(() => {
     if (isOpen) {
+      // 모달이 열릴 때 이전 로딩 잔여 상태 완전 초기화
+      setLoggingInProvider(null);
+      setIsLoading(false);
+      setErrorMsg('');
+
       const timer = setTimeout(() => {
         emailInputRef.current?.focus({ preventScroll: true });
         window.scrollTo({ left: 0 });
@@ -73,6 +117,10 @@ export const ShopLike = () => {
         window.removeEventListener('keydown', handleKeyDown);
       };
     } else {
+      if (socialTimeoutRef.current) {
+        clearTimeout(socialTimeoutRef.current);
+        socialTimeoutRef.current = null;
+      }
       setLoggingInProvider(null);
       setLoginSuccess(false);
       setErrorMsg('');
@@ -111,13 +159,20 @@ export const ShopLike = () => {
 
   // 카카오 OAuth 2.0 실제 연동 처리
   const handleKakaoLogin = async () => {
+    if (socialTimeoutRef.current) clearTimeout(socialTimeoutRef.current);
     setLoggingInProvider('카카오');
     setErrorMsg('');
+
+    // Safety timeout: 만약 리다이렉트 지연이나 사용자가 이탈 후 복귀할 때 3.5초 후 연결 중 해제
+    socialTimeoutRef.current = setTimeout(() => {
+      setLoggingInProvider(null);
+    }, 3500);
 
     try {
       // 1. 서버의 카카오 연동 설정 상태 확인
       const status = await api.getKakaoStatus();
       if (!status?.configured) {
+        if (socialTimeoutRef.current) clearTimeout(socialTimeoutRef.current);
         setLoggingInProvider(null);
         showToast(
           '카카오 REST API 키 설정이 필요합니다. docs/auth/KAKAO_LOGIN_SETUP.md를 확인해주세요.',
@@ -129,9 +184,54 @@ export const ShopLike = () => {
       // 2. 카카오 OAuth 인가 화면으로 리다이렉트
       const apiBaseUrl = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:4000/api/v1';
       window.location.href = `${apiBaseUrl}/auth/kakao`;
+
+      // 브라우저가 외부 페이지로 전환되기 직전 또는 bfcache 저장 스냅샷 대비 1.2초 후 해제
+      setTimeout(() => {
+        setLoggingInProvider(null);
+      }, 1200);
     } catch (err: any) {
+      if (socialTimeoutRef.current) clearTimeout(socialTimeoutRef.current);
       setLoggingInProvider(null);
       setErrorMsg('카카오 로그인 서버 연결에 실패했습니다. 백엔드 서버 상태를 확인해주세요.');
+    }
+  };
+
+  // 구글 OAuth 2.0 실제 연동 처리
+  const handleGoogleLogin = async () => {
+    if (socialTimeoutRef.current) clearTimeout(socialTimeoutRef.current);
+    setLoggingInProvider('구글');
+    setErrorMsg('');
+
+    // Safety timeout: 만약 리다이렉트 지연이나 사용자가 이탈 후 복귀할 때 3.5초 후 연결 중 해제
+    socialTimeoutRef.current = setTimeout(() => {
+      setLoggingInProvider(null);
+    }, 3500);
+
+    try {
+      // 1. 서버의 Google 연동 설정 상태 확인
+      const status = await api.getGoogleStatus();
+      if (!status?.configured) {
+        if (socialTimeoutRef.current) clearTimeout(socialTimeoutRef.current);
+        setLoggingInProvider(null);
+        showToast(
+          'Google Client ID 설정이 필요합니다. .env 환경변수를 확인해주세요.',
+          'info'
+        );
+        return;
+      }
+
+      // 2. 구글 OAuth 인가 화면으로 리다이렉트
+      const apiBaseUrl = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:4000/api/v1';
+      window.location.href = `${apiBaseUrl}/auth/google`;
+
+      // 브라우저가 외부 페이지로 전환되기 직전 또는 bfcache 저장 스냅샷 대비 1.2초 후 해제
+      setTimeout(() => {
+        setLoggingInProvider(null);
+      }, 1200);
+    } catch (err: any) {
+      if (socialTimeoutRef.current) clearTimeout(socialTimeoutRef.current);
+      setLoggingInProvider(null);
+      setErrorMsg('Google 로그인 서버 연결에 실패했습니다. 백엔드 서버 상태를 확인해주세요.');
     }
   };
 
@@ -233,6 +333,21 @@ export const ShopLike = () => {
                 <span className="inline-block animate-pulse">카카오 로그인 연결 중...</span>
               ) : (
                 '카카오로 3초만에 계속하기'
+              )}
+            </button>
+
+            {/* Google Official Button */}
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              disabled={!!loggingInProvider}
+              className="w-full bg-white hover:bg-gray-50 active:scale-[0.99] border border-gray-300 text-gray-800 text-[15px] font-extrabold py-3.5 rounded-xl flex items-center justify-center gap-2.5 mb-3 shadow-xs transition-all disabled:opacity-50"
+            >
+              <GoogleOfficialSymbol className="w-5 h-5 shrink-0" />
+              {loggingInProvider === '구글' ? (
+                <span className="inline-block animate-pulse">Google 로그인 연결 중...</span>
+              ) : (
+                'Google로 계속하기'
               )}
             </button>
 

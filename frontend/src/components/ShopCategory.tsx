@@ -265,6 +265,12 @@ export const ShopCategory = () => {
   };
 
   const handleAddToCart = (product: CatalogProduct, days: number) => {
+    if (!user) {
+      showToast('로그인이 필요한 서비스입니다. 먼저 로그인해 주세요.', 'info');
+      setSelectedProduct(null);
+      setActiveOverlay('LOGIN');
+      return;
+    }
     const details = calculateRentalPriceDetails(product.price, product.originalPrice, days);
     const newItem: CartItem = {
       id: product.id,
@@ -285,6 +291,12 @@ export const ShopCategory = () => {
   };
 
   const handleRentNow = (product: CatalogProduct, days: number) => {
+    if (!user) {
+      showToast('로그인이 필요한 서비스입니다. 먼저 로그인해 주세요.', 'info');
+      setSelectedProduct(null);
+      setActiveOverlay('LOGIN');
+      return;
+    }
     const details = calculateRentalPriceDetails(product.price, product.originalPrice, days);
     const newItem: CartItem = {
       id: product.id,
@@ -1101,6 +1113,12 @@ export const ShopCategory = () => {
                     <button
                       type="button"
                       onClick={() => {
+                        if (!user) {
+                          showToast('로그인이 필요한 서비스입니다. 먼저 로그인해 주세요.', 'info');
+                          setCartModalOpen(false);
+                          setActiveOverlay('LOGIN');
+                          return;
+                        }
                         setCartStep('SHIPPING');
                         if (user) {
                           setRecipientName(user.name || '홍길동');

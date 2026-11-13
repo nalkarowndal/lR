@@ -4,6 +4,7 @@ import React from 'react';
  * Official vector brand logos for social sign-in providers
  * Strict compliance with brand guidelines:
  * - Kakao: #000000 symbol on #FEE500
+ * - Google: Official 4-color 'G' (Red #EA4335, Yellow #FBBC05, Green #34A853, Blue #4285F4)
  * - Apple: #000000 symbol on white/black
  * - Naver: #FFFFFF 'N' on #03C75A
  * - PAYCO: #FFFFFF 'P' on #EA3323
@@ -18,6 +19,32 @@ export const KakaoOfficialSymbol = ({ className = 'w-5 h-5' }: { className?: str
     xmlns="http://www.w3.org/2000/svg"
   >
     <path d="M12 3C6.48 3 2 6.48 2 10.77c0 2.76 1.83 5.18 4.6 6.48-.2.75-.74 2.72-.85 3.15-.14.54.2.53.42.38.17-.11 2.74-1.87 3.86-2.63.63.09 1.29.14 1.97.14 5.52 0 10-3.48 10-7.77S17.52 3 12 3z" />
+  </svg>
+);
+
+export const GoogleOfficialSymbol = ({ className = 'w-5 h-5' }: { className?: string }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    className={className} 
+    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fill="#4285F4"
+      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+    />
+    <path
+      fill="#34A853"
+      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+    />
+    <path
+      fill="#FBBC05"
+      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+    />
+    <path
+      fill="#EA4335"
+      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+    />
   </svg>
 );
 
@@ -53,7 +80,6 @@ export const PaycoOfficialSymbol = ({ className = 'w-5 h-5' }: { className?: str
     aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14.5h-2.5V7.5H13c2.2 0 4 1.57 4 3.5s-1.8 3.5-4 3.5zm0-5h-1v3h1c1.1 0 2-.67 2-1.5S14.1 11.5 13 11.5z"/>
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.5 14.5v-9h3.75c1.79 0 3.25 1.46 3.25 3.25s-1.46 3.25-3.25 3.25H12.5v2.5h-2z"/>
   </svg>
 );
-

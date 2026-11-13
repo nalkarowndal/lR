@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { register, login, getMe, logout, forgotPassword, resetPassword } from '../controllers/auth.controller.js';
 import { getKakaoStatus, startKakaoLogin, handleKakaoCallback, unlinkKakao } from '../controllers/kakao.controller.js';
+import { getGoogleStatus, startGoogleLogin, handleGoogleCallback, unlinkGoogle } from '../controllers/google.controller.js';
 import { requireAuth } from '../middlewares/auth.js';
 
 export const authRouter = Router();
@@ -19,4 +20,8 @@ authRouter.get('/kakao', startKakaoLogin);
 authRouter.get('/kakao/callback', handleKakaoCallback);
 authRouter.post('/kakao/unlink', requireAuth, unlinkKakao);
 
-
+// Google OAuth 2.0 Endpoints
+authRouter.get('/google/status', getGoogleStatus);
+authRouter.get('/google', startGoogleLogin);
+authRouter.get('/google/callback', handleGoogleCallback);
+authRouter.post('/google/unlink', requireAuth, unlinkGoogle);

@@ -131,6 +131,22 @@ export const api = {
     });
   },
 
+  // Google OAuth 2.0 Endpoints
+  getGoogleStatus: async () => {
+    return fetchJson<{
+      success: boolean;
+      configured: boolean;
+      redirectUri: string;
+      hasClientSecret: boolean;
+    }>('/auth/google/status');
+  },
+
+  unlinkGoogle: async () => {
+    return fetchJson<{ success: boolean; message: string }>('/auth/google/unlink', {
+      method: 'POST'
+    });
+  },
+
   // User Profile & Settings Endpoints
   getMyProfile: async () => {
     return fetchJson<{ success: boolean; profile: any }>('/users/me');

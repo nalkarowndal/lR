@@ -130,10 +130,12 @@ export const ShopSearch = () => {
             };
           });
 
-          const combined = [...localMatches];
-          for (const sItem of mapped) {
-            if (!combined.some(c => c.title === sItem.title)) {
-              combined.push(sItem);
+          // Start with server results (real SQLite DB entries with live stock & IDs)
+          const combined = [...mapped];
+          // Supplement with local catalog items that aren't already represented
+          for (const lItem of localMatches) {
+            if (!combined.some(c => c.title === lItem.title || (c.imageUrl && lItem.imageUrl && c.imageUrl === lItem.imageUrl))) {
+              combined.push(lItem);
             }
           }
           setSearchResults(combined.length > 0 ? combined : localMatches);
@@ -170,6 +172,12 @@ export const ShopSearch = () => {
   };
 
   const handleAddToCart = (product: CatalogProduct, days: number) => {
+    if (!user) {
+      showToast('로그인이 필요한 서비스입니다. 먼저 로그인해 주세요.', 'info');
+      setSelectedProduct(null);
+      setActiveOverlay('LOGIN');
+      return;
+    }
     const details = calculateRentalPriceDetails(product.price, product.originalPrice, days);
     const newItem = {
       id: product.id,
@@ -188,6 +196,16 @@ export const ShopSearch = () => {
     } catch {}
     showToast(`'${product.brand} ${product.title}' 상품이 장바구니에 담겼습니다.`, 'success');
     setSelectedProduct(null);
+  };
+
+  const handleRentNow = (product: CatalogProduct, days: number) => {
+    if (!user) {
+      showToast('로그인이 필요한 서비스입니다. 먼저 로그인해 주세요.', 'info');
+      setSelectedProduct(null);
+      setActiveOverlay('LOGIN');
+      return;
+    }
+    handleAddToCart(product, days);
   };
 
   const filteredResults = searchResults.filter((item: CatalogProduct) => {
@@ -550,9 +568,16 @@ export const ShopSearch = () => {
                 <button
                   type="button"
                   onClick={() => handleAddToCart(selectedProduct, selectedDays)}
-                  className="w-full py-3 bg-gray-950 text-white rounded-xl font-bold text-xs hover:bg-black active:scale-[0.98] transition shadow-md"
+                  className="flex-1 py-3 border border-gray-300 rounded-xl font-bold text-xs text-gray-800 hover:bg-gray-50 active:scale-[0.98] transition"
                 >
                   장바구니 담기
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleRentNow(selectedProduct, selectedDays)}
+                  className="flex-1 py-3 bg-gray-950 text-white rounded-xl font-bold text-xs hover:bg-black active:scale-[0.98] transition shadow-md"
+                >
+                  바로 렌탈하기
                 </button>
               </div>
             </div>

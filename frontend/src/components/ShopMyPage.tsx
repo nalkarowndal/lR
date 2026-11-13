@@ -12,6 +12,7 @@ import {
   LuxuryCrownIcon, EngravedShieldAdmin, 
   EngravedProfileCrest, EngravedSparkleTier 
 } from './ui/LuxuryIcons';
+import { GoogleOfficialSymbol } from './ui/AuthSymbols';
 
 export const ShopMyPage: React.FC = () => {
   const { 
@@ -213,6 +214,12 @@ export const ShopMyPage: React.FC = () => {
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FEE500] text-black border border-yellow-300 flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-black/70 inline-block" />
                         카카오 계정
+                      </span>
+                    )}
+                    {user.oauth_accounts?.includes('google') && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-gray-800 border border-gray-300 shadow-2xs flex items-center gap-1">
+                        <GoogleOfficialSymbol className="w-3 h-3 shrink-0" />
+                        구글 계정
                       </span>
                     )}
                   </div>

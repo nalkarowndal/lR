@@ -29,6 +29,7 @@
     "@types/styled-components": "^5.1.36",
     "@vitejs/plugin-react": "^6.0.2",
     "autoprefixer": "^10.6.2",
+    "gifenc": "^1.0.3",
     "oxlint": "^1.69.0",
     "postcss": "^8.5.32",
     "puppeteer-core": "^25.16.0",
