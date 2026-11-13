@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  ShoppingCart, Heart, User, Home, List, ChevronRight, ChevronLeft,
-  ShieldCheck, Smartphone, Trash2, CheckCircle2, X, PackageCheck, ArrowRight
-} from 'lucide-react';
+import { Heart, User, Home, List } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { Modal } from './ui/Modal';
@@ -15,7 +12,10 @@ import {
   D2BuybackMenuIcon, D2InviteMenuIcon,
 } from './icons/BoutiqueD2Icons';
 import { D1RentIcon, D1BuyIcon, D1SellIcon } from './icons/BoutiqueD1Icons';
-import { D22Search, D22ShoppingCart, D22Settings } from './icons/BoutiqueD22Icons';
+import {
+  D22Icon, D22Search, D22ShoppingCart, D22Settings, D22ChevronRight, D22ChevronLeft,
+  D22Heart, D22Trash2, D22PackageCheck, D22ShieldCheck, D22CheckCircle2
+} from './icons/BoutiqueD22Icons';
 import { ProductImage } from './ui/ProductImage';
 import { LegalTermsModal } from './ui/LegalTermsModal';
 import { RENT_NEW_ARRIVALS } from '../data/catalog';
@@ -556,14 +556,14 @@ export const ShopMain = () => {
             onClick={() => setAppDownloadModalOpen(true)}
             className="flex items-center gap-1.5 cursor-pointer hover:text-black transition"
           >
-            <Smartphone size={13} className="text-gray-600" /> Google Play
+            <D22Icon glyph="smartphone-device" size={13} className="text-gray-600" /> Google Play
           </button>
           <button 
             type="button" 
             onClick={() => setAppDownloadModalOpen(true)}
             className="flex items-center gap-1.5 cursor-pointer hover:text-black transition"
           >
-            <Smartphone size={13} className="text-gray-600" /> App Store
+            <D22Icon glyph="smartphone-device" size={13} className="text-gray-600" /> App Store
           </button>
         </div>
       </aside>
@@ -794,14 +794,14 @@ export const ShopMain = () => {
               <h4 className="font-bold text-sm text-gray-900 group-hover:text-indigo-600 transition-colors">렌트 이용 가이드</h4>
               <p className="text-[10px] text-gray-500 mt-1">예약부터 반납까지<br />30초 만에 알아보기</p>
             </div>
-            <ChevronRight size={16} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+            <D22ChevronRight size={16} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
           </div>
           <div className="flex-1 bg-white border border-gray-100 hover:border-gray-200 rounded-xl p-4 flex justify-between items-center shadow-xs cursor-pointer hover:shadow-sm transition-all group">
             <div>
               <h4 className="font-bold text-sm text-gray-900 group-hover:text-indigo-600 transition-colors">구독 가이드</h4>
               <p className="text-[10px] text-gray-500 mt-1">명품 무제한 교환<br />30초 만에 알아보기</p>
             </div>
-            <ChevronRight size={16} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+            <D22ChevronRight size={16} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
           </div>
         </div>
       </section>
@@ -822,7 +822,7 @@ export const ShopMain = () => {
                 onClick={() => slideToNextTab('prev')}
                 className="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-black flex items-center justify-center transition active:scale-95 shadow-2xs"
               >
-                <ChevronLeft size={14} />
+                <D22ChevronLeft size={14} />
               </button>
               <button
                 type="button"
@@ -830,7 +830,7 @@ export const ShopMain = () => {
                 onClick={() => slideToNextTab('next')}
                 className="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-black flex items-center justify-center transition active:scale-95 shadow-2xs"
               >
-                <ChevronRight size={14} />
+                <D22ChevronRight size={14} />
               </button>
             </div>
           </div>
@@ -917,7 +917,7 @@ export const ShopMain = () => {
                     }}
                     className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-md text-gray-400 hover:text-red-500 hover:bg-white transition shadow-xs z-10"
                   >
-                    <Heart 
+                    <D22Heart 
                       size={16} 
                       fill={isFav ? '#EF4444' : 'none'}
                       className={isFav ? 'text-red-500' : 'text-gray-400'}
@@ -998,7 +998,7 @@ export const ShopMain = () => {
           onClick={() => navigateTo('SHOP_CATEGORY')}
           className="w-full border border-gray-300 hover:border-gray-400 hover:bg-gray-50 active:scale-[0.99] py-3.5 rounded-xl text-sm font-bold text-gray-800 flex justify-center items-center gap-1 mb-10 transition-all shadow-2xs"
         >
-          전체보기 <ChevronRight size={16} />
+          전체보기 <D22ChevronRight size={16} />
         </button>
 
         <footer className="text-xs text-gray-500 border-t border-gray-100 pt-6">
@@ -1049,7 +1049,7 @@ export const ShopMain = () => {
 
           <div className="flex justify-between items-center mb-6">
             <button type="button" className="flex items-center gap-1 font-bold border border-gray-200 px-2.5 py-1.5 rounded-lg text-gray-700 hover:bg-gray-50 transition">
-              (주)럭셔리 렌탈 <ChevronRight size={14} className="rotate-90" />
+              (주)럭셔리 렌탈 <D22ChevronRight size={14} className="rotate-90" />
             </button>
             <div className="flex gap-2">
               <div className="w-8 h-8 border border-gray-200 rounded-lg flex justify-center items-center text-gray-600 hover:text-black hover:border-gray-400 cursor-pointer transition">
@@ -1068,7 +1068,7 @@ export const ShopMain = () => {
             <p className="font-bold text-gray-700">토스페이먼츠 매매보호(에스크로)서비스</p>
             <p>럭셔리렌탈은 고객님이 현금 결제한 금액에 대해 토스페이먼츠와 매매보호 계약을 체결하여 안전거래를 보장하고 있습니다.</p>
             <p className="flex items-center gap-1 text-gray-600 mt-1 cursor-pointer hover:underline">
-              서비스 가입 확인 <ChevronRight size={10} />
+              서비스 가입 확인 <D22ChevronRight size={10} />
             </p>
           </div>
 
@@ -1151,7 +1151,7 @@ export const ShopMain = () => {
               {cartItems.length === 0 ? (
                 <div className="py-8 text-center text-gray-500 space-y-3">
                   <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto text-gray-400">
-                    <ShoppingCart size={22} />
+                    <D22ShoppingCart size={22} />
                   </div>
                   <p className="text-xs font-semibold">장바구니가 비어 있습니다.</p>
                   <p className="text-[11px] text-gray-400">원하시는 명품을 선택하여 장바구니에 담아보세요.</p>
@@ -1188,7 +1188,7 @@ export const ShopMain = () => {
                           onClick={() => handleRemoveFromCart(cItem.id)}
                           className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg transition"
                         >
-                          <Trash2 size={16} />
+                          <D22Trash2 size={16} />
                         </button>
                       </div>
                     ))}
@@ -1326,7 +1326,7 @@ export const ShopMain = () => {
           {cartStep === 'ORDER_COMPLETE' && completedOrder && (
             <div className="space-y-4 text-center py-2 animate-fadeIn">
               <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto border border-emerald-100 shadow-xs">
-                <PackageCheck size={28} />
+                <D22PackageCheck size={28} />
               </div>
 
               <div>
@@ -1422,7 +1422,7 @@ export const ShopMain = () => {
                     }}
                     className="p-2 rounded-full bg-white/90 backdrop-blur-md shadow-xs hover:bg-white text-gray-400 hover:text-red-500 transition"
                   >
-                    <Heart
+                    <D22Heart
                       size={18}
                       fill={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10)) ? '#EF4444' : 'none'}
                       className={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10)) ? 'text-red-500' : 'text-gray-400'}
@@ -1449,7 +1449,7 @@ export const ShopMain = () => {
 
               {/* 정품 인증 배지 */}
               <div className="flex items-center gap-2.5 p-3 bg-amber-50/80 border border-amber-200/60 rounded-xl text-amber-900 text-xs font-bold">
-                <ShieldCheck size={20} className="text-amber-600 shrink-0" />
+                <D22ShieldCheck size={20} className="text-amber-600 shrink-0" />
                 <div>
                   <p className="leading-tight">한국명품감정원 100% 정품 인증 완료</p>
                   <p className="text-[10px] text-amber-700/80 font-normal mt-0.5">정품 보증서 동봉 및 위조품 시 200% 책임 보상</p>
@@ -1531,7 +1531,7 @@ export const ShopMain = () => {
 
           <div className="space-y-2 text-left bg-gray-50 p-3.5 rounded-xl border border-gray-100 text-xs text-gray-700">
             <div className="flex items-center gap-2 font-bold text-gray-900">
-              <CheckCircle2 size={16} className="text-emerald-500" />
+              <D22CheckCircle2 size={16} className="text-emerald-500" />
               <span>모바일 웹 & 앱 100% 기능 동일 지원</span>
             </div>
             <p className="text-[11px] text-gray-500 pl-6 leading-relaxed">
@@ -1548,7 +1548,7 @@ export const ShopMain = () => {
               }}
               className="flex-1 py-2.5 bg-gray-900 text-white rounded-xl font-bold text-xs hover:bg-black transition flex items-center justify-center gap-1.5"
             >
-              <Smartphone size={14} /> Google Play
+              <D22Icon glyph="smartphone-device" size={14} /> Google Play
             </button>
             <button
               type="button"
@@ -1558,7 +1558,7 @@ export const ShopMain = () => {
               }}
               className="flex-1 py-2.5 bg-gray-900 text-white rounded-xl font-bold text-xs hover:bg-black transition flex items-center justify-center gap-1.5"
             >
-              <Smartphone size={14} /> App Store
+              <D22Icon glyph="smartphone-device" size={14} /> App Store
             </button>
           </div>
         </div>
