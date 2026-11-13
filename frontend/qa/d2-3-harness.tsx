@@ -53,7 +53,7 @@ function OpticalGallery() {
           <b>ICON</b>{opticalSizes.map(size => <b key={size} style={{ textAlign: 'center' }}>{size}px</b>)}
         </div>
         {d1.map(({id,title,component: Component}) => (
-          <div key={id} data-qa-row={id} style={{ display: 'grid', gridTemplateColumns: '160px repeat(6, 1fr)', gap: 4, marginBottom: 5 }}>
+          <div key={id} data-qa-phase="d1" data-qa-row={id} style={{ display: 'grid', gridTemplateColumns: '160px repeat(6, 1fr)', gap: 4, marginBottom: 5 }}>
             <div style={{ alignSelf: 'center', fontSize: 12, fontWeight: 700 }}>{title}</div>
             {opticalSizes.map(size => (
               <div key={size} style={{ background: id === 'crown' ? shades.black : '#FFFFFF', minHeight: 100, display: 'grid', placeItems: 'center', border: '1px solid #E8E4DD' }}>
