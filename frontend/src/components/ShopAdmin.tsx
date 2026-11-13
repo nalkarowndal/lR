@@ -403,14 +403,14 @@ export const ShopAdmin = () => {
 
       {/* 1. 최상단 글래스모피즘 헤더 */}
       <header className="sticky top-0 z-50 backdrop-blur-md bg-black/50 border-b border-white/10 shadow-xl w-full">
-        <div className="w-full max-w-[1800px] mx-auto px-6 lg:px-12 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-white/10 border border-white/10 shadow-inner flex items-center justify-center">
+        <div className="w-full max-w-[1800px] mx-auto px-4 lg:px-12 py-3 lg:py-4 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0 self-start">
+            <div className="p-2 shrink-0 rounded-xl bg-white/10 border border-white/10 shadow-inner flex items-center justify-center">
               <EngravedShieldAdmin className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-black text-lg tracking-tight text-white">LUXURY RENTAL</h1>
+                <h1 className="font-black text-base lg:text-lg tracking-tight text-white whitespace-nowrap">LUXURY RENTAL</h1>
                 {isBackendConnected && (
                   <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold">
                     API 연동됨
@@ -421,12 +421,12 @@ export const ShopAdmin = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="flex bg-white/5 border border-white/10 p-1 rounded-xl backdrop-blur-sm">
+          <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto min-w-0 sm:items-center">
+            <div data-qa-admin-main-tabs className="flex w-full sm:w-auto min-w-0 overflow-x-auto scrollbar-hide bg-white/5 border border-white/10 p-1 rounded-xl backdrop-blur-sm">
               <button 
                 type="button"
                 onClick={() => setMainTab('SHOP')} 
-                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`shrink-0 whitespace-nowrap px-3 lg:px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer inline-flex items-center gap-1.5 ${
                   mainTab === 'SHOP' ? 'bg-white text-black shadow-md' : 'text-gray-400 hover:text-white'
                 }`}
               >
@@ -435,7 +435,7 @@ export const ShopAdmin = () => {
               <button 
                 type="button"
                 onClick={() => setMainTab('RECRUIT')} 
-                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`shrink-0 whitespace-nowrap px-3 lg:px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer inline-flex items-center gap-1.5 ${
                   mainTab === 'RECRUIT' ? 'bg-white text-black shadow-md' : 'text-gray-400 hover:text-white'
                 }`}
               >
@@ -444,7 +444,7 @@ export const ShopAdmin = () => {
               <button 
                 type="button"
                 onClick={() => setMainTab('SELL_REQUESTS')} 
-                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`shrink-0 whitespace-nowrap px-3 lg:px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer inline-flex items-center gap-1.5 ${
                   mainTab === 'SELL_REQUESTS' ? 'bg-white text-black shadow-md' : 'text-gray-400 hover:text-white'
                 }`}
               >
@@ -455,7 +455,7 @@ export const ShopAdmin = () => {
             <button 
               type="button"
               onClick={() => returnFromAdmin('SHOP_SETTINGS')} 
-              className="text-xs bg-white/10 hover:bg-white/20 border border-white/10 text-white px-4 py-2.5 rounded-xl font-bold transition shadow flex items-center gap-2 cursor-pointer active:scale-95"
+              className="shrink-0 whitespace-nowrap self-end sm:self-auto text-xs bg-white/10 hover:bg-white/20 border border-white/10 text-white px-4 py-2.5 rounded-xl font-bold transition shadow flex items-center gap-2 cursor-pointer active:scale-95"
             >
               <i className="fa-solid fa-mobile-screen"></i> 앱으로 돌아가기
             </button>
@@ -464,7 +464,7 @@ export const ShopAdmin = () => {
       </header>
 
       {/* 2. 메인 컨텐츠 영역 (최대 폭 1800px 적용) */}
-      <main className="flex-1 w-full max-w-[1800px] mx-auto p-6 lg:p-12 flex flex-col">
+      <main className="flex-1 w-full max-w-[1800px] mx-auto p-3 sm:p-6 lg:p-12 flex flex-col min-w-0">
         
         {/* [A] 쇼핑몰 관리 탭 */}
         {mainTab === 'SHOP' && (
@@ -709,7 +709,7 @@ export const ShopAdmin = () => {
           <div className="backdrop-blur-xl bg-white/[0.03] border border-white/10 rounded-3xl shadow-2xl flex flex-col flex-1 overflow-hidden">
             
             {/* 서브 헤더 및 모드 전환 */}
-            <div className="border-b border-white/10 px-8 py-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/[0.02]">
+            <div className="border-b border-white/10 px-4 sm:px-8 py-4 sm:py-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/[0.02]">
               <div className="flex items-center gap-3">
                 <div className={`p-3 rounded-2xl flex items-center justify-center text-white shadow-lg ${
                   role === 'STORE' ? 'bg-gradient-to-br from-indigo-500 to-blue-600' : 'bg-gradient-to-br from-amber-500 to-rose-600'
@@ -717,8 +717,8 @@ export const ShopAdmin = () => {
                   <i className={`text-xl ${role === 'STORE' ? 'fa-solid fa-store' : 'fa-solid fa-building-columns'}`}></i>
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-extrabold text-white text-lg tracking-tight">스마트 구인·채용 관리 시스템</h3>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="font-extrabold text-white text-base md:text-lg tracking-tight break-keep">스마트 구인·채용 관리 시스템</h3>
                     <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full border ${
                       role === 'STORE' ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30' : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
                     }`}>
@@ -746,11 +746,11 @@ export const ShopAdmin = () => {
             </div>
 
             {/* 네비게이션 탭 */}
-            <div className="flex border-b border-white/10 px-8 gap-4 bg-white/[0.01]">
+            <div data-qa-admin-recruit-tabs className="flex min-w-0 overflow-x-auto overscroll-x-contain scrollbar-hide border-b border-white/10 px-3 sm:px-8 gap-3 sm:gap-4 bg-white/[0.01]">
               <button 
                 type="button"
                 onClick={() => setRecruitTab('dashboard')} 
-                className={`py-4 text-sm font-bold border-b-2 transition-all px-2 flex items-center gap-2 cursor-pointer ${
+                className={`shrink-0 whitespace-nowrap py-4 text-sm font-bold border-b-2 transition-all px-2 inline-flex items-center gap-2 cursor-pointer ${
                   recruitTab === 'dashboard' ? 'border-white text-white' : 'border-transparent text-gray-400 hover:text-white'
                 }`}
               >
@@ -760,7 +760,7 @@ export const ShopAdmin = () => {
                 <button 
                   type="button"
                   onClick={() => setRecruitTab('request')} 
-                  className={`py-4 text-sm font-bold border-b-2 transition-all px-2 flex items-center gap-2 cursor-pointer ${
+                  className={`shrink-0 whitespace-nowrap py-4 text-sm font-bold border-b-2 transition-all px-2 inline-flex items-center gap-2 cursor-pointer ${
                     recruitTab === 'request' ? 'border-white text-white' : 'border-transparent text-gray-400 hover:text-white'
                   }`}
                 >
@@ -770,7 +770,7 @@ export const ShopAdmin = () => {
               <button 
                 type="button"
                 onClick={() => setRecruitTab('workers')} 
-                className={`py-4 text-sm font-bold border-b-2 transition-all px-2 flex items-center gap-2 cursor-pointer ${
+                className={`shrink-0 whitespace-nowrap py-4 text-sm font-bold border-b-2 transition-all px-2 inline-flex items-center gap-2 cursor-pointer ${
                   recruitTab === 'workers' ? 'border-white text-white' : 'border-transparent text-gray-400 hover:text-white'
                 }`}
               >
@@ -779,7 +779,7 @@ export const ShopAdmin = () => {
               <button 
                 type="button"
                 onClick={() => setRecruitTab('chat')} 
-                className={`py-4 text-sm font-bold border-b-2 transition-all px-2 flex items-center gap-2 cursor-pointer ${
+                className={`shrink-0 whitespace-nowrap py-4 text-sm font-bold border-b-2 transition-all px-2 inline-flex items-center gap-2 cursor-pointer ${
                   recruitTab === 'chat' ? 'border-white text-white' : 'border-transparent text-gray-400 hover:text-white'
                 }`}
               >
@@ -788,7 +788,7 @@ export const ShopAdmin = () => {
             </div>
 
             {/* 본문 컨텐츠 (모든 탭에서 동일하게 1800px 와이드 그리드로 꽉 차게 정렬) */}
-            <div className="p-8 lg:p-12 flex-1 overflow-y-auto space-y-8">
+            <div className="p-4 sm:p-8 lg:p-12 flex-1 overflow-y-auto space-y-8 min-w-0">
               
               {/* 1. 대시보드 탭 */}
               {recruitTab === 'dashboard' && (
