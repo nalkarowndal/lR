@@ -83,6 +83,25 @@ async function render(browser,view,width,height){
     if(state.visibleIcons<min)throw new Error(`${view} rendered only ${state.visibleIcons} icons; minimum ${min}`);
     if(state.documentWidth>width+3)warnings.push(`${view} at ${width}px overflows viewport (${state.documentWidth}px); review responsive layout`);
   }
+  if(view==='admin'){
+    const tabs=await page.evaluate(()=>{
+      const selectors=['[data-qa-admin-main-tabs]','[data-qa-admin-recruit-tabs]'];
+      return selectors.map(selector=>{
+        const nav=document.querySelector(selector);
+        return {
+          selector,exists:Boolean(nav),
+          scrollable:Boolean(nav)&&getComputedStyle(nav).overflowX==='auto',
+          width:nav?.clientWidth??0,scrollWidth:nav?.scrollWidth??0,
+          tabCount:nav?.querySelectorAll('button').length??0,
+          wrapped:nav?[...nav.querySelectorAll('button')].filter(btn=>getComputedStyle(btn).whiteSpace!=='nowrap').length:-1
+        };
+      });
+    });
+    results.at(-1).responsiveTabs=tabs;
+    if(tabs.some(t=>!t.exists||!t.scrollable||t.wrapped||!t.tabCount)) {
+      throw new Error('Admin responsive tabs not readable/scrollable: '+JSON.stringify(tabs));
+    }
+  }
   await page.screenshot({path:resolve(out,`${view}-${width}.png`),fullPage:view==='gallery'});
   await page.close();
 }
@@ -106,7 +125,8 @@ try{
   const json={status:'pass',date:'2026-11-13',results,palette,warnings,scope:{
     productionScreens:'Separate D2-2 Chrome production preview QA',
     protectedScreens:'Development-only mocked component rendering. NOT real user authentication or E2E access-control test',
-    noProductionChanges:true,
+    noAuthChanges:true,
+    adminResponsiveFix:true,
     excluded:'Actual Android/iOS devices, backend E2E, screen-reader manual verification'
   }};
   await writeFile(resolve(out,'d2-3-results.json'),JSON.stringify(json,null,2));
