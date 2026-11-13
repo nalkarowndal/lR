@@ -1,4 +1,4 @@
-import { D22BadgeCheck as EngravedShieldAdmin, D22Sell as EngravedAdminHandshake, D22PlusCircle as EngravedAdminPlus, D22Refresh as EngravedAdminRefresh, D22ShoppingBag as EngravedBagIcon, D22Profile as EngravedProfileCrest }, D22Icon, D22CheckCircle2, D22Search, D22X, D22Edit3, D22MessageCircle, D22Clock, D22UploadCloud from './icons/BoutiqueD22Icons';
+import { D22BadgeCheck as EngravedShieldAdmin, D22Sell as EngravedAdminHandshake, D22PlusCircle as EngravedAdminPlus, D22Refresh as EngravedAdminRefresh, D22ShoppingBag as EngravedBagIcon, D22Profile as EngravedProfileCrest, D22Icon, D22CheckCircle2, D22Search, D22X, D22Edit3, D22MessageCircle, D22Clock, D22UploadCloud } from './icons/BoutiqueD22Icons';
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
