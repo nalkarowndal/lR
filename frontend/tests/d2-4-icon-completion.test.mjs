@@ -24,7 +24,7 @@ test('Main header uses engraved D22 vectors and maintains 40px accessible action
 
 test('Admin has no Font Awesome classes and uses correct SVG glyphs, including conditional store role', () => {
   const admin = read('src/components/ShopAdmin.tsx');
-  assert.doesNotMatch(admin, /fa-(solid|regular|brands)|<i\\b/);
+  assert.doesNotMatch(admin, /fa-(solid|regular|brands)|<i\b/);
   assert.match(admin, /glyph=\{role === 'STORE' \? 'shop' : 'building'\}/);
   for (const icon of ['media-image', 'media-image-list', 'view-grid', 'group', 'send', 'database', 'archive']) {
     assert.ok(admin.includes('glyph="' + icon + '"'), icon);
