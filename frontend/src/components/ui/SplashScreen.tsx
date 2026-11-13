@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { EngravedCrownEmblem } from '../icons';
+import { D1SplashCrownIcon } from '../icons/BoutiqueD1Icons';
 
 export interface SplashScreenProps {
   isReady?: boolean;
@@ -126,17 +126,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
 
       {/* Center Brand Identity: Emblem + Royal Crown + Typography */}
       <div className="flex flex-col items-center justify-center -mt-6 z-10 px-6">
-        {/* Outer Circular Ring with subtle gold glow */}
-        <div 
-          className="relative w-24 h-24 rounded-full border border-[#C5A880]/30 bg-gradient-to-b from-[#1E2024] to-[#121316] flex items-center justify-center shadow-[0_0_40px_rgba(197,168,128,0.18)] transition-all duration-700 ease-out scale-100 opacity-100"
-        >
-          {/* Inner hairline ring */}
-          <div className="absolute inset-1.5 rounded-full border border-[#C5A880]/20" />
-          
-          {/* Engraved Royal Gold Crown Emblem */}
-          <EngravedCrownEmblem 
-            className="w-12 h-12 transform hover:scale-105 transition-transform" 
-          />
+        {/* D1 Iconoir crown: independent atelier-engraved mark, no medal ring */}
+        <div className="w-24 h-24 flex items-center justify-center" aria-hidden="true">
+          <D1SplashCrownIcon className="w-20 h-20" />
         </div>
 
         {/* Wordmark: LUXURY RENTAL */}

@@ -7,11 +7,12 @@ import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { Modal } from './ui/Modal';
 import {
-  LuxuryDressIcon, LuxuryBagIcon, LuxuryHandshakeIcon, LuxuryGiftIcon,
+  LuxuryGiftIcon,
   MenuHangerIcon, MenuTagIcon, MenuClockIcon, MenuMembershipIcon,
   MenuCareIcon, MenuVipIcon, MenuBuybackIcon, MenuInviteIcon,
   LuxuryLuggageIcon, LuxuryJewelryIcon
 } from './ui/LuxuryIcons';
+import { D1RentIcon, D1BuyIcon, D1SellIcon } from './icons/BoutiqueD1Icons';
 import { ProductImage } from './ui/ProductImage';
 import { LegalTermsModal } from './ui/LegalTermsModal';
 import { RENT_NEW_ARRIVALS } from '../data/catalog';
@@ -671,7 +672,7 @@ export const ShopMain = () => {
                 <p className="text-[11px] text-gray-500 mt-0.5 leading-tight">특별한 날,<br />마음껏 렌트하기</p>
               </div>
               <div className="flex justify-end mt-3">
-                <LuxuryDressIcon className="w-11 h-11 transition-transform group-hover:scale-105" />
+                <D1RentIcon className="w-11 h-11 transition-transform group-hover:scale-105" />
               </div>
             </div>
 
@@ -690,7 +691,7 @@ export const ShopMain = () => {
                 <p className="text-[11px] text-gray-500 mt-0.5 leading-tight">내 마음에 쏙,<br />지금 바로 구매하기</p>
               </div>
               <div className="flex justify-end mt-3">
-                <LuxuryBagIcon className="w-11 h-11 transition-transform group-hover:scale-105" />
+                <D1BuyIcon className="w-11 h-11 transition-transform group-hover:scale-105" />
               </div>
             </div>
           </div>
@@ -710,7 +711,7 @@ export const ShopMain = () => {
               <p className="text-[11px] text-gray-500">내 명품, 쉽고 빠르게 판매하기</p>
             </div>
             <div className="pr-1">
-              <LuxuryHandshakeIcon className="w-12 h-12 transition-transform group-hover:scale-105" />
+              <D1SellIcon className="w-12 h-12 transition-transform group-hover:scale-105" />
             </div>
           </div>
         </div>
