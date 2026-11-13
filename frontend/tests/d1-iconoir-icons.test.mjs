@@ -45,3 +45,35 @@ test('License notice is bundled with copied Iconoir geometry', () => {
   assert.match(license, /Copyright \(c\) 2021 Luca Burgio/);
   assert.match(license, /MIT License/);
 });
+
+test('Refined Atelier crown has real clipped inner-cut shading and restrained metallic face', () => {
+  const code = read('src/components/icons/BoutiqueD1Icons.tsx');
+  const native = read('index.html');
+  for (const src of [code, native]) {
+    assert.match(src, /feGaussianBlur/);
+    assert.match(src, /feOffset/);
+    assert.match(src, /feComposite/);
+    assert.match(src, /operator=["']out["']/);
+    assert.match(src, /operator=["']in["']/);
+    assert.match(src, /#FFF1D2/);
+    assert.match(src, /#F4DCB1/);
+  }
+  assert.match(code, /data-d1-finish=\{variant\}/);
+  assert.match(code, /data-d1-glyph=\{glyph\}/);
+  assert.doesNotMatch(native, /native-splash-emblem::before/);
+});
+
+test('Boutique style retains bold graphite legibility without external white halo', () => {
+  const code = read('src/components/icons/BoutiqueD1Icons.tsx');
+  assert.match(code, /stroke="#302D29" strokeWidth="1\.73"/);
+  assert.match(code, /stroke="#AA9372"/);
+  assert.doesNotMatch(code, /stroke="#FBF8F3" strokeWidth="2\.3"/);
+});
+
+test('Native and React Atelier crown share the same five metallic gradient stop colors', () => {
+  const code = read('src/components/icons/BoutiqueD1Icons.tsx');
+  const native = read('index.html');
+  for (const hex of ['#FFF1D2', '#D6BD8E', '#AA8250', '#F4DCB1', '#B68E58', '#E6C99B']) {
+    assert.ok(code.includes(hex) && native.includes(hex), `Same crown metallic tint in both splash layers: ${hex}`);
+  }
+});
