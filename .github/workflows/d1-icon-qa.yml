@@ -38,3 +38,12 @@ jobs:
         run: npm run build
       - name: D1 Component Lint
         run: npx oxlint src/components/icons/BoutiqueD1Icons.tsx src/components/ui/SplashScreen.tsx
+      - name: D1 Real Browser QA (360 390 430 px)
+        run: node scripts/qa-d1-browser.mjs
+      - name: Upload D1 screenshot proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: d1-browser-qa-screens
+          path: frontend/qa/d1-screens/
+          if-no-files-found: warn
