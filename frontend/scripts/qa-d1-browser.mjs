@@ -10,7 +10,7 @@ import { resolve } from 'node:path';
 
 const port = 5187;
 const base = `http://127.0.0.1:${port}`;
-const outDir = resolve('qa/d1-screens');
+const outDir = resolve('qa/d2-screens');
 await mkdir(outDir, { recursive: true });
 
 function chromeBinary() {
@@ -39,9 +39,9 @@ const vite = spawn('npm', ['run', 'preview', '--', '--host', '127.0.0.1', '--por
 let browser;
 const metrics = [];
 try {
-  console.log('D1 QA: waiting for preview server');
+  console.log('D2 QA: waiting for preview server');
   await awaitPreview();
-  console.log('D1 QA: launching Chrome');
+  console.log('D2 QA: launching Chrome');
   browser = await puppeteer.launch({
     headless: true,
     executablePath: chromeBinary(),
@@ -84,12 +84,13 @@ try {
   await reactSplashPage.close();
 
   let serviceMarkup = null;
+  let d2Markup = null;
   for (const width of [360, 390, 430]) {
     const page = await browser.newPage();
     await page.setViewport({ width, height: 844, deviceScaleFactor: 1 });
     const pageErrors = [];
     page.on('pageerror', e => pageErrors.push(String(e.message || e)));
-    console.log('D1 QA: viewport', width);
+    console.log('D2 QA: viewport', width);
     await page.goto(base, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await new Promise(r => setTimeout(r, 5200));
     const result = await page.evaluate(() => {
@@ -108,6 +109,13 @@ try {
         visibleDocumentWidth: document.documentElement.scrollWidth,
         viewportWidth: innerWidth,
         hasReactSplash: Boolean(document.querySelector('[aria-label="LuxuryRental 로딩 중"]')),
+        d2GiftVisible: Boolean([...document.querySelectorAll('h4')].find(el => el.textContent.trim() === '회원가입 이벤트')?.closest('[role="button"]')?.querySelector('svg[data-d2-glyph="gift"]')),
+        d2GiftRoundBackground: Boolean([...document.querySelectorAll('h4')].find(el => el.textContent.trim() === '회원가입 이벤트')?.closest('[role="button"]')?.querySelector('.rounded-full')),
+        d2Icons: [...document.querySelectorAll('svg[data-d2-glyph]')].map(svg => ({
+          glyph: svg.getAttribute('data-d2-glyph'),
+          width: svg.getBoundingClientRect().width,
+          height: svg.getBoundingClientRect().height,
+        })),
       };
     });
     if (width === 390) {
@@ -118,6 +126,14 @@ try {
         }
         return samples;
       });
+      d2Markup = await page.evaluate(() => {
+        const result = {};
+        for (const glyph of ['gift', 'shirt', 'percentage', 'box', 'credit-card', 'shield-check', 'crown', 'refresh-double', 'mail']) {
+          result[glyph] = document.querySelector(`svg[data-d2-glyph="${glyph}"]`)?.outerHTML ?? null;
+        }
+        return result;
+      });
+      if (Object.values(d2Markup).some(v => !v)) throw new Error('Missing D2 SVG in real browser DOM');
       if (Object.values(serviceMarkup).some(markup => !markup)) {
         throw new Error('Could not extract all three real Boutique SVGs from mobile DOM');
       }
@@ -126,6 +142,15 @@ try {
     await page.close();
     metrics.push({ ...result, pageErrors });
     if (result.navButtons !== 5) throw new Error(`Bottom nav items invalid at ${width}: ${result.navButtons}`);
+    const requiredD2Glyphs = ['gift', 'shirt', 'percentage', 'box', 'credit-card', 'shield-check', 'crown', 'refresh-double', 'mail'];
+    for (const glyph of requiredD2Glyphs) {
+      const hits = result.d2Icons.filter(v => v.glyph === glyph);
+      if (hits.length !== 1 || hits[0].width < 24) {
+        throw new Error(`Missing or tiny D2 icon at ${width}px: ${glyph}: ${JSON.stringify(hits)}`);
+      }
+    }
+    if (!result.d2GiftVisible || result.d2GiftRoundBackground) throw new Error('D2 event gift incorrect or still within medallion');
+
     if (result.visibleDocumentWidth > result.viewportWidth + 2) throw new Error(`Horizontal overflow at ${width}: ${result.visibleDocumentWidth}`);
     if (Object.values(result.cardIcons).some(v => !v || v.width < 35 || v.height < 35)) {
       throw new Error(`D1 service icon not visible at ${width}: ${JSON.stringify(result.cardIcons)}`);
@@ -144,6 +169,15 @@ try {
     { label: 'RENT / 렌트하기', subtitle: 'BOUTIQUE LINE', markup: serviceMarkup.shirt },
     { label: 'BUY / 구매하기', subtitle: 'BOUTIQUE LINE', markup: serviceMarkup.handbag },
     { label: 'SELL / 판매하기', subtitle: 'BOUTIQUE LINE', markup: serviceMarkup['shopping-bag-arrow-up'] },
+    { label: 'EVENT / 회원가입', subtitle: 'ATELIER ENGRAVED', markup: d2Markup.gift, dark: true },
+    { label: 'RENT INTRO / 렌트 소개', subtitle: 'BOUTIQUE LINE', markup: d2Markup.shirt },
+    { label: 'DISCOUNT / 70% 할인', subtitle: 'BOUTIQUE LINE', markup: d2Markup.percentage },
+    { label: 'NEW / 오늘신규입고', subtitle: 'BOUTIQUE LINE', markup: d2Markup.box },
+    { label: 'BASIC / 베이직멤버십', subtitle: 'BOUTIQUE LINE', markup: d2Markup['credit-card'] },
+    { label: 'CARE / 렌트잇 케어', subtitle: 'BOUTIQUE LINE', markup: d2Markup['shield-check'] },
+    { label: 'VIP', subtitle: 'ATELIER ENGRAVED', markup: d2Markup.crown },
+    { label: 'BUYBACK / 바이백', subtitle: 'BOUTIQUE LINE', markup: d2Markup['refresh-double'] },
+    { label: 'INVITE / 친구 초대', subtitle: 'BOUTIQUE LINE', markup: d2Markup.mail },
   ];
   const sizes = [24, 32, 48, 72];
   const opticalGrid = referenceIcons.map((entry, row) => `
@@ -177,7 +211,7 @@ try {
       .sample svg{width:var(--sz)!important;height:var(--sz)!important;display:block}
       footer{border-top:1px solid #E6DED4;padding-top:19px;margin-top:22px;color:#786E62;font-size:11px}
     </style></head><body><main class="frame">
-    <div class="eyebrow">LUXURY RENTAL / D1 REFINEMENT</div>
+    <div class="eyebrow">LUXURY RENTAL / D1 + D2 ICON SYSTEM</div>
     <h1>Optical-size comparison</h1><p>Real Iconoir SVG components from Chrome DOM · original paths preserved · no circular medallion</p>
     ${opticalGrid}
     <footer>Large-scale master: 72px / Compact quality: 24px · Screenshot produced by automated Chrome QA</footer>
@@ -185,10 +219,10 @@ try {
   const opticalPage = await browser.newPage();
   await opticalPage.setViewport({ width: 1024, height: 850, deviceScaleFactor: 2 });
   await opticalPage.setContent(boardHTML, { waitUntil: 'domcontentloaded' });
-  await opticalPage.screenshot({ path: resolve(outDir, 'd1-refinement-optical-board.png'), fullPage: true });
+  await opticalPage.screenshot({ path: resolve(outDir, 'd2-complete-optical-board.png'), fullPage: true });
   await opticalPage.close();
-  await writeFile(resolve(outDir, 'd1-browser-qa.json'), JSON.stringify({ status: 'pass', metrics }, null, 2));
-  console.log('D1_BROWSER_QA_PASS', JSON.stringify(metrics));
+  await writeFile(resolve(outDir, 'd2-browser-qa.json'), JSON.stringify({ status: 'pass', metrics }, null, 2));
+  console.log('D2_BROWSER_QA_PASS', JSON.stringify(metrics));
 } catch (error) {
   await writeFile(resolve(outDir, 'd1-browser-qa.json'), JSON.stringify({ status: 'fail', reason: String(error), metrics }, null, 2));
   throw error;
