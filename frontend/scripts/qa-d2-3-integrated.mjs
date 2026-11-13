@@ -76,7 +76,7 @@ async function render(browser,view,width,height){
   if(pageErrors.length)throw new Error(`Uncaught React errors in ${view}: ${JSON.stringify(pageErrors)}`);
   if(view==='gallery'){
     if(state.visibleIcons<150)throw new Error('Optical gallery has too few real rendered icon samples: '+state.visibleIcons);
-    const sizes=await page.$$eval('[data-qa-row="crown"] svg',elements=>elements.map(e=>Math.round(e.getBoundingClientRect().width)));
+    const sizes=await page.$$eval('[data-qa-phase="d1"][data-qa-row="crown"] svg',elements=>elements.map(e=>Math.round(e.getBoundingClientRect().width)));
     if(JSON.stringify(sizes)!==JSON.stringify([16,20,24,32,48,72]))throw new Error('Missing optical sizes: '+sizes.join(','));
   }else{
     const min=view==='admin'?4:6;
