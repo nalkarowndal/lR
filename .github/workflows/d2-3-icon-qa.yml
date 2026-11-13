@@ -10,6 +10,14 @@ on:
       - 'frontend/qa/d2-3-harness.tsx'
       - 'frontend/scripts/qa-d2-3-integrated.mjs'
       - 'frontend/tests/d2-3-integrated-icons.test.mjs'
+      - 'frontend/tests/d2-4-icon-completion.test.mjs'
+      - 'frontend/src/components/ShopMain.tsx'
+      - 'frontend/src/components/ShopAdmin.tsx'
+      - 'frontend/src/components/icons/BoutiqueD22Icons.tsx'
+      - 'frontend/src/components/icons/D22IconShapesD.ts'
+      - 'frontend/src/components/icons/D22IconShapesE.ts'
+      - 'frontend/index.html'
+      - 'frontend/scripts/qa-d2-2-browser.mjs'
 
 permissions:
   contents: read
@@ -32,12 +40,12 @@ jobs:
         run: npm ci
       - name: D1 and D2-1 regressions
         run: npm run test:d2
-      - name: D2-2 and D2-3 regressions
-        run: node --test tests/d2-2-sitewide-icons.test.mjs tests/d2-3-integrated-icons.test.mjs
+      - name: D2-2, D2-3 and D2-4 regressions
+        run: node --test tests/d2-2-sitewide-icons.test.mjs tests/d2-3-integrated-icons.test.mjs tests/d2-4-icon-completion.test.mjs
       - name: TypeScript and Vite production build
         run: npm run build
-      - name: Lint QA harness and icon library
-        run: npx oxlint src/components/icons/BoutiqueD22Icons.tsx qa/d2-3-harness.tsx
+      - name: Lint new icon geometry, main/admin screens and QA harness
+        run: npx oxlint src/components/icons/BoutiqueD22Icons.tsx src/components/icons/D22IconShapesD.ts src/components/icons/D22IconShapesE.ts src/components/ShopMain.tsx src/components/ShopAdmin.tsx qa/d2-3-harness.tsx
       - name: Install Korean fonts
         run: |
           sudo apt-get update -qq
