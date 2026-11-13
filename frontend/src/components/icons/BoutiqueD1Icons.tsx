@@ -44,14 +44,29 @@ function IconoirPath({ glyph }: { glyph: D1Glyph }) {
   }
 }
 
-/** Two optical treatments of the exact same known icon vectors. */
-function D1Icon({ glyph, variant = 'boutique', size, className, style, ...rest }: D1IconProps & { glyph: D1Glyph }) {
-  const gradientId = `lr-d1-${useId().replace(/:/g, '')}`;
+/**
+ * D1 refinement — original Iconoir path geometry with two deliberate finishes.
+ * Atelier is an engraved metallic face, Boutique is a clean editorial outline.
+ * Small presentation sizes retain clean geometry; no medallion is drawn.
+ */
+function D1Icon({
+  glyph,
+  variant = 'boutique',
+  size,
+  className,
+  style,
+  ...rest
+}: D1IconProps & { glyph: D1Glyph }) {
+  const uid = useId().replace(/:/g, '');
+  const metalId = `lr-d1-metal-${uid}`;
+  const faceId = `lr-d1-face-${uid}`;
+  const engraveId = `lr-d1-engrave-${uid}`;
   const atelier = variant === 'atelier';
-  const line = atelier ? `url(#${gradientId})` : '#36322C';
   const initialWidth = size ?? (atelier ? 72 : 48);
+
   return (
     <svg
+      {...rest}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       width={initialWidth}
@@ -63,36 +78,67 @@ function D1Icon({ glyph, variant = 'boutique', size, className, style, ...rest }
       style={{ flexShrink: 0, ...style }}
       aria-hidden="true"
       focusable="false"
-      {...rest}
+      data-d1-finish={variant}
+      data-d1-glyph={glyph}
     >
       {atelier && (
         <defs>
-          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#F2E2BF" />
-            <stop offset="40%" stopColor="#D7BA83" />
-            <stop offset="72%" stopColor="#B08D57" />
-            <stop offset="100%" stopColor="#E6CEA0" />
+          <linearGradient id={metalId} x1="10%" y1="0%" x2="92%" y2="100%">
+            <stop offset="0%" stopColor="#FFF1D2" />
+            <stop offset="18%" stopColor="#D6BD8E" />
+            <stop offset="43%" stopColor="#AA8250" />
+            <stop offset="61%" stopColor="#F4DCB1" />
+            <stop offset="83%" stopColor="#B68E58" />
+            <stop offset="100%" stopColor="#E6C99B" />
           </linearGradient>
+          <linearGradient id={faceId} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#967447" stopOpacity=".42" />
+            <stop offset="48%" stopColor="#2C261D" stopOpacity=".92" />
+            <stop offset="100%" stopColor="#C5A16B" stopOpacity=".46" />
+          </linearGradient>
+          <filter
+            id={engraveId}
+            x="-15%" y="-20%" width="130%" height="140%"
+            colorInterpolationFilters="sRGB"
+          >
+            <feGaussianBlur in="SourceAlpha" stdDeviation=".27" result="soft" />
+            <feOffset in="soft" dx=".14" dy=".34" result="shifted" />
+            <feComposite in="SourceAlpha" in2="shifted" operator="out" result="upperInnerEdge" />
+            <feFlood floodColor="#33200E" floodOpacity=".66" result="darkCut" />
+            <feComposite in="darkCut" in2="upperInnerEdge" operator="in" result="cutShading" />
+            <feMerge>
+              <feMergeNode in="SourceGraphic" />
+              <feMergeNode in="cutShading" />
+            </feMerge>
+          </filter>
         </defs>
       )}
       {atelier ? (
         <>
-          <g stroke="#30271B" strokeWidth="2.3" opacity=".9" transform="translate(0.12 0.26)">
+          {/* Recessed crown face, not a raised circular badge. */}
+          <g stroke="#2A2015" strokeWidth="2.35" fill={`url(#${faceId})`}>
             <IconoirPath glyph={glyph} />
           </g>
-          <g stroke={line} strokeWidth="1.65">
+          <g stroke={`url(#${metalId})`} strokeWidth="1.45" filter={`url(#${engraveId})`}>
             <IconoirPath glyph={glyph} />
           </g>
-          <g stroke="#FFF4D6" strokeWidth=".32" opacity=".38" transform="translate(-0.16 -0.18)">
+          <g stroke="#FFF0CF" strokeWidth=".32" opacity=".62" transform="translate(-.12 -.17)">
+            <IconoirPath glyph={glyph} />
+          </g>
+          <g stroke="#4A3218" strokeWidth=".3" opacity=".64" transform="translate(.12 .16)">
             <IconoirPath glyph={glyph} />
           </g>
         </>
       ) : (
         <>
-          <g stroke="#FBF8F3" strokeWidth="2.3" opacity=".7" transform="translate(-0.16 -0.16)">
+          {/* Fine lower-cut edge plus solid readable foreground stroke. */}
+          <g stroke="#AA9372" strokeWidth="2.05" opacity=".26" transform="translate(0 .20)">
             <IconoirPath glyph={glyph} />
           </g>
-          <g stroke={line} strokeWidth="1.62">
+          <g stroke="#302D29" strokeWidth="1.73">
+            <IconoirPath glyph={glyph} />
+          </g>
+          <g stroke="#FFFDF8" strokeWidth=".20" opacity=".36" transform="translate(-.10 -.09)">
             <IconoirPath glyph={glyph} />
           </g>
         </>
