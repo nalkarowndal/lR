@@ -61,6 +61,24 @@ try {
   await nativePage.screenshot({ path: resolve(outDir, 'native-splash-390.png') });
   await nativePage.close();
 
+  // Capture the actual React splash too, ensuring both splash layers show
+  // the same crown design rather than only checking source text.
+  const reactSplashPage = await browser.newPage();
+  await reactSplashPage.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
+  await reactSplashPage.goto(base, { waitUntil: 'domcontentloaded' });
+  await reactSplashPage.waitForSelector('[aria-label="LuxuryRental 로딩 중"]', { timeout: 6000 });
+  await reactSplashPage.waitForFunction(() => !document.getElementById('native-splash'), { timeout: 6000 });
+  const reactCrown = await reactSplashPage.evaluate(() => {
+    const splash = document.querySelector('[aria-label="LuxuryRental 로딩 중"]');
+    const svg = splash?.querySelector('svg');
+    return svg ? { width: svg.getBoundingClientRect().width, height: svg.getBoundingClientRect().height } : null;
+  });
+  if (!reactCrown || reactCrown.width < 60 || reactCrown.height < 60) {
+    throw new Error('React splash crown not rendered');
+  }
+  await reactSplashPage.screenshot({ path: resolve(outDir, 'react-splash-390.png') });
+  await reactSplashPage.close();
+
   for (const width of [360, 390, 430]) {
     const page = await browser.newPage();
     await page.setViewport({ width, height: 844, deviceScaleFactor: 1 });
