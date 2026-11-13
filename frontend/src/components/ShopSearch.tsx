@@ -1,5 +1,6 @@
+import { D22ChevronLeft as ChevronLeft, D22Search as SearchIcon, D22X as X, D22ArrowUp as ArrowUp, D22ArrowDown as ArrowDown, D22Heart as Heart, D22ShieldCheck as ShieldCheck } from './icons/BoutiqueD22Icons';
 import React, { useEffect, useRef, useState } from 'react';
-import { ChevronLeft, Search as SearchIcon, X, ArrowUp, ArrowDown, Heart, ShieldCheck } from 'lucide-react';
+
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { Modal } from './ui/Modal';

@@ -1,6 +1,7 @@
+import { D22ChevronLeft as ChevronLeft, D22Search as Search, D22ChevronRight as ChevronRight, D22Check as Check, D22PlusCircle as PlusCircle, D22X as X, D22AlertCircle as AlertCircle, D22BadgeCheck as EngravedMedalEmblem } from './icons/BoutiqueD22Icons';
 import React, { useState } from 'react';
-import { ChevronLeft, Search, ChevronRight, Check, PlusCircle, X, AlertCircle } from 'lucide-react';
-import { EngravedMedalEmblem } from './ui/LuxuryIcons';
+
+
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 

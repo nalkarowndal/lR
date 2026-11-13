@@ -41,3 +41,43 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+## D2-2 page icons (original Iconoir MIT glyph geometries)
+
+Source paths: `frontend/src/components/icons/D22IconShapesA.ts`, `D22IconShapesB.ts`, `D22IconShapesC.ts`.
+Each glyph below uses the original `icons/regular/<name>.svg` from the Iconoir repository:
+- `icons/regular/nav-arrow-left.svg`
+- `icons/regular/nav-arrow-right.svg`
+- `icons/regular/arrow-left.svg`
+- `icons/regular/arrow-up.svg`
+- `icons/regular/arrow-down.svg`
+- `icons/regular/search.svg`
+- `icons/regular/settings.svg`
+- `icons/regular/heart.svg`
+- `icons/regular/chat-bubble.svg`
+- `icons/regular/cart.svg`
+- `icons/regular/shopping-bag.svg`
+- `icons/regular/trash.svg`
+- `icons/regular/check-circle.svg`
+- `icons/regular/check.svg`
+- `icons/regular/warning-circle.svg`
+- `icons/regular/clock.svg`
+- `icons/regular/edit-pencil.svg`
+- `icons/regular/cloud-upload.svg`
+- `icons/regular/bell.svg`
+- `icons/regular/lock.svg`
+- `icons/regular/log-out.svg`
+- `icons/regular/info-circle.svg`
+- `icons/regular/page.svg`
+- `icons/regular/plus-circle.svg`
+- `icons/regular/user-circle.svg`
+- `icons/regular/spark.svg`
+- `icons/regular/package.svg`
+- `icons/regular/xmark.svg`
+- `icons/regular/shopping-bag-arrow-up.svg`
+- `icons/regular/badge-check.svg`
+- `icons/regular/medal.svg`
+- `icons/regular/user.svg`
+
+The existing `BoutiqueD2Icons.tsx` paths for crown, shield-check, refresh-double and other shared shapes are also reused by `BoutiqueD22Icons.tsx` without redrawing their geometry.

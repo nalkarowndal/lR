@@ -1,18 +1,13 @@
+import { D22ArrowLeft as ArrowLeft, D22ChevronRight as ChevronRight, D22User as User, D22ShieldCheck as ShieldCheck, D22Bell as Bell, D22Sparkles as Sparkles, D22FileText as FileText, D22Lock as Lock, D22LogOut as LogOut, D22CheckCircle2 as CheckCircle2, D22AlertCircle as AlertCircle, D22Info as Info, D22ShieldAlert as ShieldAlert, D22Crown as LuxuryCrownIcon, D22Lock as EngravedLockIcon, D22Bell as EngravedBellIcon, D22Profile as EngravedProfileCrest, D22Sparkles as EngravedSparkleTier } from './icons/BoutiqueD22Icons';
 import React, { useState } from 'react';
-import { 
-  ArrowLeft, ChevronRight, User, ShieldCheck, Bell, Sparkles, 
-  HelpCircle, FileText, Lock, LogOut, CheckCircle2, AlertCircle, Info, ShieldAlert
-} from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { Modal } from './ui/Modal';
 import { ConfirmDialog } from './ui/ConfirmDialog';
 import { api } from '../services/api';
 import { LegalTermsModal } from './ui/LegalTermsModal';
-import { 
-  LuxuryCrownIcon, EngravedLockIcon, EngravedBellIcon, 
-  EngravedProfileCrest, EngravedSparkleTier 
-} from './ui/LuxuryIcons';
+
 
 export const ShopSettings: React.FC = () => {
   const { 

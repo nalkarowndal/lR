@@ -1,17 +1,12 @@
+import { D22ArrowLeft as ArrowLeft, D22Settings as Settings, D22Heart as Heart, D22ShoppingBag as ShoppingBag, D22Clock as Clock, D22PackageCheck as PackageCheck, D22Edit3 as Edit3, D22ShieldCheck as ShieldCheck, D22AlertCircle as AlertCircle, D22Sparkles as Sparkles, D22UploadCloud as UploadCloud, D22Refresh as RotateCcw, D22Crown as LuxuryCrownIcon, D22BadgeCheck as EngravedShieldAdmin, D22Profile as EngravedProfileCrest, D22Sparkles as EngravedSparkleTier } from './icons/BoutiqueD22Icons';
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  ArrowLeft, Settings, Heart, ShoppingBag, Clock, PackageCheck, 
-  Edit3, ShieldCheck, UserCheck, AlertCircle, Sparkles, UploadCloud, RotateCcw
-} from 'lucide-react';
+import { UserCheck } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { Modal } from './ui/Modal';
 import { ProductImage } from './ui/ProductImage';
 import { api } from '../services/api';
-import { 
-  LuxuryCrownIcon, EngravedShieldAdmin, 
-  EngravedProfileCrest, EngravedSparkleTier 
-} from './ui/LuxuryIcons';
+
 import { GoogleOfficialSymbol } from './ui/AuthSymbols';
 
 export const ShopMyPage: React.FC = () => {
