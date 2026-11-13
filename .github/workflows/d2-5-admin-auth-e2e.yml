@@ -1,0 +1,60 @@
+name: D2-5 Real Test-Account Admin Authorization E2E
+
+on:
+  push:
+    branches: [qa/d2-3-integrated-icon-visual]
+    paths:
+      - '.github/workflows/d2-5-admin-auth-e2e.yml'
+      - 'backend/**'
+      - 'frontend/src/**'
+      - 'frontend/scripts/qa-auth-admin-real-e2e.mjs'
+  pull_request:
+    paths:
+      - '.github/workflows/d2-5-admin-auth-e2e.yml'
+      - 'backend/**'
+      - 'frontend/src/**'
+      - 'frontend/scripts/qa-auth-admin-real-e2e.mjs'
+
+permissions:
+  contents: read
+
+jobs:
+  isolated-role-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+      - name: Install backend
+        run: npm ci
+        working-directory: backend
+      - name: Compile real Express backend
+        run: npm run build
+        working-directory: backend
+      - name: Real HTTP ADMIN/USER/guest authorization and session lifecycle
+        run: node --test tests/admin-role-e2e.test.js
+        working-directory: backend
+      - name: Install frontend and Puppeteer
+        run: npm ci
+        working-directory: frontend
+      - name: Production frontend build targeting disposable localhost backend
+        run: npm run build
+        working-directory: frontend
+        env:
+          VITE_API_BASE_URL: http://127.0.0.1:5279/api/v1
+      - name: Real Chrome UI login and administrator route E2E
+        run: node scripts/qa-auth-admin-real-e2e.mjs
+        working-directory: frontend
+      - name: Upload sanitized UI evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: d2-5-isolated-admin-role-e2e
+          path: frontend/qa/admin-role-e2e-evidence/
+          if-no-files-found: warn
