@@ -132,13 +132,13 @@ function D1Icon({
       ) : (
         <>
           {/* Fine lower-cut edge plus solid readable foreground stroke. */}
-          <g stroke="#AA9372" strokeWidth="2.05" opacity=".26" transform="translate(0 .20)">
+          <g stroke="#AA9372" strokeWidth="1.70" opacity=".19" transform="translate(0 .14)">
             <IconoirPath glyph={glyph} />
           </g>
-          <g stroke="#302D29" strokeWidth="1.73">
+          <g stroke="#302D29" strokeWidth="1.52">
             <IconoirPath glyph={glyph} />
           </g>
-          <g stroke="#FFFDF8" strokeWidth=".20" opacity=".36" transform="translate(-.10 -.09)">
+          <g stroke="#FFFDF8" strokeWidth=".16" opacity=".28" transform="translate(-.08 -.07)">
             <IconoirPath glyph={glyph} />
           </g>
         </>
