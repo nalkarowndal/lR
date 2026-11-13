@@ -67,8 +67,23 @@ async function realLogin(page,who){
   await page.waitForSelector('input[placeholder="아이디(이메일)"]',{visible:true});
   await page.type('input[placeholder="아이디(이메일)"]',users[who].email);
   await page.type('input[placeholder="비밀번호"]',users[who].password);
+  const loginResponse=page.waitForResponse(
+    response=>response.url().includes('/auth/login') && response.request().method()==='POST',
+    {timeout:15000}
+  );
   await page.$eval('input[placeholder="아이디(이메일)"]',i=>i.closest('form')?.requestSubmit());
-  await textVisible(page,who==='ADMIN'?'최고관리자':'일반 회원');
+  const actualLogin=await loginResponse;
+  if(actualLogin.status()!==200)throw new Error('Real account login HTTP '+actualLogin.status()+' ('+who+')');
+  try{
+    await textVisible(page,who==='ADMIN'?'최고관리자':'일반 회원');
+  }catch(e){
+    const diagnosis=await page.evaluate(()=>({
+      screen:document.body.innerText.slice(0,950),
+      savedSession:Boolean(sessionStorage.getItem('lr_token')||localStorage.getItem('lr_token')),
+      overlayVisible:Boolean(document.querySelector('[role="dialog"]'))
+    }));
+    throw new Error('Login response 200 but UI role missing: '+JSON.stringify(diagnosis));
+  }
   await sleep(950); // overlay closes after successful login animation
 }
 let browser;
