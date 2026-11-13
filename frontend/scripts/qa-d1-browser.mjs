@@ -139,6 +139,18 @@ try {
       }
     }
     await page.screenshot({ path: resolve(outDir, `main-${width}.png`), fullPage: true });
+    if (width === 390) {
+      const foundMenu = await page.evaluate(() => {
+        const heading = [...document.querySelectorAll('h3')]
+          .find(el => el.textContent?.trim() === '리본즈만의 서비스');
+        if (!heading) return false;
+        heading.scrollIntoView({ block: 'start', behavior: 'instant' });
+        return true;
+      });
+      if (!foundMenu) throw new Error('Cannot find the service menu heading for visual QA');
+      await new Promise(r => setTimeout(r, 150));
+      await page.screenshot({ path: resolve(outDir, 'main-menu-390.png') });
+    }
     await page.close();
     metrics.push({ ...result, pageErrors });
     if (result.navButtons !== 5) throw new Error(`Bottom nav items invalid at ${width}: ${result.navButtons}`);
