@@ -36,3 +36,14 @@ test('Main page bottom navigation is untouched by D2-3',()=>{
   assert.match(part,/<Heart size=\{22\}/);
   assert.match(part,/<User size=\{22\}/);
 });
+
+test('Admin 390px responsive tabs are horizontally scrollable and labels do not wrap',()=>{
+  const admin=read('src/components/ShopAdmin.tsx');
+  const visual=read('scripts/qa-d2-3-integrated.mjs');
+  assert.match(admin,/data-qa-admin-main-tabs/);
+  assert.match(admin,/data-qa-admin-recruit-tabs/);
+  assert.match(admin,/overflow-x-auto/);
+  assert.match(admin,/whitespace-nowrap/);
+  assert.match(visual,/responsiveTabs/);
+  assert.match(visual,/Admin responsive tabs not readable/);
+});
