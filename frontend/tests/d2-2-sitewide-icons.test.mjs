@@ -62,5 +62,9 @@ test('Bottom navigation remains the original five buttons', () => {
   for (const icon of ['<List size={22}', '<ShoppingBagIcon size={22}', '<Home size={22}', '<Heart size={22}', '<User size={22}']) {
     assert.ok(nav.includes(icon), icon);
   }
-  assert.doesNotMatch(main, /BoutiqueD22Icons/);
+  // D2-4 extends the bundled icon family to the main header only.
+  assert.match(main, /BoutiqueD22Icons/);
+  const bottomNavOnly = nav.slice(0, nav.indexOf('</nav>'));
+  assert.equal((bottomNavOnly.match(/<button\b/g) || []).length, 5);
+  assert.doesNotMatch(bottomNavOnly, /<D22/);
 });

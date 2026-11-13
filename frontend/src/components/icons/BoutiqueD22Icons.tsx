@@ -3,6 +3,8 @@ import { D2_ICONOIR_PATHS } from './BoutiqueD2Icons';
 import { D22_SHAPES_A } from './D22IconShapesA';
 import { D22_SHAPES_B } from './D22IconShapesB';
 import { D22_SHAPES_C } from './D22IconShapesC';
+import { D22_SHAPES_D } from './D22IconShapesD';
+import { D22_SHAPES_E } from './D22IconShapesE';
 
 /**
  * D2-2: The same 24x24 Iconoir geometry and finishes on all non-bottom-nav pages.
@@ -13,9 +15,11 @@ const originalShapes: Record<string, readonly {tag: string; props: Record<string
   ...D22_SHAPES_A,
   ...D22_SHAPES_B,
   ...D22_SHAPES_C,
+  ...D22_SHAPES_D,
+  ...D22_SHAPES_E,
 };
 const originalPaths: Record<string, readonly string[]> = D2_ICONOIR_PATHS;
-export type D22Glyph = keyof typeof D22_SHAPES_A | keyof typeof D22_SHAPES_B | keyof typeof D22_SHAPES_C | keyof typeof D2_ICONOIR_PATHS;
+export type D22Glyph = keyof typeof D22_SHAPES_A | keyof typeof D22_SHAPES_B | keyof typeof D22_SHAPES_C | keyof typeof D22_SHAPES_D | keyof typeof D22_SHAPES_E | keyof typeof D2_ICONOIR_PATHS;
 export type D22Finish = 'boutique' | 'atelier';
 
 export interface D22IconProps extends Omit<React.SVGProps<SVGSVGElement>, 'size'> {

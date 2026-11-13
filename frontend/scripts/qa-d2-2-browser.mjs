@@ -66,6 +66,30 @@ try{
     const navCount=await page.$$eval('nav[aria-label="하단 네비게이션"] button',els=>els.length);
     if(navCount!==5)throw new Error('Bottom navigation changed: '+navCount);
 
+    // D2-4: production header icons use bundled D22 glyphs at accessible touch sizes.
+    const headerIcons=await page.evaluate(()=>{
+      const cases=[
+        ['상품 검색 열기','search'],
+        ['장바구니','cart'],
+        ['설정 센터로 이동','settings']
+      ];
+      return cases.map(([label,glyph])=>{
+        const button=[...document.querySelectorAll('header button')].find(el=>
+          el.getAttribute('aria-label')?.startsWith(label));
+        const rect=button?.getBoundingClientRect();
+        return {
+          label,glyph,
+          visible: Boolean(rect && rect.width>=40 && rect.height>=40),
+          actualGlyph:button?.querySelector('svg[data-d22-glyph]')?.getAttribute('data-d22-glyph'),
+          width:rect?.width??0,height:rect?.height??0,
+        };
+      });
+    });
+    if(headerIcons.some(x=>!x.visible || x.actualGlyph!==x.glyph))
+      throw new Error('D2-4 main header icons/touch targets failed: '+JSON.stringify(headerIcons));
+    report.push({width,name:'main-header',headerIcons,bottomNavButtons:navCount});
+    await page.screenshot({path:resolve(outDir,`main-header-${width}.png`)});
+
     // Category (real photos remain, new navigational symbols visible).
     await page.$eval('nav[aria-label="하단 네비게이션"] button',el=>el.click());
     await find(page,'svg[data-d22-glyph="chat-bubble"]');
