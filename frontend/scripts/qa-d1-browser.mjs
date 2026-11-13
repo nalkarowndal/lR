@@ -53,7 +53,7 @@ try {
   const nativeOK = await nativePage.evaluate(() => {
     const frame = document.getElementById('native-splash');
     const svg = frame?.querySelector('svg');
-    return Boolean(frame && svg && svg.querySelector('path') && !frame.querySelector('.native-splash-emblem::after'));
+    return Boolean(frame && svg && svg.querySelector('path'));
   });
   if (!nativeOK) throw new Error('Initial native splash crown missing');
   await nativePage.screenshot({ path: resolve(outDir, 'native-splash-390.png') });
