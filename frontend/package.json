@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint src",
     "test:d1": "node --test tests/d1-iconoir-icons.test.mjs",
+    "test:d2": "node --test tests/d1-iconoir-icons.test.mjs tests/d2-boutique-icons.test.mjs",
     "test:capture": "node scripts/capture-all.js",
     "preview": "vite preview"
   },
