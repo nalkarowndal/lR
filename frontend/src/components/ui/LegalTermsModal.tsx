@@ -1,5 +1,5 @@
+import { ThemeIcon } from '../icons/ThemeIcon';
 import React from 'react';
-import { X, CheckCircle2, Shield, Calendar, FileText } from 'lucide-react';
 import { LEGAL_DOCUMENTS, type LegalDocument } from '../../data/legalTerms';
 
 interface LegalTermsModalProps {
@@ -50,18 +50,18 @@ export const LegalTermsModal = ({
             className="p-1 text-gray-400 hover:text-gray-800 transition rounded-lg hover:bg-gray-100"
             aria-label="닫기"
           >
-            <X size={20} />
+            <ThemeIcon.close size={20} />
           </button>
         </div>
 
         {/* Metadata Bar */}
         <div className="bg-gray-50/80 px-5 py-2.5 border-b border-gray-100 flex items-center justify-between text-[11px] text-gray-500 shrink-0 font-medium">
           <div className="flex items-center gap-1.5">
-            <FileText size={13} className="text-gray-400" />
+            <ThemeIcon.document size={13} className="text-gray-400" />
             <span>버전: <strong className="text-gray-700">{doc.version}</strong></span>
           </div>
           <div className="flex items-center gap-1.5">
-            <Calendar size={13} className="text-gray-400" />
+            <ThemeIcon.calendar size={13} className="text-gray-400" />
             <span>시행일자: <strong className="text-gray-700">{doc.effectiveDate}</strong></span>
           </div>
         </div>
@@ -70,7 +70,7 @@ export const LegalTermsModal = ({
         <div className="p-5 overflow-y-auto space-y-4 text-xs text-gray-600 leading-relaxed scrollbar-thin">
           {/* Summary Box */}
           <div className="p-3 bg-blue-50/70 border border-blue-100 rounded-xl text-blue-900 font-medium flex items-start gap-2.5">
-            <Shield size={16} className="text-blue-600 shrink-0 mt-0.5" />
+            <ThemeIcon.shield size={16} className="text-blue-600 shrink-0 mt-0.5" />
             <p className="text-[11px] leading-relaxed">{doc.summary}</p>
           </div>
 
@@ -101,7 +101,7 @@ export const LegalTermsModal = ({
               }}
               className="flex-1 py-3 bg-black hover:bg-gray-900 active:scale-[0.99] text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm"
             >
-              <CheckCircle2 size={15} />
+              <ThemeIcon.success size={15} />
               <span>동의하고 확인 완료</span>
             </button>
           )}

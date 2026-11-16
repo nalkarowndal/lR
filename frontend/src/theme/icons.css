@@ -1,0 +1,24 @@
+:root {
+  --theme-icon-accent: #a78a5f;
+  --theme-icon-selected: #9d3b50;
+  --theme-icon-focus: #80633d;
+}
+
+[data-icon-tone="dark"] {
+  --theme-icon-accent: #dfca9b;
+  --theme-icon-selected: #f3a4b4;
+  --theme-icon-focus: #dfca9b;
+}
+
+.theme-line-icon {
+  flex-shrink: 0;
+}
+
+.theme-line-icon[data-selected] {
+  color: var(--theme-icon-selected);
+}
+
+button:has(.theme-line-icon):focus-visible {
+  outline: 2px solid var(--theme-icon-focus);
+  outline-offset: 2px;
+}

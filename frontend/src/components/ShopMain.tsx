@@ -1,17 +1,9 @@
+import { ThemeIcon } from './icons/ThemeIcon';
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  Search, ShoppingCart, Settings, Heart, User, Home, List, ChevronRight, ChevronLeft,
-  ShieldCheck, Smartphone, Trash2, CheckCircle2, X, PackageCheck, ArrowRight
-} from 'lucide-react';
+import { Heart, User, Home, List } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { Modal } from './ui/Modal';
-import {
-  LuxuryDressIcon, LuxuryBagIcon, LuxuryHandshakeIcon, LuxuryGiftIcon,
-  MenuHangerIcon, MenuTagIcon, MenuClockIcon, MenuMembershipIcon,
-  MenuCareIcon, MenuVipIcon, MenuBuybackIcon, MenuInviteIcon,
-  LuxuryLuggageIcon, LuxuryJewelryIcon
-} from './ui/LuxuryIcons';
 import { ProductImage } from './ui/ProductImage';
 import { LegalTermsModal } from './ui/LegalTermsModal';
 import { RENT_NEW_ARRIVALS } from '../data/catalog';
@@ -457,10 +449,7 @@ export const ShopMain = () => {
   const handleMenuClick = (title: string) => {
     switch (title) {
       case '렌트 소개':
-        setServiceInfoModal({
-          title: 'LUXURYRENTAL 렌트 서비스 소개',
-          desc: '원하는 명품을 1일 단위부터 자유롭게 렌탈할 수 있는 프리미엄 커머스 서비스입니다. 반납 시 무료 수거와 100% 전문 감정 정품 보증을 기본 제공합니다.'
-        });
+        navigateTo('SHOP_RENT_GUIDE');
         break;
       case '70% 할인':
         setServiceInfoModal({
@@ -475,10 +464,7 @@ export const ShopMain = () => {
         });
         break;
       case '베이직멤버십':
-        setServiceInfoModal({
-          title: '베이직 멤버십 혜택',
-          desc: '매월 1회 무료 배송 쿠폰과 렌탈료 5% 추가 할인 적립 혜택을 드립니다. 마이페이지에서 간편하게 등록하실 수 있습니다.'
-        });
+        navigateTo('SHOP_SUBSCRIPTION_GUIDE');
         break;
       case '렌트잇 케어':
         setServiceInfoModal({
@@ -552,14 +538,14 @@ export const ShopMain = () => {
             onClick={() => setAppDownloadModalOpen(true)}
             className="flex items-center gap-1.5 cursor-pointer hover:text-black transition"
           >
-            <Smartphone size={13} className="text-gray-600" /> Google Play
+            <ThemeIcon.phone size={13} className="text-gray-600" /> Google Play
           </button>
           <button 
             type="button" 
             onClick={() => setAppDownloadModalOpen(true)}
             className="flex items-center gap-1.5 cursor-pointer hover:text-black transition"
           >
-            <Smartphone size={13} className="text-gray-600" /> App Store
+            <ThemeIcon.phone size={13} className="text-gray-600" /> App Store
           </button>
         </div>
       </aside>
@@ -582,7 +568,7 @@ export const ShopMain = () => {
             onClick={() => setActiveOverlay('SEARCH')}
             className="p-1.5 rounded-full hover:bg-gray-100 active:scale-95 transition"
           >
-            <Search size={22} />
+            <ThemeIcon.search size={22} />
           </button>
 
           <button
@@ -598,7 +584,7 @@ export const ShopMain = () => {
             }}
             className="p-1.5 rounded-full hover:bg-gray-100 active:scale-95 transition relative"
           >
-            <ShoppingCart size={22} />
+            <ThemeIcon.cart size={22} />
             {cartItems.length > 0 && (
               <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold animate-scaleUp">
                 {cartItems.length}
@@ -612,7 +598,7 @@ export const ShopMain = () => {
             onClick={() => navigateTo('SHOP_SETTINGS')}
             className="text-gray-700 bg-gray-100 p-1.5 rounded-full hover:bg-gray-200 active:scale-95 transition shadow-sm"
           >
-            <Settings size={21} />
+            <ThemeIcon.settings size={21} />
           </button>
         </div>
       </header>
@@ -671,7 +657,7 @@ export const ShopMain = () => {
                 <p className="text-[11px] text-gray-500 mt-0.5 leading-tight">특별한 날,<br />마음껏 렌트하기</p>
               </div>
               <div className="flex justify-end mt-3">
-                <LuxuryDressIcon className="w-11 h-11 transition-transform group-hover:scale-105" />
+                <ThemeIcon.rent className="w-11 h-11 transition-transform group-hover:scale-105" />
               </div>
             </div>
 
@@ -690,7 +676,7 @@ export const ShopMain = () => {
                 <p className="text-[11px] text-gray-500 mt-0.5 leading-tight">내 마음에 쏙,<br />지금 바로 구매하기</p>
               </div>
               <div className="flex justify-end mt-3">
-                <LuxuryBagIcon className="w-11 h-11 transition-transform group-hover:scale-105" />
+                <ThemeIcon.buy className="w-11 h-11 transition-transform group-hover:scale-105" />
               </div>
             </div>
           </div>
@@ -710,7 +696,7 @@ export const ShopMain = () => {
               <p className="text-[11px] text-gray-500">내 명품, 쉽고 빠르게 판매하기</p>
             </div>
             <div className="pr-1">
-              <LuxuryHandshakeIcon className="w-12 h-12 transition-transform group-hover:scale-105" />
+              <ThemeIcon.sell className="w-12 h-12 transition-transform group-hover:scale-105" />
             </div>
           </div>
         </div>
@@ -729,7 +715,7 @@ export const ShopMain = () => {
             <p className="text-xs text-gray-300 mt-0.5">간단하게 가입하고 가볍게 쇼핑!</p>
           </div>
           <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center shadow-inner relative z-10">
-            <LuxuryGiftIcon className="w-7 h-7 text-amber-300" />
+            <ThemeIcon.gift className="w-7 h-7 text-amber-300" />
           </div>
           <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl pointer-events-none" />
         </div>
@@ -756,14 +742,14 @@ export const ShopMain = () => {
         {/* 8-Grid 프리미엄 각인 아이콘 메뉴 */}
         <div className="grid grid-cols-4 gap-y-6 gap-x-2 text-center bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
           {[
-            { icon: <MenuHangerIcon />, title: '렌트 소개' },
-            { icon: <MenuTagIcon />, title: '70% 할인' },
-            { icon: <MenuClockIcon />, title: '오늘신규입고' },
-            { icon: <MenuMembershipIcon />, title: '베이직멤버십' },
-            { icon: <MenuCareIcon />, title: '렌트잇 케어' },
-            { icon: <MenuVipIcon />, title: 'VIP' },
-            { icon: <MenuBuybackIcon />, title: '바이백' },
-            { icon: <MenuInviteIcon />, title: '친구 초대' }
+            { icon: <ThemeIcon.rentGuide />, title: '렌트 소개' },
+            { icon: <ThemeIcon.discount />, title: '70% 할인' },
+            { icon: <ThemeIcon.newArrivals />, title: '오늘신규입고' },
+            { icon: <ThemeIcon.membership />, title: '베이직멤버십' },
+            { icon: <ThemeIcon.care />, title: '렌트잇 케어' },
+            { icon: <ThemeIcon.vipCrest size={20} aria-hidden="true" />, title: 'VIP' },
+            { icon: <ThemeIcon.buyback />, title: '바이백' },
+            { icon: <ThemeIcon.invitation />, title: '친구 초대' }
           ].map((menu, idx) => (
             <div
               key={idx}
@@ -786,19 +772,31 @@ export const ShopMain = () => {
       <section className="p-5 bg-white mb-2 shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
         <h3 className="font-extrabold text-lg mb-3 text-gray-900 tracking-tight">가이드 한눈에</h3>
         <div className="flex gap-3">
-          <div className="flex-1 bg-white border border-gray-100 hover:border-gray-200 rounded-xl p-4 flex justify-between items-center shadow-xs cursor-pointer hover:shadow-sm transition-all group">
+          <div 
+            role="button"
+            tabIndex={0}
+            onClick={() => navigateTo('SHOP_RENT_GUIDE')}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigateTo('SHOP_RENT_GUIDE')}
+            className="flex-1 bg-white border border-gray-100 hover:border-gray-200 rounded-xl p-4 flex justify-between items-center shadow-xs cursor-pointer hover:shadow-sm transition-all group active:scale-[0.98]"
+          >
             <div>
-              <h4 className="font-bold text-sm text-gray-900 group-hover:text-indigo-600 transition-colors">렌트 이용 가이드</h4>
+              <h4 className="font-bold text-sm text-gray-900 group-hover:text-[#8C734B] transition-colors">렌트 이용 가이드</h4>
               <p className="text-[10px] text-gray-500 mt-1">예약부터 반납까지<br />30초 만에 알아보기</p>
             </div>
-            <ChevronRight size={16} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+            <ThemeIcon.forward size={16} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
           </div>
-          <div className="flex-1 bg-white border border-gray-100 hover:border-gray-200 rounded-xl p-4 flex justify-between items-center shadow-xs cursor-pointer hover:shadow-sm transition-all group">
+          <div 
+            role="button"
+            tabIndex={0}
+            onClick={() => navigateTo('SHOP_SUBSCRIPTION_GUIDE')}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigateTo('SHOP_SUBSCRIPTION_GUIDE')}
+            className="flex-1 bg-white border border-gray-100 hover:border-gray-200 rounded-xl p-4 flex justify-between items-center shadow-xs cursor-pointer hover:shadow-sm transition-all group active:scale-[0.98]"
+          >
             <div>
-              <h4 className="font-bold text-sm text-gray-900 group-hover:text-indigo-600 transition-colors">구독 가이드</h4>
+              <h4 className="font-bold text-sm text-gray-900 group-hover:text-[#8C734B] transition-colors">구독 가이드</h4>
               <p className="text-[10px] text-gray-500 mt-1">명품 무제한 교환<br />30초 만에 알아보기</p>
             </div>
-            <ChevronRight size={16} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+            <ThemeIcon.forward size={16} className="text-gray-400 group-hover:translate-x-0.5 transition-transform" />
           </div>
         </div>
       </section>
@@ -819,7 +817,7 @@ export const ShopMain = () => {
                 onClick={() => slideToNextTab('prev')}
                 className="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-black flex items-center justify-center transition active:scale-95 shadow-2xs"
               >
-                <ChevronLeft size={14} />
+                <ThemeIcon.back size={14} />
               </button>
               <button
                 type="button"
@@ -827,7 +825,7 @@ export const ShopMain = () => {
                 onClick={() => slideToNextTab('next')}
                 className="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-black flex items-center justify-center transition active:scale-95 shadow-2xs"
               >
-                <ChevronRight size={14} />
+                <ThemeIcon.forward size={14} />
               </button>
             </div>
           </div>
@@ -898,6 +896,7 @@ export const ShopMain = () => {
                   <button
                     type="button"
                     aria-label={`${item.title} 좋아요`}
+                    aria-pressed={isFav}
                     onClick={async (e) => {
                       e.stopPropagation();
                       if (!user) {
@@ -912,12 +911,11 @@ export const ShopMain = () => {
                         }
                       }
                     }}
-                    className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-md text-gray-400 hover:text-red-500 hover:bg-white transition shadow-xs z-10"
+                    className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-md text-gray-600 hover:text-red-600 hover:bg-white transition shadow-xs z-10"
                   >
-                    <Heart 
+                    <ThemeIcon.favorite
                       size={16} 
-                      fill={isFav ? '#EF4444' : 'none'}
-                      className={isFav ? 'text-red-500' : 'text-gray-400'}
+                      filled={isFav}
                     />
                   </button>
                   {item.tag === '예약 마감' && (
@@ -995,7 +993,7 @@ export const ShopMain = () => {
           onClick={() => navigateTo('SHOP_CATEGORY')}
           className="w-full border border-gray-300 hover:border-gray-400 hover:bg-gray-50 active:scale-[0.99] py-3.5 rounded-xl text-sm font-bold text-gray-800 flex justify-center items-center gap-1 mb-10 transition-all shadow-2xs"
         >
-          전체보기 <ChevronRight size={16} />
+          전체보기 <ThemeIcon.forward size={16} />
         </button>
 
         <footer className="text-xs text-gray-500 border-t border-gray-100 pt-6">
@@ -1046,7 +1044,7 @@ export const ShopMain = () => {
 
           <div className="flex justify-between items-center mb-6">
             <button type="button" className="flex items-center gap-1 font-bold border border-gray-200 px-2.5 py-1.5 rounded-lg text-gray-700 hover:bg-gray-50 transition">
-              (주)럭셔리 렌탈 <ChevronRight size={14} className="rotate-90" />
+              (주)럭셔리 렌탈 <ThemeIcon.forward size={14} className="rotate-90" />
             </button>
             <div className="flex gap-2">
               <div className="w-8 h-8 border border-gray-200 rounded-lg flex justify-center items-center text-gray-600 hover:text-black hover:border-gray-400 cursor-pointer transition">
@@ -1065,7 +1063,7 @@ export const ShopMain = () => {
             <p className="font-bold text-gray-700">토스페이먼츠 매매보호(에스크로)서비스</p>
             <p>럭셔리렌탈은 고객님이 현금 결제한 금액에 대해 토스페이먼츠와 매매보호 계약을 체결하여 안전거래를 보장하고 있습니다.</p>
             <p className="flex items-center gap-1 text-gray-600 mt-1 cursor-pointer hover:underline">
-              서비스 가입 확인 <ChevronRight size={10} />
+              서비스 가입 확인 <ThemeIcon.forward size={10} />
             </p>
           </div>
 
@@ -1147,8 +1145,8 @@ export const ShopMain = () => {
             <>
               {cartItems.length === 0 ? (
                 <div className="py-8 text-center text-gray-500 space-y-3">
-                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto text-gray-400">
-                    <ShoppingCart size={22} />
+                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto text-gray-700">
+                    <ThemeIcon.cart size={24} accent />
                   </div>
                   <p className="text-xs font-semibold">장바구니가 비어 있습니다.</p>
                   <p className="text-[11px] text-gray-400">원하시는 명품을 선택하여 장바구니에 담아보세요.</p>
@@ -1185,7 +1183,7 @@ export const ShopMain = () => {
                           onClick={() => handleRemoveFromCart(cItem.id)}
                           className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg transition"
                         >
-                          <Trash2 size={16} />
+                          <ThemeIcon.remove size={16} />
                         </button>
                       </div>
                     ))}
@@ -1322,8 +1320,8 @@ export const ShopMain = () => {
 
           {cartStep === 'ORDER_COMPLETE' && completedOrder && (
             <div className="space-y-4 text-center py-2 animate-fadeIn">
-              <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto border border-emerald-100 shadow-xs">
-                <PackageCheck size={28} />
+              <div className="flex items-center justify-center mx-auto">
+                <ThemeIcon.orderComplete size={64} />
               </div>
 
               <div>
@@ -1407,6 +1405,7 @@ export const ShopMain = () => {
                   <button
                     type="button"
                     aria-label="관심 상품 저장"
+                    aria-pressed={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10))}
                     onClick={async () => {
                       if (!user) {
                         showToast('좋아요를 저장하려면 먼저 로그인해주세요.', 'info');
@@ -1417,12 +1416,11 @@ export const ShopMain = () => {
                         showToast(isNowFav ? '관심 상품에 추가되었습니다.' : '관심 상품에서 해제되었습니다.', 'info');
                       }
                     }}
-                    className="p-2 rounded-full bg-white/90 backdrop-blur-md shadow-xs hover:bg-white text-gray-400 hover:text-red-500 transition"
+                    className="p-2 rounded-full bg-white/90 backdrop-blur-md shadow-xs hover:bg-white text-gray-600 hover:text-red-600 transition"
                   >
-                    <Heart
+                    <ThemeIcon.favorite
                       size={18}
-                      fill={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10)) ? '#EF4444' : 'none'}
-                      className={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10)) ? 'text-red-500' : 'text-gray-400'}
+                      filled={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10))}
                     />
                   </button>
                 </div>
@@ -1445,8 +1443,8 @@ export const ShopMain = () => {
               </div>
 
               {/* 정품 인증 배지 */}
-              <div className="flex items-center gap-2.5 p-3 bg-amber-50/80 border border-amber-200/60 rounded-xl text-amber-900 text-xs font-bold">
-                <ShieldCheck size={20} className="text-amber-600 shrink-0" />
+              <div className="flex items-center gap-3 p-3 bg-amber-50/80 border border-amber-200/60 rounded-xl text-amber-900 text-xs font-bold">
+                <ThemeIcon.authenticSeal size={36} className="shrink-0" />
                 <div>
                   <p className="leading-tight">한국명품감정원 100% 정품 인증 완료</p>
                   <p className="text-[10px] text-amber-700/80 font-normal mt-0.5">정품 보증서 동봉 및 위조품 시 200% 책임 보상</p>
@@ -1528,7 +1526,7 @@ export const ShopMain = () => {
 
           <div className="space-y-2 text-left bg-gray-50 p-3.5 rounded-xl border border-gray-100 text-xs text-gray-700">
             <div className="flex items-center gap-2 font-bold text-gray-900">
-              <CheckCircle2 size={16} className="text-emerald-500" />
+              <ThemeIcon.success size={16} className="text-emerald-500" />
               <span>모바일 웹 & 앱 100% 기능 동일 지원</span>
             </div>
             <p className="text-[11px] text-gray-500 pl-6 leading-relaxed">
@@ -1545,7 +1543,7 @@ export const ShopMain = () => {
               }}
               className="flex-1 py-2.5 bg-gray-900 text-white rounded-xl font-bold text-xs hover:bg-black transition flex items-center justify-center gap-1.5"
             >
-              <Smartphone size={14} /> Google Play
+              <ThemeIcon.phone size={14} /> Google Play
             </button>
             <button
               type="button"
@@ -1555,7 +1553,7 @@ export const ShopMain = () => {
               }}
               className="flex-1 py-2.5 bg-gray-900 text-white rounded-xl font-bold text-xs hover:bg-black transition flex items-center justify-center gap-1.5"
             >
-              <Smartphone size={14} /> App Store
+              <ThemeIcon.phone size={14} /> App Store
             </button>
           </div>
         </div>

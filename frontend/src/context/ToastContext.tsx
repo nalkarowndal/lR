@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
-import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
+import { ThemeIcon } from '../components/icons/ThemeIcon';
 
 export type ToastType = 'success' | 'error' | 'info';
 
@@ -41,6 +41,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
       {/* Toast Overlay Container: Centered at top of screen / mobile container */}
       <div 
         aria-live="polite"
+        data-icon-tone="dark"
         className="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] flex flex-col items-center gap-2 pointer-events-none w-full max-w-sm px-4"
       >
         {toasts.map((toast) => (
@@ -56,9 +57,9 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
             }`}
           >
             <div className="flex items-center gap-2.5 flex-1 min-w-0">
-              {toast.type === 'success' && <CheckCircle2 size={18} className="text-emerald-400 shrink-0" />}
-              {toast.type === 'error' && <AlertCircle size={18} className="text-rose-400 shrink-0" />}
-              {toast.type === 'info' && <Info size={18} className="text-blue-400 shrink-0" />}
+              {toast.type === 'success' && <ThemeIcon.success size={18} className="text-emerald-400" />}
+              {toast.type === 'error' && <ThemeIcon.alert size={18} className="text-rose-400" />}
+              {toast.type === 'info' && <ThemeIcon.info size={18} className="text-blue-400" />}
               <span className="truncate leading-snug">{toast.message}</span>
             </div>
             <button
@@ -67,7 +68,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
               className="text-gray-400 hover:text-white p-1 transition"
               aria-label="알림 닫기"
             >
-              <X size={14} />
+              <ThemeIcon.close size={14} />
             </button>
           </div>
         ))}

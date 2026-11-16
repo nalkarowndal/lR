@@ -1,18 +1,11 @@
+import { ThemeIcon } from './icons/ThemeIcon';
 import React, { useState } from 'react';
-import { 
-  ArrowLeft, ChevronRight, User, ShieldCheck, Bell, Sparkles, 
-  HelpCircle, FileText, Lock, LogOut, CheckCircle2, AlertCircle, Info, ShieldAlert
-} from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { Modal } from './ui/Modal';
 import { ConfirmDialog } from './ui/ConfirmDialog';
 import { api } from '../services/api';
 import { LegalTermsModal } from './ui/LegalTermsModal';
-import { 
-  LuxuryCrownIcon, EngravedLockIcon, EngravedBellIcon, 
-  EngravedProfileCrest, EngravedSparkleTier 
-} from './ui/LuxuryIcons';
 
 export const ShopSettings: React.FC = () => {
   const { 
@@ -93,7 +86,7 @@ export const ShopSettings: React.FC = () => {
           aria-label="뒤로 가기"
           className="p-1.5 -ml-1 text-gray-700 hover:text-black rounded-full hover:bg-gray-100 transition active:scale-95"
         >
-          <ArrowLeft size={22} />
+          <ThemeIcon.back size={22} />
         </button>
         <h1 className="text-base font-bold text-gray-900 tracking-tight">설정</h1>
         <div className="w-8" />
@@ -121,7 +114,7 @@ export const ShopSettings: React.FC = () => {
                   }`}>
                     {user.role === 'ADMIN' ? (
                       <>
-                        <LuxuryCrownIcon className="w-3.5 h-3.5 inline-block text-amber-700" />
+                        <ThemeIcon.crown className="w-3.5 h-3.5 inline-block text-amber-700" />
                         <span>관리자</span>
                       </>
                     ) : (
@@ -170,9 +163,7 @@ export const ShopSettings: React.FC = () => {
           <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-4 border border-indigo-500/30 shadow-lg text-white">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-300">
-                  <ShieldCheck size={22} />
-                </div>
+                <ThemeIcon.adminEmblem size={42} className="shrink-0" />
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-sm text-white">통합 관리자 대시보드</span>
@@ -186,7 +177,7 @@ export const ShopSettings: React.FC = () => {
                 onClick={() => navigateTo('SHOP_ADMIN')}
                 className="flex items-center gap-1 px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition shadow-md shadow-indigo-600/30 active:scale-95"
               >
-                진입 <ChevronRight size={14} />
+                진입 <ThemeIcon.forward size={14} />
               </button>
             </div>
           </div>
@@ -207,10 +198,10 @@ export const ShopSettings: React.FC = () => {
                   className="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-gray-50/80 transition"
                 >
                   <div className="flex items-center gap-3 text-gray-700">
-                    <EngravedProfileCrest className="w-5 h-5" />
+                    <ThemeIcon.profileCrest className="w-5 h-5" />
                     <span className="text-sm font-medium text-gray-900">내 정보 관리</span>
                   </div>
-                  <ChevronRight size={16} className="text-gray-400" />
+                  <ThemeIcon.forward size={16} className="text-gray-400" />
                 </button>
 
                 <button
@@ -219,10 +210,10 @@ export const ShopSettings: React.FC = () => {
                   className="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-gray-50/80 transition"
                 >
                   <div className="flex items-center gap-3 text-gray-700">
-                    <EngravedLockIcon className="w-5 h-5" />
+                    <ThemeIcon.lock className="w-5 h-5" />
                     <span className="text-sm font-medium text-gray-900">비밀번호 변경</span>
                   </div>
-                  <ChevronRight size={16} className="text-gray-400" />
+                  <ThemeIcon.forward size={16} className="text-gray-400" />
                 </button>
 
                 <button
@@ -231,10 +222,10 @@ export const ShopSettings: React.FC = () => {
                   className="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-gray-50/80 transition"
                 >
                   <div className="flex items-center gap-3 text-red-600">
-                    <LogOut size={18} />
+                    <ThemeIcon.signOut size={18} />
                     <span className="text-sm font-medium">로그아웃</span>
                   </div>
-                  <ChevronRight size={16} className="text-gray-400" />
+                  <ThemeIcon.forward size={16} className="text-gray-400" />
                 </button>
 
                 <button
@@ -252,10 +243,10 @@ export const ShopSettings: React.FC = () => {
                 className="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-gray-50/80 transition"
               >
                 <div className="flex items-center gap-3 text-gray-700">
-                  <EngravedProfileCrest className="w-5 h-5" />
+                  <ThemeIcon.profileCrest className="w-5 h-5" />
                   <span className="text-sm font-medium text-gray-900">로그인하기</span>
                 </div>
-                <ChevronRight size={16} className="text-gray-400" />
+                <ThemeIcon.forward size={16} className="text-gray-400" />
               </button>
             )}
           </div>
@@ -267,7 +258,7 @@ export const ShopSettings: React.FC = () => {
           <div className="divide-y divide-gray-50">
             <div className="px-4 py-3.5 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <EngravedBellIcon className="w-5 h-5" />
+                <ThemeIcon.notifications className="w-5 h-5" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">서비스 이용 알림</p>
                   <p className="text-xs text-gray-400">주문, 렌탈 반납일, 결제 현황 안내</p>
@@ -290,7 +281,7 @@ export const ShopSettings: React.FC = () => {
 
             <div className="px-4 py-3.5 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <EngravedSparkleTier className="w-5 h-5" />
+                <ThemeIcon.displayPreference className="w-5 h-5" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">마케팅 및 혜택 알림</p>
                   <p className="text-xs text-gray-400">명품 신규 입고 및 할인 쿠폰 소식</p>
@@ -313,7 +304,7 @@ export const ShopSettings: React.FC = () => {
 
             <div className="px-4 py-3.5 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <CheckCircle2 size={18} className="text-gray-500" />
+                <ThemeIcon.success size={18} className="text-gray-500" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">상품 재입고 알림</p>
                   <p className="text-xs text-gray-400">찜한 상품 입고 및 가격 변동 알림</p>
@@ -377,7 +368,7 @@ export const ShopSettings: React.FC = () => {
               className="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-gray-50/80 transition"
             >
               <div className="flex items-center gap-3 text-gray-700">
-                <HelpCircle size={18} className="text-gray-500" />
+                <ThemeIcon.help size={18} className="text-gray-500" />
                 <span className="text-sm font-medium text-gray-900">고객센터 안내</span>
               </div>
               <span className="text-xs text-gray-400">1544-0000</span>
@@ -389,10 +380,10 @@ export const ShopSettings: React.FC = () => {
               className="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-gray-50/80 transition"
             >
               <div className="flex items-center gap-3 text-gray-700">
-                <Info size={18} className="text-gray-500" />
+                <ThemeIcon.info size={18} className="text-gray-500" />
                 <span className="text-sm font-medium text-gray-900">자주 묻는 질문 (FAQ)</span>
               </div>
-              <ChevronRight size={16} className="text-gray-400" />
+              <ThemeIcon.forward size={16} className="text-gray-400" />
             </button>
 
             <button
@@ -401,10 +392,10 @@ export const ShopSettings: React.FC = () => {
               className="w-full px-4 py-3.5 flex items-center justify-between text-left hover:bg-gray-50/80 transition"
             >
               <div className="flex items-center gap-3 text-gray-700">
-                <FileText size={18} className="text-gray-500" />
+                <ThemeIcon.document size={18} className="text-gray-500" />
                 <span className="text-sm font-medium text-gray-900">이용약관 및 개인정보처리방침</span>
               </div>
-              <ChevronRight size={16} className="text-gray-400" />
+              <ThemeIcon.forward size={16} className="text-gray-400" />
             </button>
           </div>
         </section>
@@ -434,7 +425,7 @@ export const ShopSettings: React.FC = () => {
         <form onSubmit={handlePasswordSubmit} className="space-y-4">
           {pwError && (
             <div className="p-3 bg-red-50 text-red-700 text-xs rounded-xl flex items-center gap-2 border border-red-100">
-              <AlertCircle size={15} />
+              <ThemeIcon.alert size={15} />
               <span>{pwError}</span>
             </div>
           )}
@@ -569,7 +560,7 @@ export const ShopSettings: React.FC = () => {
               <h4 className="font-bold text-gray-900 text-xs">서비스 이용약관 (v2.1)</h4>
               <p className="text-[11px] text-gray-500">명품 렌트, 구매 및 판매 기본 규정</p>
             </div>
-            <ChevronRight size={16} className="text-gray-400" />
+            <ThemeIcon.forward size={16} className="text-gray-400" />
           </button>
 
           <button
@@ -584,7 +575,7 @@ export const ShopSettings: React.FC = () => {
               <h4 className="font-bold text-gray-900 text-xs">개인정보 처리방침 (v2.1)</h4>
               <p className="text-[11px] text-gray-500">개인정보 보호 및 안전성 조치</p>
             </div>
-            <ChevronRight size={16} className="text-gray-400" />
+            <ThemeIcon.forward size={16} className="text-gray-400" />
           </button>
 
           <button
@@ -612,7 +603,7 @@ export const ShopSettings: React.FC = () => {
       >
         <div className="space-y-3 text-xs text-gray-600 leading-relaxed">
           <div className="p-3 bg-amber-50 text-amber-800 rounded-xl border border-amber-200 flex items-start gap-2">
-            <ShieldAlert size={16} className="shrink-0 mt-0.5" />
+            <ThemeIcon.securityAlert size={16} className="shrink-0 mt-0.5" />
             <span>현재 이용 중인 렌탈 상품이나 진행 중인 판매 신청이 있는 경우 탈퇴가 제한될 수 있습니다.</span>
           </div>
           <p>탈퇴 시 등록된 찜 목록, 쿠폰 및 적립금은 즉시 소멸되며 복구되지 않습니다. 전자상거래법에 의거하여 주문 및 결제 내역은 5년간 보관됩니다.</p>

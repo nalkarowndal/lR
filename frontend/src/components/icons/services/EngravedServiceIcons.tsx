@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import type { EngravedIconBaseProps } from '../EngravedIcon.types';
 import { EngravedDefs } from '../EngravedIconTokens';
 
@@ -10,24 +10,27 @@ export const EngravedDressIcon: React.FC<EngravedIconBaseProps> = ({
   className = 'w-11 h-11',
   active = false,
   ...props
-}) => (
-  <svg
+}) => {
+  const paintId = useId();
+
+  return <svg
     viewBox="0 0 48 48"
     fill="none"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     className={`luxury-engraved-icon luxury-engraved-satin ${className}`}
     {...props}
   >
-    <EngravedDefs prefix="dress" />
-    
+    <EngravedDefs prefix={paintId} />
+
     {/* Satin Outer Medallion Plate */}
     <circle cx="24" cy="24" r="22" fill="#F8F7F4" stroke="#E6E0D4" strokeWidth="1" />
-    <circle cx="24" cy="24" r="19" fill="url(#dress-radial-halo)" stroke="url(#dress-gold-grad)" strokeWidth="0.8" strokeDasharray="1.5 1.5" strokeOpacity="0.7" />
+    <circle cx="24" cy="24" r="19" fill={`url(#${paintId}-radial-halo)`} stroke={`url(#${paintId}-gold-grad)`} strokeWidth="0.8" strokeDasharray="1.5 1.5" strokeOpacity="0.7" />
 
     {/* Atelier Hanger Hook */}
     <path
       d="M24 7.5C24 6.2 24.9 5.5 25.8 5.5C26.8 5.5 27.5 6.3 27.5 7.2C27.5 8.5 25.8 9.5 24 10.5V12.5"
-      stroke="url(#dress-gold-grad)"
+      stroke={`url(#${paintId}-gold-grad)`}
       strokeWidth="1.8"
       strokeLinecap="round"
     />
@@ -39,11 +42,11 @@ export const EngravedDressIcon: React.FC<EngravedIconBaseProps> = ({
       stroke="#1C1C1C"
       strokeWidth="1.2"
       strokeLinejoin="round"
-      filter="url(#dress-deboss-filter)"
+      filter={`url(#${paintId}-deboss-filter)`}
     />
 
     {/* Inner Chiffon V-Neck Specular Etch */}
-    <path d="M21 13.8L24 18L27 13.8" stroke="url(#dress-gold-grad)" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M21 13.8L24 18L27 13.8" stroke={`url(#${paintId}-gold-grad)`} strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
 
     {/* Flared Gown Silhouette with Micro-Bevel */}
     <path
@@ -53,7 +56,7 @@ export const EngravedDressIcon: React.FC<EngravedIconBaseProps> = ({
       stroke="#1C1C1C"
       strokeWidth="1.2"
       strokeLinejoin="round"
-      filter="url(#dress-deboss-filter)"
+      filter={`url(#${paintId}-deboss-filter)`}
     />
 
     {/* Precision Drapery Incisions */}
@@ -62,9 +65,9 @@ export const EngravedDressIcon: React.FC<EngravedIconBaseProps> = ({
     <path d="M26.5 22L28.5 38.5" stroke="#B49A67" strokeWidth="0.85" strokeOpacity="0.8" />
 
     {/* Satin Gold Waistline Belt Seal */}
-    <rect x="18" y="20.5" width="12" height="2" rx="1" fill="url(#dress-gold-grad)" stroke="#8C734B" strokeWidth="0.4" />
-  </svg>
-);
+    <rect x="18" y="20.5" width="12" height="2" rx="1" fill={`url(#${paintId}-gold-grad)`} stroke="#8C734B" strokeWidth="0.4" />
+  </svg>;
+};
 
 /**
  * 구매하기 (Structured Handbag Satin Metal Deboss)
@@ -74,24 +77,27 @@ export const EngravedBagIcon: React.FC<EngravedIconBaseProps> = ({
   className = 'w-11 h-11',
   active = false,
   ...props
-}) => (
-  <svg
+}) => {
+  const paintId = useId();
+
+  return <svg
     viewBox="0 0 48 48"
     fill="none"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     className={`luxury-engraved-icon luxury-engraved-satin ${className}`}
     {...props}
   >
-    <EngravedDefs prefix="bag" />
+    <EngravedDefs prefix={paintId} />
 
     {/* Satin Outer Medallion Plate */}
     <circle cx="24" cy="24" r="22" fill="#F8F7F4" stroke="#E6E0D4" strokeWidth="1" />
-    <circle cx="24" cy="24" r="19" fill="url(#bag-radial-halo)" stroke="url(#bag-gold-grad)" strokeWidth="0.8" strokeDasharray="1.5 1.5" strokeOpacity="0.7" />
+    <circle cx="24" cy="24" r="19" fill={`url(#${paintId}-radial-halo)`} stroke={`url(#${paintId}-gold-grad)`} strokeWidth="0.8" strokeDasharray="1.5 1.5" strokeOpacity="0.7" />
 
     {/* Rigid Arch Handle */}
     <path
       d="M18.5 16.5V11.5C18.5 8.46 20.96 6 24 6C27.04 6 29.5 8.46 29.5 11.5V16.5"
-      stroke="url(#bag-gold-grad)"
+      stroke={`url(#${paintId}-gold-grad)`}
       strokeWidth="2"
       strokeLinecap="round"
     />
@@ -107,27 +113,27 @@ export const EngravedBagIcon: React.FC<EngravedIconBaseProps> = ({
       stroke="#1C1C1C"
       strokeWidth="1.2"
       strokeLinejoin="round"
-      filter="url(#bag-deboss-filter)"
+      filter={`url(#${paintId}-deboss-filter)`}
     />
 
     {/* Flap & Saddle Stitch Contour */}
     <path
       d="M12 18L13.8 29.2C14 30.2 14.8 31 15.8 31H32.2C33.2 31 34 30.2 34.2 29.2L36 18"
       fill="#2E2C2A"
-      stroke="url(#bag-gold-grad)"
+      stroke={`url(#${paintId}-gold-grad)`}
       strokeWidth="0.9"
       strokeLinejoin="round"
     />
 
     {/* Center Turn-lock Clasp */}
-    <ellipse cx="24" cy="29.2" rx="3.4" ry="2.3" fill="url(#bag-gold-grad)" stroke="#7A6136" strokeWidth="0.6" />
+    <ellipse cx="24" cy="29.2" rx="3.4" ry="2.3" fill={`url(#${paintId}-gold-grad)`} stroke="#7A6136" strokeWidth="0.6" />
     <rect x="23.2" y="28.1" width="1.6" height="2.2" rx="0.4" fill="#252525" />
 
     {/* Base Stud Feet */}
-    <circle cx="14" cy="39.2" r="0.9" fill="url(#bag-gold-grad)" />
-    <circle cx="34" cy="39.2" r="0.9" fill="url(#bag-gold-grad)" />
-  </svg>
-);
+    <circle cx="14" cy="39.2" r="0.9" fill={`url(#${paintId}-gold-grad)`} />
+    <circle cx="34" cy="39.2" r="0.9" fill={`url(#${paintId}-gold-grad)`} />
+  </svg>;
+};
 
 /**
  * 판매하기 (Consignment Concierge Partnership Crest)
@@ -137,27 +143,30 @@ export const EngravedHandshakeIcon: React.FC<EngravedIconBaseProps> = ({
   className = 'w-11 h-11',
   active = false,
   ...props
-}) => (
-  <svg
+}) => {
+  const paintId = useId();
+
+  return <svg
     viewBox="0 0 48 48"
     fill="none"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     className={`luxury-engraved-icon luxury-engraved-satin ${className}`}
     {...props}
   >
-    <EngravedDefs prefix="consignment" />
+    <EngravedDefs prefix={paintId} />
 
     {/* Satin Outer Medallion Plate */}
     <circle cx="24" cy="24" r="22" fill="#F8F7F4" stroke="#E6E0D4" strokeWidth="1" />
-    <circle cx="24" cy="24" r="19" fill="url(#consignment-radial-halo)" stroke="url(#consignment-gold-grad)" strokeWidth="0.8" strokeDasharray="1.5 1.5" strokeOpacity="0.7" />
+    <circle cx="24" cy="24" r="19" fill={`url(#${paintId}-radial-halo)`} stroke={`url(#${paintId}-gold-grad)`} strokeWidth="0.8" strokeDasharray="1.5 1.5" strokeOpacity="0.7" />
 
     {/* Inner Concentric Gunmetal Medal */}
-    <circle cx="24" cy="24" r="15.5" fill="#252525" stroke="url(#consignment-gold-grad)" strokeWidth="1.1" filter="url(#consignment-deboss-filter)" />
+    <circle cx="24" cy="24" r="15.5" fill="#252525" stroke={`url(#${paintId}-gold-grad)`} strokeWidth="1.1" filter={`url(#${paintId}-deboss-filter)`} />
 
     {/* Left Hand Cuff */}
-    <path d="M13.5 26.5L17.5 22.5L20.5 25L17 29.5L13.5 26.5Z" fill="url(#consignment-gold-grad)" stroke="#7A6136" strokeWidth="0.4" />
+    <path d="M13.5 26.5L17.5 22.5L20.5 25L17 29.5L13.5 26.5Z" fill={`url(#${paintId}-gold-grad)`} stroke="#7A6136" strokeWidth="0.4" />
     {/* Right Hand Cuff */}
-    <path d="M34.5 21.5L30.5 25.5L27 23L31 18.5L34.5 21.5Z" fill="url(#consignment-gold-grad)" stroke="#7A6136" strokeWidth="0.4" />
+    <path d="M34.5 21.5L30.5 25.5L27 23L31 18.5L34.5 21.5Z" fill={`url(#${paintId}-gold-grad)`} stroke="#7A6136" strokeWidth="0.4" />
 
     {/* Interlocking Clasped Hands */}
     <path
@@ -168,7 +177,7 @@ export const EngravedHandshakeIcon: React.FC<EngravedIconBaseProps> = ({
     />
     <path
       d="M22.5 24.5L25 27.5C25.8 28.5 27.2 28.8 28.2 28L30 26.5L28 23.5L25 25.5L22.5 24.5Z"
-      fill="url(#consignment-gold-grad)"
+      fill={`url(#${paintId}-gold-grad)`}
       stroke="#1C1C1C"
       strokeWidth="0.5"
     />
@@ -176,20 +185,20 @@ export const EngravedHandshakeIcon: React.FC<EngravedIconBaseProps> = ({
     {/* Laurel Leaf Wreath Engravings */}
     <path
       d="M15.5 16C17.8 14.2 20.8 13.8 24 13.8C27.2 13.8 30.2 14.2 32.5 16"
-      stroke="url(#consignment-gold-grad)"
+      stroke={`url(#${paintId}-gold-grad)`}
       strokeWidth="0.85"
       strokeLinecap="round"
       strokeDasharray="1.2 2"
     />
     <path
       d="M15.5 32C17.8 33.8 20.8 34.2 24 34.2C27.2 34.2 30.2 33.8 32.5 32"
-      stroke="url(#consignment-gold-grad)"
+      stroke={`url(#${paintId}-gold-grad)`}
       strokeWidth="0.85"
       strokeLinecap="round"
       strokeDasharray="1.2 2"
     />
-  </svg>
-);
+  </svg>;
+};
 
 /**
  * 회원가입 이벤트 (Faceted Diamond Gift Medallion)
@@ -199,26 +208,29 @@ export const EngravedGiftIcon: React.FC<EngravedIconBaseProps> = ({
   className = 'w-7 h-7',
   active = false,
   ...props
-}) => (
-  <svg
+}) => {
+  const paintId = useId();
+
+  return <svg
     viewBox="0 0 24 24"
     fill="none"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     className={`luxury-engraved-icon luxury-engraved-champagne ${className}`}
     {...props}
   >
-    <EngravedDefs prefix="gift" />
+    <EngravedDefs prefix={paintId} />
 
     {/* Bow Loops with Precision Facets */}
     <path
       d="M12 7.2C10.8 5 8 4 6.8 5.2C5.5 6.5 6.8 8.8 12 7.8Z"
-      fill="url(#gift-gold-grad)"
+      fill={`url(#${paintId}-gold-grad)`}
       stroke="#6E5630"
       strokeWidth="0.5"
     />
     <path
       d="M12 7.2C13.2 5 16 4 17.2 5.2C18.5 6.5 17.2 8.8 12 7.8Z"
-      fill="url(#gift-gold-grad)"
+      fill={`url(#${paintId}-gold-grad)`}
       stroke="#6E5630"
       strokeWidth="0.5"
     />
@@ -232,25 +244,25 @@ export const EngravedGiftIcon: React.FC<EngravedIconBaseProps> = ({
       height="3.5"
       rx="0.8"
       fill="#252525"
-      stroke="url(#gift-gold-grad)"
+      stroke={`url(#${paintId}-gold-grad)`}
       strokeWidth="0.8"
-      filter="url(#gift-deboss-filter)"
+      filter={`url(#${paintId}-deboss-filter)`}
     />
     {/* Lid Center Ribbon */}
-    <rect x="10.8" y="8" width="2.4" height="3.5" fill="url(#gift-gold-grad)" />
+    <rect x="10.8" y="8" width="2.4" height="3.5" fill={`url(#${paintId}-gold-grad)`} />
 
     {/* Gift Box Body */}
     <path
       d="M4.5 11.5H19.5V19.2C19.5 20 18.8 20.7 18 20.7H6C5.2 20.7 4.5 20 4.5 19.2V11.5Z"
       fill="#252525"
-      stroke="url(#gift-gold-grad)"
+      stroke={`url(#${paintId}-gold-grad)`}
       strokeWidth="0.8"
-      filter="url(#gift-deboss-filter)"
+      filter={`url(#${paintId}-deboss-filter)`}
     />
     {/* Vertical Body Ribbon */}
-    <rect x="10.8" y="11.5" width="2.4" height="9.2" fill="url(#gift-gold-grad)" />
+    <rect x="10.8" y="11.5" width="2.4" height="9.2" fill={`url(#${paintId}-gold-grad)`} />
 
     {/* Delicate Micro Highlight Line */}
-    <line x1="5.5" y1="13.2" x2="9.8" y2="13.2" stroke="url(#gift-gold-grad)" strokeWidth="0.6" strokeOpacity="0.5" />
-  </svg>
-);
+    <line x1="5.5" y1="13.2" x2="9.8" y2="13.2" stroke={`url(#${paintId}-gold-grad)`} strokeWidth="0.6" strokeOpacity="0.5" />
+  </svg>;
+};

@@ -1,5 +1,5 @@
+import { ThemeIcon } from './icons/ThemeIcon';
 import React, { useEffect, useRef, useState } from 'react';
-import { ChevronLeft, Search as SearchIcon, X, ArrowUp, ArrowDown, Heart, ShieldCheck } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { Modal } from './ui/Modal';
@@ -236,7 +236,7 @@ export const ShopSearch = () => {
           onClick={() => setActiveOverlay(null)} 
           className="p-1 -ml-1 text-gray-800 hover:text-black transition"
         >
-          <ChevronLeft size={24} />
+          <ThemeIcon.back size={22} />
         </button>
         <div className="flex-1 border border-gray-900 rounded-lg px-3 py-2 flex items-center gap-2 focus-within:ring-2 focus-within:ring-black/10 transition-all">
           <input 
@@ -262,11 +262,11 @@ export const ShopSearch = () => {
               }}
               className="text-gray-400 hover:text-gray-700"
             >
-              <X size={16} />
+              <ThemeIcon.close size={16} />
             </button>
           ) : (
             <div className="w-6 h-6 rounded-full bg-[#F5F2ED] border border-[#E6E0D4] flex items-center justify-center text-[#252525] shadow-2xs">
-              <SearchIcon size={12} className="text-[#252525] stroke-[2.5]" />
+              <ThemeIcon.search size={14} accent />
             </div>
           )}
         </div>
@@ -357,6 +357,7 @@ export const ShopSearch = () => {
                         <button 
                           type="button"
                           aria-label={`${item.title} 좋아요`}
+                          aria-pressed={isFav}
                           onClick={async (e) => {
                             e.stopPropagation();
                             if (!user) {
@@ -371,12 +372,11 @@ export const ShopSearch = () => {
                               }
                             }
                           }}
-                          className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-md text-gray-400 hover:text-red-500 hover:bg-white transition shadow-xs z-10"
+                          className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-md text-gray-600 hover:text-red-600 hover:bg-white transition shadow-xs z-10"
                         >
-                          <Heart 
+                          <ThemeIcon.favorite
                             size={15}
-                            fill={isFav ? '#EF4444' : 'none'}
-                            className={isFav ? 'text-red-500' : 'text-gray-400'}
+                            filled={isFav}
                           />
                         </button>
                         {item.tag && (() => {
@@ -434,8 +434,8 @@ export const ShopSearch = () => {
                     </div>
                     {item.status && (
                       <span className="text-[12px] font-bold text-blue-500 flex items-center gap-0.5">
-                        {item.status.type === 'up' && <ArrowUp size={12} className="stroke-[3]" />}
-                        {item.status.type === 'down' && <ArrowDown size={12} className="stroke-[3]" />}
+                        {item.status.type === 'up' && <ThemeIcon.trendUp size={12} />}
+                        {item.status.type === 'down' && <ThemeIcon.trendDown size={12} />}
                         {item.status.type === 'new' ? 'new' : `▲ ${item.status.text}`}
                       </span>
                     )}
@@ -455,8 +455,8 @@ export const ShopSearch = () => {
                     </div>
                     {item.status && (
                       <span className="text-[12px] font-bold text-blue-500 flex items-center gap-0.5">
-                        {item.status.type === 'up' && <ArrowUp size={12} className="stroke-[3]" />}
-                        {item.status.type === 'down' && <ArrowDown size={12} className="stroke-[3]" />}
+                        {item.status.type === 'up' && <ThemeIcon.trendUp size={12} />}
+                        {item.status.type === 'down' && <ThemeIcon.trendDown size={12} />}
                         {item.status.type === 'new' ? 'new' : `${item.status.type === 'up' ? '▲' : '▼'} ${item.status.text}`}
                       </span>
                     )}
@@ -494,6 +494,7 @@ export const ShopSearch = () => {
                   <button
                     type="button"
                     aria-label="관심 상품 저장"
+                    aria-pressed={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10))}
                     onClick={async () => {
                       if (!user) {
                         showToast('좋아요를 저장하려면 먼저 로그인해주세요.', 'info');
@@ -506,12 +507,11 @@ export const ShopSearch = () => {
                         showToast(isNowFav ? '관심 상품에 추가되었습니다.' : '관심 상품에서 해제되었습니다.', 'info');
                       }
                     }}
-                    className="p-2 rounded-full bg-white/90 backdrop-blur-md shadow-xs hover:bg-white text-gray-400 hover:text-red-500 transition"
+                    className="p-2 rounded-full bg-white/90 backdrop-blur-md shadow-xs hover:bg-white text-gray-600 hover:text-red-600 transition"
                   >
-                    <Heart
+                    <ThemeIcon.favorite
                       size={18}
-                      fill={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10)) ? '#EF4444' : 'none'}
-                      className={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10)) ? 'text-red-500' : 'text-gray-400'}
+                      filled={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10))}
                     />
                   </button>
                 </div>
@@ -534,8 +534,8 @@ export const ShopSearch = () => {
               </div>
 
               {/* 정품 인증 배지 */}
-              <div className="flex items-center gap-2.5 p-3 bg-amber-50/80 border border-amber-200/60 rounded-xl text-amber-900 text-xs font-bold">
-                <ShieldCheck size={20} className="text-amber-600 shrink-0" />
+              <div className="flex items-center gap-3 p-3 bg-amber-50/80 border border-amber-200/60 rounded-xl text-amber-900 text-xs font-bold">
+                <ThemeIcon.authenticSeal size={36} className="shrink-0" />
                 <div>
                   <p className="leading-tight">한국명품감정원 100% 정품 인증 완료</p>
                   <p className="text-[10px] text-amber-700/80 font-normal mt-0.5">정품 보증서 동봉 및 위조품 시 200% 책임 보상</p>

@@ -1,7 +1,5 @@
+import { ThemeIcon } from './icons/ThemeIcon';
 import React, { useState } from 'react';
-import { 
-  Send, Upload, FileText, CheckCircle2, AlertCircle, Info
-} from 'lucide-react';
 
 export const RecruitApp = () => {
   const [role] = useState<'STORE' | 'ADMIN'>('STORE');
@@ -58,7 +56,7 @@ export const RecruitApp = () => {
             <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
               noticeModal.type === 'success' ? 'bg-emerald-50 text-emerald-600' : 'bg-indigo-50 text-indigo-600'
             }`}>
-              {noticeModal.type === 'success' ? <CheckCircle2 size={24} /> : <Info size={24} />}
+              {noticeModal.type === 'success' ? <ThemeIcon.success size={24} /> : <ThemeIcon.info size={24} />}
             </div>
             <h3 className="font-extrabold text-base text-gray-900 mb-2">{noticeModal.title}</h3>
             <p className="text-xs text-gray-600 mb-6 leading-relaxed whitespace-pre-line">{noticeModal.message}</p>
@@ -157,7 +155,7 @@ export const RecruitApp = () => {
 
             <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-xs">
               <h3 className="font-bold text-sm sm:text-base text-gray-900 mb-4 flex items-center gap-2">
-                <FileText size={18} className="text-indigo-600" /> 
+                <ThemeIcon.spreadsheet size={18} className="text-indigo-600" />
                 {role === 'STORE' ? '우리 매장 구인 신청 및 충원 현황 명단' : '전체 35개 매장 구인 요청 실시간 접수 리스트'}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -279,7 +277,7 @@ export const RecruitApp = () => {
                   onClick={() => showNotice('단체 문자 발송 안내', `선택된 ${workers.length}명의 인재에게 매장 구인 안내 메시지가 시뮬레이션 발송되었습니다.`, 'success')} 
                   className="text-xs bg-gray-900 text-white font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 hover:bg-black transition"
                 >
-                  <Send size={12} /> 선택 대상 단체 문자 발송
+                  <ThemeIcon.send size={12} /> 선택 대상 단체 문자 발송
                 </button>
               </div>
               {workers.map(w => (
@@ -325,7 +323,7 @@ export const RecruitApp = () => {
                 className="flex-1 border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:border-indigo-600"
               />
               <button onClick={handleSendMessage} className="bg-indigo-600 text-white p-2 rounded-xl">
-                <Send size={18} />
+                <ThemeIcon.send size={18} />
               </button>
             </div>
           </div>

@@ -1,17 +1,10 @@
+import { ThemeIcon } from './icons/ThemeIcon';
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  ArrowLeft, Settings, Heart, ShoppingBag, Clock, PackageCheck, 
-  Edit3, ShieldCheck, UserCheck, AlertCircle, Sparkles, UploadCloud, RotateCcw
-} from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { Modal } from './ui/Modal';
 import { ProductImage } from './ui/ProductImage';
 import { api } from '../services/api';
-import { 
-  LuxuryCrownIcon, EngravedShieldAdmin, 
-  EngravedProfileCrest, EngravedSparkleTier 
-} from './ui/LuxuryIcons';
 import { GoogleOfficialSymbol } from './ui/AuthSymbols';
 
 export const ShopMyPage: React.FC = () => {
@@ -169,7 +162,7 @@ export const ShopMyPage: React.FC = () => {
           aria-label="뒤로 가기"
           className="p-1.5 -ml-1 text-gray-700 hover:text-black rounded-full hover:bg-gray-100 transition active:scale-95"
         >
-          <ArrowLeft size={22} />
+          <ThemeIcon.back size={22} />
         </button>
         <h1 className="text-base font-bold text-gray-900 tracking-tight">마이페이지</h1>
         <button
@@ -178,7 +171,7 @@ export const ShopMyPage: React.FC = () => {
           aria-label="설정으로 이동"
           className="p-1.5 -mr-1 text-gray-700 hover:text-black rounded-full hover:bg-gray-100 transition active:scale-95"
         >
-          <Settings size={21} />
+          <ThemeIcon.settings size={21} />
         </button>
       </header>
 
@@ -205,7 +198,7 @@ export const ShopMyPage: React.FC = () => {
                     }`}>
                       {user.role === 'ADMIN' ? (
                         <span className="flex items-center gap-1">
-                          <LuxuryCrownIcon className="w-3.5 h-3.5 inline text-amber-600" />
+                          <ThemeIcon.crown className="w-3.5 h-3.5 inline text-amber-600" />
                           관리자 계정
                         </span>
                       ) : '일반 회원'}
@@ -233,7 +226,7 @@ export const ShopMyPage: React.FC = () => {
                 className="p-2 text-gray-500 hover:text-black hover:bg-gray-50 rounded-xl transition active:scale-95 border border-gray-200/80"
                 aria-label="내 정보 수정"
               >
-                <Edit3 size={16} />
+                <ThemeIcon.camera size={16} />
               </button>
             </div>
 
@@ -269,7 +262,7 @@ export const ShopMyPage: React.FC = () => {
             {user.role === 'ADMIN' && (
               <div className="mt-4 p-3.5 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <EngravedShieldAdmin className="w-5 h-5" />
+                  <ThemeIcon.adminShield className="w-5 h-5" />
                   <span className="text-xs font-bold text-indigo-950">관리자 대시보드 바로가기</span>
                 </div>
                 <button
@@ -286,7 +279,7 @@ export const ShopMyPage: React.FC = () => {
           <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-black rounded-2xl p-6 text-white shadow-lg">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center shrink-0">
-                <EngravedProfileCrest className="w-12 h-12" />
+                <ThemeIcon.profileCrest className="w-12 h-12" />
               </div>
               <div>
                 <h2 className="text-base font-bold">럭셔리렌탈에 오신 것을 환영합니다</h2>
@@ -324,7 +317,7 @@ export const ShopMyPage: React.FC = () => {
               activeTab === 'FAVORITES' ? 'border-black text-black' : 'border-transparent text-gray-400 hover:text-gray-600'
             }`}
           >
-            <Heart size={15} /> 찜한 상품 ({favorites.length})
+            <ThemeIcon.favorite size={15} filled={activeTab === 'FAVORITES'} /> 찜한 상품 ({favorites.length})
           </button>
           <button
             type="button"
@@ -333,7 +326,7 @@ export const ShopMyPage: React.FC = () => {
               activeTab === 'RENTALS' ? 'border-black text-black' : 'border-transparent text-gray-400 hover:text-gray-600'
             }`}
           >
-            <ShoppingBag size={15} /> 이용 중인 렌탈 ({orders.length})
+            <ThemeIcon.cart size={15} /> 이용 중인 렌탈 ({orders.length})
           </button>
           <button
             type="button"
@@ -342,7 +335,7 @@ export const ShopMyPage: React.FC = () => {
               activeTab === 'SELLS' ? 'border-black text-black' : 'border-transparent text-gray-400 hover:text-gray-600'
             }`}
           >
-            <Clock size={15} /> 판매 신청 ({sellRequests.length})
+            <ThemeIcon.clock size={15} /> 판매 신청 ({sellRequests.length})
           </button>
         </div>
 
@@ -366,7 +359,7 @@ export const ShopMyPage: React.FC = () => {
                         className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-red-500 shadow-sm active:scale-90 transition"
                         aria-label="찜 취소"
                       >
-                        <Heart size={16} fill="currentColor" />
+                        <ThemeIcon.favorite size={16} filled className="text-red-500" />
                       </button>
                     </div>
                     <div className="p-3 flex-1 flex flex-col justify-between">
@@ -390,7 +383,7 @@ export const ShopMyPage: React.FC = () => {
             ) : (
               <div className="bg-white rounded-2xl p-8 border border-gray-100 text-center">
                 <div className="w-12 h-12 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Heart size={22} />
+                  <ThemeIcon.favorite size={24} />
                 </div>
                 <h3 className="text-sm font-bold text-gray-800 mb-1">찜한 상품이 없습니다</h3>
                 <p className="text-xs text-gray-400 mb-4">마음에 드는 상품의 하트를 눌러 위시리스트에 담아보세요.</p>
@@ -459,7 +452,7 @@ export const ShopMyPage: React.FC = () => {
             ) : (
               <div className="bg-white rounded-2xl p-8 border border-gray-100 text-center">
                 <div className="w-12 h-12 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <PackageCheck size={22} />
+                  <ThemeIcon.packageReady size={22} />
                 </div>
                 <h3 className="text-sm font-bold text-gray-800 mb-1">이용 중인 렌탈 상품이 없습니다</h3>
                 <p className="text-xs text-gray-400 mb-4">특별한 날, 원하는 명품을 부담 없이 렌탈하여 사용해보세요.</p>
@@ -499,8 +492,8 @@ export const ShopMyPage: React.FC = () => {
               </div>
             ) : (
               <div className="bg-white rounded-2xl p-8 border border-gray-100 text-center">
-                <div className="w-12 h-12 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <ShoppingBag size={22} />
+                <div className="w-12 h-12 bg-gray-100 text-gray-700 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <ThemeIcon.cart size={24} accent />
                 </div>
                 <h3 className="text-sm font-bold text-gray-800 mb-1">신청된 판매 내역이 없습니다</h3>
                 <p className="text-xs text-gray-400 mb-4">옷장에 잠자고 있는 명품을 최고가로 손쉽게 위탁 판매해보세요.</p>
@@ -521,7 +514,7 @@ export const ShopMyPage: React.FC = () => {
       <div className="p-4 mt-2">
         <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm space-y-3">
           <h2 className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
-            <EngravedSparkleTier className="w-4 h-4" />
+            <ThemeIcon.displayPreference className="w-4 h-4" />
             럭셔리렌탈 프리미엄 멤버십 혜택
           </h2>
           <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
@@ -548,7 +541,7 @@ export const ShopMyPage: React.FC = () => {
         <form onSubmit={handleProfileSave} className="space-y-4">
           {editError && (
             <div className="p-3 bg-red-50 text-red-700 text-xs rounded-xl flex items-center gap-2 border border-red-100">
-              <AlertCircle size={15} />
+              <ThemeIcon.alert size={15} />
               <span>{editError}</span>
             </div>
           )}
@@ -604,7 +597,7 @@ export const ShopMyPage: React.FC = () => {
                     onClick={() => fileInputRef.current?.click()}
                     className="px-3 py-1.5 bg-black hover:bg-gray-800 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-xs"
                   >
-                    <UploadCloud size={14} />
+                    <ThemeIcon.upload size={14} />
                     <span>사진 업로드</span>
                   </button>
                   {editAvatar && (
@@ -613,7 +606,7 @@ export const ShopMyPage: React.FC = () => {
                       onClick={() => setEditAvatar('')}
                       className="px-2.5 py-1.5 border border-gray-300 hover:bg-gray-200/70 text-gray-700 rounded-lg text-xs font-medium transition flex items-center gap-1"
                     >
-                      <RotateCcw size={12} />
+                      <ThemeIcon.refresh size={12} />
                       <span>기본값</span>
                     </button>
                   )}

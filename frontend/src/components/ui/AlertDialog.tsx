@@ -1,6 +1,6 @@
+import { ThemeIcon } from '../icons/ThemeIcon';
 import React from 'react';
 import { Modal } from './Modal';
-import { AlertCircle, CheckCircle2, Info } from 'lucide-react';
 
 export interface AlertDialogProps {
   isOpen: boolean;
@@ -27,9 +27,9 @@ export const AlertDialog = ({
           type === 'error' ? 'bg-rose-50 text-rose-600' :
           'bg-gray-100 text-gray-900'
         }`}>
-          {type === 'success' && <CheckCircle2 size={24} className="stroke-[2.5]" />}
-          {type === 'error' && <AlertCircle size={24} className="stroke-[2.5]" />}
-          {type === 'info' && <Info size={24} className="stroke-[2.5]" />}
+          {type === 'success' && <ThemeIcon.success size={24} className="stroke-[2.5]" />}
+          {type === 'error' && <ThemeIcon.alert size={24} className="stroke-[2.5]" />}
+          {type === 'info' && <ThemeIcon.info size={24} className="stroke-[2.5]" />}
         </div>
         <h4 className="font-extrabold text-base text-gray-950 mb-1.5">{title}</h4>
         <p className="text-xs text-gray-600 leading-relaxed mb-5 whitespace-pre-line">{message}</p>

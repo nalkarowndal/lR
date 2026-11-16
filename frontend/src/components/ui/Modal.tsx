@@ -1,5 +1,5 @@
+import { ThemeIcon } from '../icons/ThemeIcon';
 import React, { useEffect, useRef, type ReactNode } from 'react';
-import { X } from 'lucide-react';
 
 export interface ModalProps {
   isOpen: boolean;
@@ -74,7 +74,7 @@ export const Modal = ({
                 aria-label="닫기"
                 className="text-gray-400 hover:text-gray-900 p-1 rounded-lg transition"
               >
-                <X size={18} />
+                <ThemeIcon.close size={18} />
               </button>
             )}
           </div>

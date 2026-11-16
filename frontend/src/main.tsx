@@ -1,4 +1,4 @@
-import React, { StrictMode, useState, useEffect } from 'react';
+import React, { StrictMode, useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 
@@ -20,6 +20,8 @@ import { ShopLike } from './components/ShopLike';
 import { ShopRegister } from './components/ShopRegister';
 import { ShopPasswordReset } from './components/ShopPasswordReset';
 import { OAuthCallback } from './components/OAuthCallback';
+import { ShopRentGuide } from './components/ShopRentGuide';
+import { ShopSubscriptionGuide } from './components/ShopSubscriptionGuide';
 
 // 3. Navigation Wrappers
 import { AnimatedView } from './components/navigation/AnimatedView';
@@ -30,25 +32,15 @@ export const MainRouter = () => {
   const { currentView, userSettings, activeOverlay, checkUserAuth, setActiveOverlay, isAppReady } = useApp();
   const { showToast } = useToast();
 
-  const [showSplash, setShowSplash] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      if (params.has('code') || params.has('oauth') || params.get('splash') === 'false') {
-        return false;
-      }
-      return sessionStorage.getItem('lr_splash_viewed') !== 'true';
-    }
-    return true;
-  });
+  const [showSplash, setShowSplash] = useState(() => Boolean(document.getElementById('native-splash')));
+  const finishSplash = useCallback(() => setShowSplash(false), []);
 
-  // Guarantee Tier 1 native inline splash is dismissed once React mounts
-  useEffect(() => {
+  useLayoutEffect(() => {
     const nativeSplash = document.getElementById('native-splash');
-    if (nativeSplash) {
-      nativeSplash.style.opacity = '0';
-      nativeSplash.style.pointerEvents = 'none';
-      setTimeout(() => nativeSplash.remove(), 350);
+    if (nativeSplash?.contains(document.activeElement)) {
+      document.querySelector<HTMLButtonElement>('#app-splash button')?.focus();
     }
+    nativeSplash?.remove();
   }, []);
 
   // Global helper for QA, automated tests, or manual replay
@@ -126,37 +118,34 @@ export const MainRouter = () => {
     return <OAuthCallback />;
   }
 
+  const splash = showSplash && (
+    <SplashScreen
+      isReady={isAppReady}
+      reduceAnimations={userSettings?.reduce_animations}
+      onComplete={finishSplash}
+    />
+  );
+
   // 관리자 화면일 때는 PC, 태블릿, 모바일 해상도에 맞춰 화면 전체(100%)를 유연하게 활용
   // 엄격한 세션 인가 가드(ProtectedAdminView) 적용
   if (currentView === 'SHOP_ADMIN') {
     return (
-      <div className="min-h-screen bg-gray-100 w-full flex flex-col relative">
-        {showSplash && (
-          <SplashScreen 
-            isReady={isAppReady}
-            reduceAnimations={userSettings?.reduce_animations}
-            onComplete={() => setShowSplash(false)}
-          />
-        )}
-        <ProtectedAdminView>
-          <ShopAdmin />
-        </ProtectedAdminView>
-      </div>
+      <>
+        <div className="min-h-screen bg-gray-100 w-full flex flex-col relative" inert={showSplash}>
+          <ProtectedAdminView>
+            <ShopAdmin />
+          </ProtectedAdminView>
+        </div>
+        {splash}
+      </>
     );
   }
 
   // 쇼핑몰 메인 및 기타 화면일 때는 모바일 앱 뷰(max-w-md) 유지 + 부드러운 페이지 전환 시스템
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center items-center font-sans text-gray-900">
+    <>
+    <div className="min-h-screen bg-gray-100 flex justify-center items-center font-sans text-gray-900" inert={showSplash}>
       <div className="w-full max-w-md h-screen sm:h-[90vh] bg-white relative flex flex-col overflow-hidden shadow-2xl sm:rounded-2xl">
-        {showSplash && (
-          <SplashScreen 
-            isReady={isAppReady}
-            reduceAnimations={userSettings?.reduce_animations}
-            onComplete={() => setShowSplash(false)}
-          />
-        )}
-        
         <div 
           className="flex-1 w-full h-full flex flex-col"
           aria-hidden={activeOverlay !== null}
@@ -197,6 +186,18 @@ export const MainRouter = () => {
               <RecruitApp />
             </AnimatedView>
           )}
+
+          {currentView === 'SHOP_RENT_GUIDE' && (
+            <AnimatedView viewKey="SHOP_RENT_GUIDE">
+              <ShopRentGuide />
+            </AnimatedView>
+          )}
+
+          {currentView === 'SHOP_SUBSCRIPTION_GUIDE' && (
+            <AnimatedView viewKey="SHOP_SUBSCRIPTION_GUIDE">
+              <ShopSubscriptionGuide />
+            </AnimatedView>
+          )}
         </div>
         
         {/* 슬라이딩 오버레이 */}
@@ -207,6 +208,8 @@ export const MainRouter = () => {
         
       </div>
     </div>
+    {splash}
+    </>
   );
 };
 

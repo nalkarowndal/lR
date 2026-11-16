@@ -1,6 +1,6 @@
+import { ThemeIcon } from '../icons/ThemeIcon';
 import React from 'react';
 import { Modal } from './Modal';
-import { HelpCircle } from 'lucide-react';
 
 export interface ConfirmDialogProps {
   isOpen: boolean;
@@ -29,7 +29,7 @@ export const ConfirmDialog = ({
         <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${
           isDestructive ? 'bg-rose-50 text-rose-600' : 'bg-gray-100 text-gray-900'
         }`}>
-          <HelpCircle size={24} className="stroke-[2.5]" />
+          <ThemeIcon.help size={24} className="stroke-[2.5]" />
         </div>
         <h4 className="font-extrabold text-base text-gray-950 mb-1.5">{title}</h4>
         <p className="text-xs text-gray-600 leading-relaxed mb-5 whitespace-pre-line">{message}</p>

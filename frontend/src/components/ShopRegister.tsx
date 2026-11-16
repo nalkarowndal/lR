@@ -1,5 +1,5 @@
+import { ThemeIcon } from './icons/ThemeIcon';
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, Eye, EyeOff, Check, AlertCircle, ChevronRight, CheckSquare, Square } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { api, setAuthToken } from '../services/api';
@@ -188,7 +188,7 @@ export const ShopRegister = () => {
           onClick={() => setActiveOverlay('LOGIN')} 
           className="p-1 -ml-1 text-black hover:text-gray-600 transition"
         >
-          <ChevronLeft size={24} />
+          <ThemeIcon.back size={22} />
         </button>
         <span className="text-xs text-gray-500 font-bold">회원가입</span>
         <div className="w-6" />
@@ -203,9 +203,7 @@ export const ShopRegister = () => {
 
         {successRegistered && (
           <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-center animate-scaleUp">
-            <div className="w-12 h-12 bg-emerald-500 text-white rounded-full flex items-center justify-center mx-auto mb-2">
-              <Check size={24} className="stroke-[3]" />
-            </div>
+            <ThemeIcon.orderComplete size={56} className="mx-auto mb-2" />
             <h4 className="font-extrabold text-sm text-emerald-950 mb-1">회원가입 완료!</h4>
             <p className="text-xs text-emerald-700">로그인 상태로 메인 화면으로 이동합니다.</p>
           </div>
@@ -213,7 +211,7 @@ export const ShopRegister = () => {
 
         {errorMsg && (
           <div className="mb-5 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2 animate-fadeIn">
-            <AlertCircle size={16} className="text-rose-500 shrink-0" />
+            <ThemeIcon.alert size={16} className="text-rose-500 shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
@@ -280,7 +278,7 @@ export const ShopRegister = () => {
                 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black p-1"
                 aria-label="비밀번호 표시 토글"
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPassword ? <ThemeIcon.hidePassword size={18} /> : <ThemeIcon.revealPassword size={18} />}
               </button>
             </div>
             {password && (
@@ -367,7 +365,7 @@ export const ShopRegister = () => {
                   className="text-[11px] text-gray-400 hover:text-black underline flex items-center gap-0.5 ml-2"
                 >
                   <span>내용 보기</span>
-                  <ChevronRight size={12} />
+                  <ThemeIcon.forward size={12} />
                 </button>
               </div>
 
@@ -390,7 +388,7 @@ export const ShopRegister = () => {
                   className="text-[11px] text-gray-400 hover:text-black underline flex items-center gap-0.5 ml-2"
                 >
                   <span>내용 보기</span>
-                  <ChevronRight size={12} />
+                  <ThemeIcon.forward size={12} />
                 </button>
               </div>
 
@@ -413,7 +411,7 @@ export const ShopRegister = () => {
                   className="text-[11px] text-gray-400 hover:text-black underline flex items-center gap-0.5 ml-2"
                 >
                   <span>내용 보기</span>
-                  <ChevronRight size={12} />
+                  <ThemeIcon.forward size={12} />
                 </button>
               </div>
             </div>

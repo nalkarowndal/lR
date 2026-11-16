@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 104" fill="none">
+  <title>LuxuryRental LR monogram</title>
+  <defs>
+    <linearGradient id="metal" x1="18" y1="10" x2="84" y2="96" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A78A5F"/>
+      <stop offset=".32" stop-color="#F3E5C8"/>
+      <stop offset=".65" stop-color="#C5A880"/>
+      <stop offset="1" stop-color="#8F714A"/>
+    </linearGradient>
+    <linearGradient id="inset" x1="22" y1="11" x2="70" y2="91" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#34312E"/>
+      <stop offset="1" stop-color="#171719"/>
+    </linearGradient>
+  </defs>
+  <circle cx="52" cy="52" r="50" stroke="url(#metal)" stroke-opacity=".6"/>
+  <circle cx="52" cy="52" r="45.5" fill="url(#inset)" stroke="url(#metal)" stroke-opacity=".8"/>
+  <circle cx="52" cy="52" r="41.5" stroke="url(#metal)" stroke-width=".65" stroke-opacity=".34"/>
+  <path d="m52 12 2 2-2 2-2-2 2-2Zm0 76 2 2-2 2-2-2 2-2Z" fill="url(#metal)"/>
+  <path d="M33 29h14v2h-4v41h10c6 0 8-2 10-8h2l-2 10H33v-2h4V31h-4v-2Z" fill="#0D0D0E" transform="translate(1 1.5)"/>
+  <path d="M48 29h15c10 0 16 4 16 12 0 6-4 10-11 12l9 14c2 3 4 5 7 5v2H73L60 54h-2v11h-6V31h-4v-2Zm10 3v19h4c7 0 11-3 11-10 0-6-4-9-10-9h-5Z" fill="#0D0D0E" transform="translate(1 1.5)"/>
+  <path d="M33 29h14v2h-4v41h10c6 0 8-2 10-8h2l-2 10H33v-2h4V31h-4v-2Z" fill="url(#metal)"/>
+  <path d="M48 29h15c10 0 16 4 16 12 0 6-4 10-11 12l9 14c2 3 4 5 7 5v2H73L60 54h-2v11h-6V31h-4v-2Zm10 3v19h4c7 0 11-3 11-10 0-6-4-9-10-9h-5Z" fill="url(#metal)" fill-rule="evenodd"/>
+</svg>

@@ -1,5 +1,5 @@
+import { ThemeIcon } from './icons/ThemeIcon';
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, KeyRound, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { api } from '../services/api';
@@ -141,7 +141,7 @@ export const ShopPasswordReset = () => {
           onClick={() => setActiveOverlay('LOGIN')} 
           className="p-1 -ml-1 text-black hover:text-gray-600 transition"
         >
-          <ChevronLeft size={24} />
+          <ThemeIcon.back size={22} />
         </button>
         <span className="text-xs text-gray-500 font-bold">계정 찾기</span>
         <div className="w-6" />
@@ -150,7 +150,7 @@ export const ShopPasswordReset = () => {
       <div className="flex-1 overflow-y-auto px-6 py-10 scrollbar-hide">
         <div className="text-center mb-8">
           <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-800">
-            <KeyRound size={22} />
+            <ThemeIcon.password size={24} accent />
           </div>
           <h2 className="text-xl font-black text-gray-950 mb-1">비밀번호 재설정</h2>
           <p className="text-xs text-gray-500">
@@ -162,14 +162,14 @@ export const ShopPasswordReset = () => {
 
         {errorMsg && (
           <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2 animate-fadeIn">
-            <AlertCircle size={16} className="text-rose-500 shrink-0" />
+            <ThemeIcon.alert size={16} className="text-rose-500 shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
 
         {successMsg && (
           <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-fadeIn">
-            <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
+            <ThemeIcon.success size={16} className="text-emerald-500 shrink-0" />
             <span>{successMsg}</span>
           </div>
         )}

@@ -1,5 +1,5 @@
+import { ThemeIcon } from './icons/ThemeIcon';
 import React, { useEffect, useState, useRef } from 'react';
-import { ChevronLeft, Mail, CheckCircle2, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { api, setAuthToken } from '../services/api';
@@ -264,7 +264,7 @@ export const ShopLike = () => {
           onClick={() => setActiveOverlay(null)}
           className="p-1 -ml-1 text-black hover:text-gray-600 transition"
         >
-          <ChevronLeft size={24} />
+          <ThemeIcon.back size={22} />
         </button>
         <span className="text-xs text-gray-400 font-semibold">간편 로그인 / 가입</span>
         <div className="w-6" />
@@ -277,14 +277,14 @@ export const ShopLike = () => {
 
         {loginSuccess && (
           <div className="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 animate-fadeIn w-full max-w-sm justify-center">
-            <CheckCircle2 size={16} className="text-emerald-600" />
+            <ThemeIcon.success size={16} className="text-emerald-600" />
             <span>로그인되었습니다. 환영합니다!</span>
           </div>
         )}
 
         {errorMsg && (
           <div className="mb-4 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 animate-fadeIn w-full max-w-sm">
-            <AlertCircle size={16} className="text-rose-600 shrink-0" />
+            <ThemeIcon.alert size={16} className="text-rose-600 shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
@@ -395,7 +395,7 @@ export const ShopLike = () => {
                 onClick={() => setLoginType('EMAIL')}
                 className="w-12 h-12 bg-[#4C51F7] hover:bg-[#3d42e0] active:scale-95 rounded-full flex items-center justify-center text-white shadow-xs transition"
               >
-                <Mail size={20} />
+                <ThemeIcon.email size={20} />
               </button>
             </div>
           </div>
@@ -427,7 +427,7 @@ export const ShopLike = () => {
                 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black p-1"
                 aria-label="비밀번호 표시 토글"
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPassword ? <ThemeIcon.hidePassword size={18} /> : <ThemeIcon.revealPassword size={18} />}
               </button>
             </div>
 

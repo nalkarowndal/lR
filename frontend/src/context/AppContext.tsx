@@ -8,7 +8,9 @@ export type ViewState =
   | 'SHOP_MY_PAGE' 
   | 'SHOP_SETTINGS' 
   | 'SHOP_ADMIN' 
-  | 'RECRUIT_APP';
+  | 'RECRUIT_APP'
+  | 'SHOP_RENT_GUIDE'
+  | 'SHOP_SUBSCRIPTION_GUIDE';
 
 export type Role = 'STORE' | 'ADMIN';
 export type OverlayState = 'SEARCH' | 'LOGIN' | 'REGISTER' | 'FORGOT_PASSWORD' | 'PASSWORD_RESET' | 'PROFILE_EDIT' | null;
@@ -441,7 +443,17 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      (window as any).__lrNavigate = navigateTo;
+      (window as any).__lrNavigate = (view: any) => {
+        if (view === 'MY_PAGE' || view === 'SHOP_MY_PAGE') navigateTo('SHOP_MY_PAGE');
+        else if (view === 'SETTINGS' || view === 'SHOP_SETTINGS') navigateTo('SHOP_SETTINGS');
+        else if (view === 'CATEGORY' || view === 'SHOP_CATEGORY') navigateTo('SHOP_CATEGORY');
+        else if (view === 'SELL' || view === 'SHOP_SELL') navigateTo('SHOP_SELL');
+        else if (view === 'ADMIN' || view === 'SHOP_ADMIN') navigateTo('SHOP_ADMIN');
+        else if (view === 'MAIN' || view === 'SHOP_MAIN') navigateTo('SHOP_MAIN');
+        else if (view === 'RENT_GUIDE' || view === 'SHOP_RENT_GUIDE') navigateTo('SHOP_RENT_GUIDE');
+        else if (view === 'SUBSCRIPTION_GUIDE' || view === 'SHOP_SUBSCRIPTION_GUIDE') navigateTo('SHOP_SUBSCRIPTION_GUIDE');
+        else navigateTo(view);
+      };
       (window as any).__lrReturnFromAdmin = returnFromAdmin;
       (window as any).__lrGoBack = goBack;
       (window as any).__lrSetOverlay = (overlay: any) => {

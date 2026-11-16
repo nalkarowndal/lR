@@ -1,8 +1,5 @@
+import { ThemeIcon } from './icons/ThemeIcon';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { 
-  ChevronLeft, MessageCircle, ShoppingCart, ChevronRight, Heart, 
-  ShieldCheck, PackageCheck, Trash2 
-} from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { BrandMonogram } from './ui/LuxuryIcons';
@@ -491,7 +488,7 @@ export const ShopCategory = () => {
           onClick={() => goBack('SHOP_MAIN')}
           className="p-1 -ml-1 text-gray-800 hover:text-black transition active:scale-95"
         >
-          <ChevronLeft size={24} />
+          <ThemeIcon.back size={22} />
         </button>
         <h1 className="text-base font-extrabold text-gray-900 tracking-tight">카테고리</h1>
         <div className="flex gap-3 text-gray-800">
@@ -501,7 +498,7 @@ export const ShopCategory = () => {
             onClick={() => setCustomerModalOpen(true)}
             className="p-1 hover:text-black transition active:scale-95"
           >
-            <MessageCircle size={21} />
+            <ThemeIcon.chat size={21} />
           </button>
           <button 
             type="button" 
@@ -516,7 +513,7 @@ export const ShopCategory = () => {
             }}
             className="p-1 hover:text-black transition relative active:scale-95"
           >
-            <ShoppingCart size={21} />
+            <ThemeIcon.cart size={21} />
             {cartItems.length > 0 && (
               <span className="absolute -top-1 -right-1 bg-black text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
                 {cartItems.length}
@@ -653,7 +650,7 @@ export const ShopCategory = () => {
                         <span className={`text-[12px] truncate ${isSelected ? 'font-black text-white' : 'group-hover:text-black'}`}>
                           {sub}
                         </span>
-                        <ChevronRight 
+                        <ThemeIcon.forward
                           size={13} 
                           className={`shrink-0 ml-1 transition-transform ${isSelected ? 'text-white translate-x-0.5' : 'text-gray-400 group-hover:translate-x-0.5'}`} 
                         />
@@ -706,6 +703,7 @@ export const ShopCategory = () => {
                           <button 
                             type="button"
                             aria-label={`${item.title} 좋아요`}
+                            aria-pressed={isFav}
                             onClick={async (e) => {
                               e.stopPropagation();
                               if (!user) {
@@ -720,12 +718,11 @@ export const ShopCategory = () => {
                                 }
                               }
                             }}
-                            className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-md text-gray-400 hover:text-red-500 hover:bg-white transition shadow-xs z-10"
+                            className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-md text-gray-600 hover:text-red-600 hover:bg-white transition shadow-xs z-10"
                           >
-                            <Heart 
+                            <ThemeIcon.favorite
                               size={15}
-                              fill={isFav ? '#EF4444' : 'none'}
-                              className={isFav ? 'text-red-500' : 'text-gray-400'}
+                              filled={isFav}
                             />
                           </button>
                           {item.tag === 'N' && (
@@ -756,7 +753,7 @@ export const ShopCategory = () => {
                   onClick={() => setMainTab('BRAND')}
                   className="w-full border border-gray-300 hover:border-gray-400 hover:bg-gray-50 active:scale-[0.99] py-3 rounded-xl text-xs font-bold text-gray-800 flex justify-center items-center gap-1 mb-8 transition-all shadow-2xs"
                 >
-                  명품 브랜드관으로 이동하기 <ChevronRight size={15} />
+                  명품 브랜드관으로 이동하기 <ThemeIcon.forward size={15} />
                 </button>
               </div>
             </div>
@@ -788,7 +785,7 @@ export const ShopCategory = () => {
                 onClick={() => handleBrandScroll('left')}
                 className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/95 backdrop-blur-md border border-gray-200 shadow-md flex items-center justify-center text-gray-800 hover:text-black hover:scale-110 active:scale-95 transition"
               >
-                <ChevronLeft size={16} />
+                <ThemeIcon.back size={16} />
               </button>
             )}
 
@@ -800,7 +797,7 @@ export const ShopCategory = () => {
                 onClick={() => handleBrandScroll('right')}
                 className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/95 backdrop-blur-md border border-gray-200 shadow-md flex items-center justify-center text-gray-800 hover:text-black hover:scale-110 active:scale-95 transition"
               >
-                <ChevronRight size={16} />
+                <ThemeIcon.forward size={16} />
               </button>
             )}
 
@@ -856,6 +853,7 @@ export const ShopCategory = () => {
                     <button 
                       type="button"
                       aria-label={`${item.title} 좋아요`}
+                      aria-pressed={isFav}
                       onClick={async (e) => {
                         e.stopPropagation();
                         if (!user) {
@@ -870,12 +868,11 @@ export const ShopCategory = () => {
                           }
                         }
                       }}
-                      className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-md text-gray-400 hover:text-red-500 hover:bg-white transition shadow-xs z-10"
+                      className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-md text-gray-600 hover:text-red-600 hover:bg-white transition shadow-xs z-10"
                     >
-                      <Heart 
+                      <ThemeIcon.favorite
                         size={16}
-                        fill={isFav ? '#EF4444' : 'none'}
-                        className={isFav ? 'text-red-500' : 'text-gray-400'}
+                        filled={isFav}
                       />
                     </button>
                     {item.tag === 'N' && (
@@ -906,7 +903,7 @@ export const ShopCategory = () => {
             onClick={() => showToast(`${activeBrand} 전용 기획전 페이지 준비 중입니다.`, 'info')}
             className="w-full border border-gray-300 hover:border-gray-400 hover:bg-gray-50 active:scale-[0.99] py-3.5 rounded-xl text-sm font-bold text-gray-800 flex justify-center items-center gap-1 mb-8 transition-all shadow-2xs"
           >
-            {activeBrand} 상품 더보기 ({currentBrandProducts.length}개 상품) <ChevronRight size={16}/>
+            {activeBrand} 상품 더보기 ({currentBrandProducts.length}개 상품) <ThemeIcon.forward size={16}/>
           </button>
         </div>
       )}
@@ -937,6 +934,7 @@ export const ShopCategory = () => {
                   <button
                     type="button"
                     aria-label="관심 상품 저장"
+                    aria-pressed={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10))}
                     onClick={async () => {
                       if (!user) {
                         showToast('좋아요를 저장하려면 먼저 로그인해주세요.', 'info');
@@ -949,12 +947,11 @@ export const ShopCategory = () => {
                         showToast(isNowFav ? '관심 상품에 추가되었습니다.' : '관심 상품에서 해제되었습니다.', 'info');
                       }
                     }}
-                    className="p-2 rounded-full bg-white/90 backdrop-blur-md shadow-xs hover:bg-white text-gray-400 hover:text-red-500 transition"
+                    className="p-2 rounded-full bg-white/90 backdrop-blur-md shadow-xs hover:bg-white text-gray-600 hover:text-red-600 transition"
                   >
-                    <Heart
+                    <ThemeIcon.favorite
                       size={18}
-                      fill={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10)) ? '#EF4444' : 'none'}
-                      className={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10)) ? 'text-red-500' : 'text-gray-400'}
+                      filled={favorites.includes(typeof selectedProduct.id === 'number' ? selectedProduct.id : parseInt(String(selectedProduct.id).replace(/\D/g, '') || '1', 10))}
                     />
                   </button>
                 </div>
@@ -977,8 +974,8 @@ export const ShopCategory = () => {
               </div>
 
               {/* 정품 인증 배지 */}
-              <div className="flex items-center gap-2.5 p-3 bg-amber-50/80 border border-amber-200/60 rounded-xl text-amber-900 text-xs font-bold">
-                <ShieldCheck size={20} className="text-amber-600 shrink-0" />
+              <div className="flex items-center gap-3 p-3 bg-amber-50/80 border border-amber-200/60 rounded-xl text-amber-900 text-xs font-bold">
+                <ThemeIcon.authenticSeal size={36} className="shrink-0" />
                 <div>
                   <p className="leading-tight">한국명품감정원 100% 정품 인증 완료</p>
                   <p className="text-[10px] text-amber-700/80 font-normal mt-0.5">정품 보증서 동봉 및 위조품 시 200% 책임 보상</p>
@@ -1045,7 +1042,9 @@ export const ShopCategory = () => {
             <>
               {cartItems.length === 0 ? (
                 <div className="py-8 text-center text-gray-500 space-y-3">
-                  <ShoppingCart size={40} className="mx-auto text-gray-300 stroke-1" />
+                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto text-gray-700">
+                    <ThemeIcon.cart size={24} accent />
+                  </div>
                   <p className="text-xs">장바구니가 비어 있습니다.</p>
                   <button
                     type="button"
@@ -1087,7 +1086,7 @@ export const ShopCategory = () => {
                           onClick={() => handleRemoveFromCart(item.id)}
                           className="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition p-1"
                         >
-                          <Trash2 size={15} />
+                          <ThemeIcon.remove size={15} />
                         </button>
                       </div>
                     ))}
@@ -1218,8 +1217,8 @@ export const ShopCategory = () => {
 
           {cartStep === 'ORDER_COMPLETE' && completedOrder && (
             <div className="space-y-4 text-center py-2 animate-fadeIn">
-              <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto border border-emerald-100 shadow-xs">
-                <PackageCheck size={28} />
+              <div className="flex items-center justify-center mx-auto">
+                <ThemeIcon.orderComplete size={64} />
               </div>
 
               <div>

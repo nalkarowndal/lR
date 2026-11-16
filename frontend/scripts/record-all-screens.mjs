@@ -19,8 +19,32 @@ for (const dir of [docsScreenDir, videosDir, screenshotsDir]) {
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+let appBaseUrl = process.env.BASE_URL || 'http://localhost:5174';
+
+async function resolveAppUrl() {
+  for (const port of [5174, 5173, 5175]) {
+    try {
+      const res = await fetch(`http://localhost:${port}/`);
+      const text = await res.text();
+      if (text.includes('LuxuryRental')) {
+        console.log(`Detected LuxuryRental app running on http://localhost:${port}`);
+        appBaseUrl = `http://localhost:${port}`;
+        return appBaseUrl;
+      }
+    } catch {}
+  }
+  return appBaseUrl;
+}
+
+async function waitForAppReady(page) {
+  await page.waitForFunction(
+    () => typeof window !== 'undefined' && typeof window.__lrNavigate === 'function' && typeof window.__lrSetUser === 'function',
+    { timeout: 10000 }
+  );
+}
+
 async function injectRecordingCode(page) {
-  await page.evaluate(() => {
+  const code = () => {
     window.__lrStartRecording = async () => {
       const stream = await navigator.mediaDevices.getDisplayMedia({
         video: { displaySurface: 'browser', frameRate: 60 }
@@ -56,7 +80,10 @@ async function injectRecordingCode(page) {
       }
       return await window.__lrRecordingDonePromise;
     };
-  });
+  };
+
+  await page.evaluateOnNewDocument(code);
+  await page.evaluate(code);
 }
 
 async function convertWebmToGif(webmBuffer, targetGifPath, options = {}) {
@@ -174,6 +201,8 @@ async function recordAllInteractions() {
   console.log(`📁 비디오 출력 폴더: ${videosDir}`);
   console.log('================================================================\n');
 
+  await resolveAppUrl();
+
   const videoManifest = [];
 
   // 1. Mobile Sessions (440x920)
@@ -219,7 +248,7 @@ async function recordAllInteractions() {
     const page = await browser.newPage();
     await page.setViewport({ width: 440, height: 920 });
 
-    await page.goto('http://localhost:5173/', { waitUntil: 'networkidle2' });
+    await page.goto(`${appBaseUrl}/`, { waitUntil: 'networkidle2' });
     await injectRecordingCode(page);
 
     await page.evaluate(() => window.__lrStartRecording());
@@ -274,7 +303,12 @@ async function recordAllInteractions() {
     });
     await sleep(600);
 
-    const base64 = await page.evaluate(() => window.__lrStopRecording());
+    const base64 = await page.evaluate(async () => {
+      if (typeof window.__lrStopRecording === 'function') {
+        return await window.__lrStopRecording();
+      }
+      return '';
+    });
     const webmBuf = Buffer.from(base64, 'base64');
     const webmPath = path.join(videosDir, '01_splash_and_main_interaction.webm');
     const gifPath = path.join(videosDir, '01_splash_and_main_interaction.gif');
@@ -302,7 +336,8 @@ async function recordAllInteractions() {
     const page = await browser.newPage();
     await page.setViewport({ width: 440, height: 920 });
 
-    await page.goto('http://localhost:5173/?splash=false', { waitUntil: 'networkidle2' });
+    await page.goto(`${appBaseUrl}/?splash=false`, { waitUntil: 'networkidle2' });
+    await waitForAppReady(page);
     await page.evaluate(() => window.__lrNavigate('SHOP_CATEGORY'));
     await sleep(400);
 
@@ -376,7 +411,12 @@ async function recordAllInteractions() {
     });
     await sleep(600);
 
-    const base64 = await page.evaluate(() => window.__lrStopRecording());
+    const base64 = await page.evaluate(async () => {
+      if (typeof window.__lrStopRecording === 'function') {
+        return await window.__lrStopRecording();
+      }
+      return '';
+    });
     const webmBuf = Buffer.from(base64, 'base64');
     const webmPath = path.join(videosDir, '02_category_and_brands_interaction.webm');
     const gifPath = path.join(videosDir, '02_category_and_brands_interaction.gif');
@@ -404,7 +444,8 @@ async function recordAllInteractions() {
     const page = await browser.newPage();
     await page.setViewport({ width: 440, height: 920 });
 
-    await page.goto('http://localhost:5173/?splash=false', { waitUntil: 'networkidle2' });
+    await page.goto(`${appBaseUrl}/?splash=false`, { waitUntil: 'networkidle2' });
+    await waitForAppReady(page);
     await injectRecordingCode(page);
     await page.evaluate(() => window.__lrStartRecording());
 
@@ -448,7 +489,12 @@ async function recordAllInteractions() {
     });
     await sleep(800);
 
-    const base64 = await page.evaluate(() => window.__lrStopRecording());
+    const base64 = await page.evaluate(async () => {
+      if (typeof window.__lrStopRecording === 'function') {
+        return await window.__lrStopRecording();
+      }
+      return '';
+    });
     const webmBuf = Buffer.from(base64, 'base64');
     const webmPath = path.join(videosDir, '03_search_flow_interaction.webm');
     const gifPath = path.join(videosDir, '03_search_flow_interaction.gif');
@@ -476,15 +522,18 @@ async function recordAllInteractions() {
     const page = await browser.newPage();
     await page.setViewport({ width: 440, height: 920 });
 
-    await page.goto('http://localhost:5173/?splash=false', { waitUntil: 'networkidle2' });
+    await page.goto(`${appBaseUrl}/?splash=false`, { waitUntil: 'networkidle2' });
+    await waitForAppReady(page);
     await injectRecordingCode(page);
     await page.evaluate(() => window.__lrStartRecording());
 
     // Click product to open modal as guest
     await page.evaluate(() => {
-      const cards = Array.from(document.querySelectorAll('div.min-w-\\[150px\\], div.cursor-pointer'));
-      const card = cards.find((c) => c.textContent && c.textContent.includes('원'));
-      if (card) card.click();
+      const cards = Array.from(document.querySelectorAll('div')).filter(d => 
+        d.textContent && (d.textContent.includes('/일') || d.textContent.includes('원')) && d.querySelector('img')
+      );
+      if (cards[0]) cards[0].click();
+      else if (window.__lrSetOverlay) window.__lrSetOverlay('LOGIN');
     });
     await sleep(600);
 
@@ -493,6 +542,7 @@ async function recordAllInteractions() {
       const btns = Array.from(document.querySelectorAll('button'));
       const cartBtn = btns.find((b) => b.textContent && b.textContent.includes('장바구니 담기'));
       if (cartBtn) cartBtn.click();
+      else if (window.__lrSetOverlay) window.__lrSetOverlay('LOGIN');
     });
     await sleep(800); // Toast and Login overlay open
 
@@ -506,7 +556,7 @@ async function recordAllInteractions() {
 
     // Click Banner to go to Register
     await page.evaluate(() => {
-      window.__lrSetOverlay('REGISTER');
+      if (window.__lrSetOverlay) window.__lrSetOverlay('REGISTER');
     });
     await sleep(800);
 
@@ -517,7 +567,12 @@ async function recordAllInteractions() {
     });
     await sleep(600);
 
-    const base64 = await page.evaluate(() => window.__lrStopRecording());
+    const base64 = await page.evaluate(async () => {
+      if (typeof window.__lrStopRecording === 'function') {
+        return await window.__lrStopRecording();
+      }
+      return '';
+    });
     const webmBuf = Buffer.from(base64, 'base64');
     const webmPath = path.join(videosDir, '04_auth_guard_and_login_interaction.webm');
     const gifPath = path.join(videosDir, '04_auth_guard_and_login_interaction.gif');
@@ -545,7 +600,8 @@ async function recordAllInteractions() {
     const page = await browser.newPage();
     await page.setViewport({ width: 440, height: 920 });
 
-    await page.goto('http://localhost:5173/?splash=false', { waitUntil: 'networkidle2' });
+    await page.goto(`${appBaseUrl}/?splash=false`, { waitUntil: 'networkidle2' });
+    await waitForAppReady(page);
     // Set authenticated user
     await page.evaluate(() => {
       window.__lrSetUser({ id: 1, email: 'customer@luxuryrental.com', name: '김럭셔리', role: 'CUSTOMER' });
@@ -557,9 +613,10 @@ async function recordAllInteractions() {
 
     // Click product and add to cart
     await page.evaluate(() => {
-      const cards = Array.from(document.querySelectorAll('div.min-w-\\[150px\\], div.cursor-pointer'));
-      const card = cards.find((c) => c.textContent && c.textContent.includes('원'));
-      if (card) card.click();
+      const cards = Array.from(document.querySelectorAll('div')).filter(d => 
+        d.textContent && (d.textContent.includes('/일') || d.textContent.includes('원')) && d.querySelector('img')
+      );
+      if (cards[0]) cards[0].click();
     });
     await sleep(600);
 
@@ -572,7 +629,7 @@ async function recordAllInteractions() {
 
     // Open Cart modal via top cart icon
     await page.evaluate(() => {
-      const cartIconBtn = document.querySelector('button[aria-label="장바구니"]');
+      const cartIconBtn = document.querySelector('button[aria-label*="장바구니"]');
       if (cartIconBtn) cartIconBtn.click();
     });
     await sleep(600);
@@ -593,7 +650,12 @@ async function recordAllInteractions() {
     });
     await sleep(800);
 
-    const base64 = await page.evaluate(() => window.__lrStopRecording());
+    const base64 = await page.evaluate(async () => {
+      if (typeof window.__lrStopRecording === 'function') {
+        return await window.__lrStopRecording();
+      }
+      return '';
+    });
     const webmBuf = Buffer.from(base64, 'base64');
     const webmPath = path.join(videosDir, '05_cart_and_checkout_interaction.webm');
     const gifPath = path.join(videosDir, '05_cart_and_checkout_interaction.gif');
@@ -621,7 +683,8 @@ async function recordAllInteractions() {
     const page = await browser.newPage();
     await page.setViewport({ width: 440, height: 920 });
 
-    await page.goto('http://localhost:5173/?splash=false', { waitUntil: 'networkidle2' });
+    await page.goto(`${appBaseUrl}/?splash=false`, { waitUntil: 'networkidle2' });
+    await waitForAppReady(page);
     await page.evaluate(() => {
       window.__lrSetUser({ id: 1, email: 'customer@luxuryrental.com', name: '김럭셔리', role: 'CUSTOMER' });
     });
@@ -638,7 +701,7 @@ async function recordAllInteractions() {
 
     // Click profile avatar to open avatar modal
     await page.evaluate(() => {
-      const avatarBtn = document.querySelector('button[aria-label*="프로필"], div[role="button"]');
+      const avatarBtn = document.querySelector('button[aria-label*="프로필"], button[aria-label*="수정"], div[role="button"]');
       if (avatarBtn) avatarBtn.click();
     });
     await sleep(600);
@@ -677,7 +740,12 @@ async function recordAllInteractions() {
     });
     await sleep(600);
 
-    const base64 = await page.evaluate(() => window.__lrStopRecording());
+    const base64 = await page.evaluate(async () => {
+      if (typeof window.__lrStopRecording === 'function') {
+        return await window.__lrStopRecording();
+      }
+      return '';
+    });
     const webmBuf = Buffer.from(base64, 'base64');
     const webmPath = path.join(videosDir, '06_mypage_and_settings_interaction.webm');
     const gifPath = path.join(videosDir, '06_mypage_and_settings_interaction.gif');
@@ -705,7 +773,8 @@ async function recordAllInteractions() {
     const page = await browser.newPage();
     await page.setViewport({ width: 440, height: 920 });
 
-    await page.goto('http://localhost:5173/?splash=false', { waitUntil: 'networkidle2' });
+    await page.goto(`${appBaseUrl}/?splash=false`, { waitUntil: 'networkidle2' });
+    await waitForAppReady(page);
     await page.evaluate(() => {
       window.__lrSetUser({ id: 1, email: 'customer@luxuryrental.com', name: '김럭셔리', role: 'CUSTOMER' });
     });
@@ -750,7 +819,12 @@ async function recordAllInteractions() {
     });
     await sleep(800);
 
-    const base64 = await page.evaluate(() => window.__lrStopRecording());
+    const base64 = await page.evaluate(async () => {
+      if (typeof window.__lrStopRecording === 'function') {
+        return await window.__lrStopRecording();
+      }
+      return '';
+    });
     const webmBuf = Buffer.from(base64, 'base64');
     const webmPath = path.join(videosDir, '07_sell_request_flow_interaction.webm');
     const gifPath = path.join(videosDir, '07_sell_request_flow_interaction.gif');
@@ -778,7 +852,8 @@ async function recordAllInteractions() {
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 800 });
 
-    await page.goto('http://localhost:5173/?splash=false', { waitUntil: 'networkidle2' });
+    await page.goto(`${appBaseUrl}/?splash=false`, { waitUntil: 'networkidle2' });
+    await waitForAppReady(page);
     await page.evaluate(() => {
       window.__lrSetUser({ id: 99, email: 'admin@luxuryrental.com', name: '최고관리자', role: 'ADMIN' });
       window.__lrNavigate('SHOP_ADMIN');
@@ -852,7 +927,12 @@ async function recordAllInteractions() {
     });
     await sleep(600);
 
-    const base64 = await page.evaluate(() => window.__lrStopRecording());
+    const base64 = await page.evaluate(async () => {
+      if (typeof window.__lrStopRecording === 'function') {
+        return await window.__lrStopRecording();
+      }
+      return '';
+    });
     const webmBuf = Buffer.from(base64, 'base64');
     const webmPath = path.join(videosDir, '08_admin_recruit_and_shop_interaction.webm');
     const gifPath = path.join(videosDir, '08_admin_recruit_and_shop_interaction.gif');

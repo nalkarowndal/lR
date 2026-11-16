@@ -1,6 +1,5 @@
+import { ThemeIcon } from './icons/ThemeIcon';
 import React, { useState } from 'react';
-import { ChevronLeft, Search, ChevronRight, Check, PlusCircle, X, AlertCircle } from 'lucide-react';
-import { EngravedMedalEmblem } from './ui/LuxuryIcons';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 
@@ -142,8 +141,8 @@ export const ShopSell = () => {
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-extrabold text-base text-gray-900">신규 브랜드 직접 등록</h3>
-              <button type="button" onClick={() => setShowDirectModal(false)} className="text-gray-400 hover:text-black">
-                <X size={20} />
+              <button type="button" aria-label="브랜드 등록 닫기" onClick={() => setShowDirectModal(false)} className="text-gray-600 hover:text-black">
+                <ThemeIcon.close size={20} />
               </button>
             </div>
             <p className="text-xs text-gray-500 mb-4">목록에 없는 명품 브랜드명을 직접 등록하시면, 전문 감정팀 검수 후 위탁 및 매입 절차가 진행됩니다.</p>
@@ -209,8 +208,8 @@ export const ShopSell = () => {
       {confirmModal.isOpen && confirmModal.brand && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center flex flex-col items-center animate-fadeIn max-h-[90vh] overflow-y-auto scrollbar-hide">
-            <div className="w-11 h-11 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2.5">
-              <AlertCircle size={22} />
+            <div className="flex items-center justify-center mb-2">
+              <ThemeIcon.authenticSeal size={44} />
             </div>
             <h3 className="font-extrabold text-base text-gray-900 mb-1">명품 위탁·판매 신청서</h3>
             <p className="text-xs text-gray-500 mb-3">
@@ -247,21 +246,23 @@ export const ShopSell = () => {
             <div className="w-full text-left mb-3">
               <label className="text-[11px] font-bold text-gray-700 block mb-1">상품 상태 (외관/사용감)</label>
               <div className="grid grid-cols-3 gap-1.5">
-                {[
+                {([
                   { id: 'S', label: 'S급 (미사용급)' },
                   { id: 'A', label: 'A급 (미세사용감)' },
                   { id: 'B', label: 'B급 (자연스런사용감)' }
-                ].map(cond => (
+                ] as const).map(cond => (
                   <button
                     key={cond.id}
                     type="button"
-                    onClick={() => setItemCondition(cond.id as any)}
+                    aria-pressed={itemCondition === cond.id}
+                    onClick={() => setItemCondition(cond.id)}
                     className={`py-1.5 rounded-lg text-[11px] font-bold border transition ${
                       itemCondition === cond.id
                         ? 'bg-indigo-600 text-white border-indigo-600'
                         : 'bg-white text-gray-700 border-gray-200'
                     }`}
                   >
+                    <ThemeIcon.conditionGrade grade={cond.id} size={12} aria-hidden="true" className="inline-block align-[-2px] mr-0.5" />
                     {cond.label}
                   </button>
                 ))}
@@ -372,7 +373,7 @@ export const ShopSell = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
           <div className="bg-white rounded-2xl p-6 max-w-xs w-full shadow-2xl text-center flex flex-col items-center animate-fadeIn">
             <div className="mb-2">
-              <EngravedMedalEmblem className="w-16 h-16 mx-auto" />
+              <ThemeIcon.orderComplete size={64} className="mx-auto" />
             </div>
             <h3 className="font-extrabold text-base text-gray-900 mb-1">위탁 판매 접수 완료</h3>
             <p className="text-xs text-emerald-600 font-bold mb-3">접수번호: {receiptModal.receiptCode}</p>
@@ -412,7 +413,7 @@ export const ShopSell = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
           <div className="bg-white rounded-2xl p-6 max-w-xs w-full shadow-2xl text-center flex flex-col items-center animate-fadeIn">
             <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mb-3">
-              <AlertCircle size={24} className="stroke-[2.5]" />
+              <ThemeIcon.alert size={24} className="stroke-[2.5]" />
             </div>
             <h3 className="font-extrabold text-base text-gray-900 mb-2">접수 오류 안내</h3>
             <p className="text-xs text-gray-600 mb-6 leading-relaxed">{errorModal.message}</p>
@@ -435,7 +436,7 @@ export const ShopSell = () => {
           onClick={() => goBack('SHOP_MAIN')} 
           className="p-1 -ml-1 text-gray-800 hover:text-black transition active:scale-95"
         >
-          <ChevronLeft size={24} />
+          <ThemeIcon.back size={22} />
         </button>
         <h1 className="text-[15px] font-extrabold text-gray-900 flex-1 text-center pr-6 tracking-tight">브랜드 선택</h1>
       </header>
@@ -459,13 +460,14 @@ export const ShopSell = () => {
             {searchQuery ? (
               <button 
                 type="button" 
+                aria-label="브랜드 검색어 지우기"
                 onClick={() => setSearchQuery('')}
-                className="text-gray-400 hover:text-gray-700 mr-1"
+                className="text-gray-600 hover:text-gray-900 mr-1"
               >
-                <X size={16} />
+                <ThemeIcon.close size={16} />
               </button>
             ) : null}
-            <Search size={20} className="text-gray-600" />
+            <ThemeIcon.search size={20} className="text-gray-600" />
           </div>
         </div>
 
@@ -477,7 +479,7 @@ export const ShopSell = () => {
             className="text-[13px] text-gray-700 font-bold flex items-center gap-1 hover:text-black transition group"
           >
             <span>원하는 브랜드가 없다면 직접 등록해보세요</span>
-            <ChevronRight size={14} className="text-gray-700 group-hover:translate-x-0.5 transition-transform" />
+            <ThemeIcon.forward size={14} className="text-gray-700 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
 
@@ -494,7 +496,7 @@ export const ShopSell = () => {
                 }}
                 className="inline-flex items-center gap-1.5 text-xs bg-gray-900 text-white font-bold px-4 py-2 rounded-lg hover:bg-black transition"
               >
-                <PlusCircle size={14} /> '{searchQuery}' 직접 등록하기
+                <ThemeIcon.add size={14} /> '{searchQuery}' 직접 등록하기
               </button>
             </div>
           ) : (
@@ -520,9 +522,9 @@ export const ShopSell = () => {
                   </span>
                 </div>
                 {selectedBrand?.ko === brand.ko ? (
-                  <Check size={18} className="text-blue-600 stroke-[3]" />
+                  <ThemeIcon.check size={18} className="text-blue-600 stroke-[3]" />
                 ) : (
-                  <ChevronRight size={16} className="text-gray-300" />
+                  <ThemeIcon.forward size={16} className="text-gray-300" />
                 )}
               </div>
             ))
