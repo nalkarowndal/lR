@@ -138,7 +138,6 @@ export const ShopCategory = () => {
 
   // 브랜드 가로 스크롤 및 좌우 이동 상태 관리
   const brandScrollRef = useRef<HTMLDivElement>(null);
-  const productGridRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [isAutoScrollActive] = useState(true);
@@ -250,27 +249,11 @@ export const ShopCategory = () => {
     setLeftActive(targetCategory);
     setSelectedSubCategory('전체');
     showToast(`'${tileTitle}' 카테고리(${targetCategory})로 이동했습니다.`, 'info');
-    setTimeout(() => {
-      if (productGridRef.current) {
-        const container = productGridRef.current.closest('.overflow-y-auto') as HTMLElement | null;
-        if (container) {
-          container.scrollTo({ top: productGridRef.current.offsetTop - 12, behavior: 'smooth' });
-        }
-      }
-    }, 150);
   };
 
   const handleSubCategoryClick = (sub: string) => {
     setSelectedSubCategory(sub);
     showToast(`${leftActive} > ${sub} 상품을 불러왔습니다.`, 'info');
-    setTimeout(() => {
-      if (productGridRef.current) {
-        const container = productGridRef.current.closest('.overflow-y-auto') as HTMLElement | null;
-        if (container) {
-          container.scrollTo({ top: productGridRef.current.offsetTop - 12, behavior: 'smooth' });
-        }
-      }
-    }, 100);
   };
 
   const handleProductClick = (item: CatalogProduct) => {
@@ -681,8 +664,8 @@ export const ShopCategory = () => {
                 </div>
               </div>
 
-              {/* 🌟 선택된 카테고리 & 서브카테고리 상품 그리드 (화면 공백 버그 원천 해결) */}
-              <div ref={productGridRef} className="border-t border-gray-100 pt-4">
+              {/* 🌟 선택된 카테고리 & 서브카테고리 상품 그리드 */}
+              <div className="border-t border-gray-100 pt-4">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-extrabold text-[13px] text-gray-950 tracking-tight flex items-center gap-1.5">
                     <span className="px-1.5 py-0.5 text-[10px] rounded bg-gray-900 text-white font-black tracking-normal">{subTab}</span>
