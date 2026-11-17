@@ -104,7 +104,19 @@ export function seedDatabase() {
     { brand: '루이비통', title: '스피디 반둘리에 25 모노그램', type: 'RENT', price: 25000, orig: 32000, disc: '21%', unit: '1일', tag: '추천', cat: 'bag', target: '20대 여성', img: '/assets/products/bags/louisvuitton_speedy.jpg' },
     { brand: '아미', title: '하트 로고 울 니트 가디건', type: 'BUY', price: 420000, orig: 520000, disc: '19%', unit: '', tag: '구매전용', cat: 'clothing', target: '20대 남성', img: '/assets/products/clothing/ami_heart_knit.jpg' },
     { brand: '롤렉스', title: '서브마리너 데이트 블랙 41mm', type: 'RENT', price: 79000, orig: 95000, disc: '16%', unit: '1일', tag: '명품시계', cat: 'watch', target: '30대 남성', img: '/assets/products/watches/rolex_submariner.jpg' },
-    { brand: '반클리프 앤 아펠', title: '빈티지 알함브라 펜던트 옐로우 골드', type: 'BUY', price: 3850000, orig: 4200000, disc: '8%', unit: '', tag: '한정수량', cat: 'jewelry', target: '30대 여성', img: '/assets/products/jewelry/vancleef_alhambra.jpg' }
+    { brand: '반클리프 앤 아펠', title: '빈티지 알함브라 펜던트 옐로우 골드', type: 'BUY', price: 3850000, orig: 4200000, disc: '8%', unit: '', tag: '한정수량', cat: 'jewelry', target: '30대 여성', img: '/assets/products/jewelry/vancleef_alhambra.jpg' },
+    { brand: '구찌', title: '키즈 GG 수프림 스타 토트백', type: 'RENT', price: 14000, orig: 18000, disc: '15%', unit: '1일', tag: '키즈인기', cat: 'bag', target: '아동', img: '/assets/products/kids/gucci_kids_star_tote.jpg' },
+    { brand: '구찌', title: '키즈 에이스 GG 웹 스니커즈', type: 'RENT', price: 9800, orig: 12000, disc: '18%', unit: '1일', tag: '베스트', cat: 'shoes', target: '아동', img: '/assets/products/kids/gucci_kids_ace_sneakers.jpg' },
+    { brand: '구찌', title: '키즈 웹 스트라이프 폴로셔츠', type: 'RENT', price: 7500, orig: 9000, disc: '12%', unit: '1일', tag: '신규등록', cat: 'clothing', target: '아동', img: '/assets/products/kids/gucci_kids_polo.jpg' },
+    { brand: '버버리', title: '칠드런 빈티지 체크 트렌치코트', type: 'RENT', price: 18500, orig: 23000, disc: '20%', unit: '1일', tag: '아이코닉', cat: 'clothing', target: '아동', img: '/assets/products/kids/burberry_kids_trench.jpg' },
+    { brand: '버버리', title: '토마스 베어 체크 나일론 백팩', type: 'RENT', price: 11000, orig: 13000, disc: '16%', unit: '1일', tag: '추천', cat: 'bag', target: '아동', img: '/assets/products/kids/burberry_kids_backpack.jpg' },
+    { brand: '버버리', title: '칠드런 체크 플리츠 코튼 원피스', type: 'RENT', price: 12500, orig: 15000, disc: '14%', unit: '1일', tag: '인기상품', cat: 'clothing', target: '아동', img: '/assets/products/kids/burberry_kids_dress.jpg' },
+    { brand: '몽클레르', title: '앙팡 바디 다운 패딩 네이비', type: 'RENT', price: 22000, orig: 27000, disc: '19%', unit: '1일', tag: '겨울필수', cat: 'clothing', target: '아동', img: '/assets/products/kids/moncler_kids_down_jacket.jpg' },
+    { brand: '몽클레르', title: '키즈 펠트 로고 트랙 팬츠', type: 'RENT', price: 8000, orig: 9500, disc: '15%', unit: '1일', tag: '데일리', cat: 'clothing', target: '아동', img: '/assets/products/kids/moncler_kids_sweatpants.jpg' },
+    { brand: '디올', title: '베이비 디올 오블리크 B23 슈즈', type: 'RENT', price: 15000, orig: 18000, disc: '17%', unit: '1일', tag: '프리미엄', cat: 'shoes', target: '아동', img: '/assets/products/kids/baby_dior_b23_sneakers.jpg' },
+    { brand: '디올', title: '베이비 디올 테디베어 플러시 참', type: 'RENT', price: 6500, orig: 7500, disc: '10%', unit: '1일', tag: '선물추천', cat: 'jewelry', target: '아동', img: '/assets/products/kids/baby_dior_teddy_charm.jpg' },
+    { brand: '펜디', title: '키즈 FF 로고 자카드 벨트백', type: 'RENT', price: 13000, orig: 15000, disc: '15%', unit: '1일', tag: '유니크', cat: 'bag', target: '아동', img: '/assets/products/kids/fendi_kids_beltbag.jpg' },
+    { brand: '펜디', title: '주니어 FF 올오버 윈드브레이커', type: 'RENT', price: 16500, orig: 20000, disc: '18%', unit: '1일', tag: '스페셜', cat: 'clothing', target: '아동', img: '/assets/products/kids/fendi_kids_windbreaker.jpg' }
   ];
 
   const insertProd = db.prepare(`
