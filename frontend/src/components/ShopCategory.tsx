@@ -1,4 +1,5 @@
 import { ThemeIcon } from './icons/ThemeIcon';
+import { resolveAssetUrl } from '../utils/assetUrl';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
@@ -8,6 +9,9 @@ import { Modal } from './ui/Modal';
 import { 
   BRAND_PRODUCTS_MAP, 
   CATEGORY_TOP_TILES,
+  CATEGORY_TOP_TILES_BY_GENDER,
+  type SubCategoryGender,
+  inferTargetGroup,
   getAllCatalogProducts,
   type CatalogProduct 
 } from '../data/catalog';
@@ -101,7 +105,7 @@ export const ShopCategory = () => {
   const { goBack, navigateTo, setActiveOverlay, user, favorites, toggleFavorite } = useApp();
   const { showToast } = useToast();
   const [mainTab, setMainTab] = useState<'CATEGORY' | 'BRAND'>('CATEGORY');
-  const [subTab, setSubTab] = useState('여성');
+  const [subTab, setSubTab] = useState<SubCategoryGender>('여성');
   const [leftActive, setLeftActive] = useState('가방/핸드백');
   const [activeBrand, setActiveBrand] = useState('루이비통');
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>('전체');
@@ -172,10 +176,22 @@ export const ShopCategory = () => {
 
   const displayedCategoryProducts = useMemo(() => {
     const targetCategories = CATEGORY_MAP[leftActive] || ['bag'];
-    const matchedCategoryItems = allCatalog.filter(item => targetCategories.includes(item.category));
 
+    // 1단계: 성별/연령군(subTab) 1차 필터링
+    const genderFiltered = allCatalog.filter(item => {
+      const tg = item.targetGroup || inferTargetGroup(item);
+      if (subTab === '여성') return tg === '여성' || tg === '공용';
+      if (subTab === '남성') return tg === '남성' || tg === '공용';
+      if (subTab === '아동') return tg === '아동';
+      return true;
+    });
+
+    // 2단계: LNB 대분류 카테고리 매칭
+    const matchedCategoryItems = genderFiltered.filter(item => targetCategories.includes(item.category));
+
+    // 3단계: 소분류 필터링
     if (selectedSubCategory === '전체') {
-      return matchedCategoryItems.length > 0 ? matchedCategoryItems : allCatalog.slice(0, 8);
+      return matchedCategoryItems.length > 0 ? matchedCategoryItems : genderFiltered.slice(0, 8);
     }
 
     const keywords = SUBCATEGORY_KEYWORD_MAP[selectedSubCategory] || [selectedSubCategory];
@@ -183,9 +199,9 @@ export const ShopCategory = () => {
       keywords.some(kw => item.title.includes(kw) || item.brand.includes(kw))
     );
 
-    // 키워드 일치 상품이 있을 경우 반환, 없을 경우 해당 대분류 상품들을 폴백으로 제공하여 공백 방지
-    return filteredBySub.length > 0 ? filteredBySub : matchedCategoryItems;
-  }, [allCatalog, leftActive, selectedSubCategory]);
+    // 키워드 일치 상품이 있을 경우 반환, 없을 경우 대분류 상품들을 폴백으로 제공하여 공백 방지
+    return filteredBySub.length > 0 ? filteredBySub : (matchedCategoryItems.length > 0 ? matchedCategoryItems : genderFiltered.slice(0, 8));
+  }, [allCatalog, leftActive, selectedSubCategory, subTab]);
 
   // 브랜드 탭 전환 시 서버 데이터베이스에서 실시간 조회 (관리자가 등록한 최신 상품 포함)
   useEffect(() => {
@@ -554,7 +570,12 @@ export const ShopCategory = () => {
               <button 
                 key={tab} 
                 type="button"
-                onClick={() => setSubTab(tab)}
+                onClick={() => {
+                  const newTab = tab as SubCategoryGender;
+                  setSubTab(newTab);
+                  setSelectedSubCategory('전체');
+                  showToast(`${newTab} 럭셔리 컬렉션으로 전환했습니다.`, 'info');
+                }}
                 className={`py-3 mr-6 text-sm font-extrabold border-b-2 transition-all ${
                   subTab === tab ? 'border-black text-black' : 'border-transparent text-gray-400 hover:text-gray-600'
                 }`}
@@ -588,9 +609,9 @@ export const ShopCategory = () => {
 
             {/* 우측 세부 콘텐츠 */}
             <div className="flex-1 bg-white overflow-y-auto scrollbar-hide p-4 sm:p-5">
-              {/* 상단 추천 3개 카드: 실사 패션 스튜디오 에셋 적용 */}
+              {/* 상단 추천 3개 카드: 서브탭(여성/남성/아동)별 고유 실사 룩북 에셋 동적 바인딩 */}
               <div className="flex justify-between gap-2.5 mb-6">
-                {CATEGORY_TOP_TILES.map((tile) => {
+                {(CATEGORY_TOP_TILES_BY_GENDER[subTab] || CATEGORY_TOP_TILES).map((tile) => {
                   const isActive = leftActive === tile.targetCategory;
                   return (
                     <div 
@@ -602,7 +623,7 @@ export const ShopCategory = () => {
                     >
                       <div className="relative aspect-square w-full rounded-xl overflow-hidden border border-gray-200/80 shadow-2xs group-hover:shadow-xs transition-all bg-gray-100">
                         <img 
-                          src={tile.imageUrl} 
+                          src={resolveAssetUrl(tile.imageUrl)}
                           alt={tile.title}
                           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                           loading="lazy"
@@ -613,7 +634,7 @@ export const ShopCategory = () => {
                         )}
                       </div>
                       <span className="text-[11px] text-center font-bold text-gray-800 break-keep leading-tight group-hover:text-black">
-                        {subTab} {tile.title}
+                        {tile.title}
                       </span>
                     </div>
                   );
@@ -664,6 +685,7 @@ export const ShopCategory = () => {
               <div ref={productGridRef} className="border-t border-gray-100 pt-4">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-extrabold text-[13px] text-gray-950 tracking-tight flex items-center gap-1.5">
+                    <span className="px-1.5 py-0.5 text-[10px] rounded bg-gray-900 text-white font-black tracking-normal">{subTab}</span>
                     <span>{leftActive}</span>
                     {selectedSubCategory !== '전체' && (
                       <span className="text-indigo-600 font-bold">&gt; {selectedSubCategory}</span>

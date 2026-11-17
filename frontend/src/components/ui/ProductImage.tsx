@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { resolveAssetUrl } from '../../utils/assetUrl';
 import { ProductVisualBadge } from './LuxuryIcons';
 
 export interface ProductImageProps {
@@ -28,13 +29,7 @@ export const ProductImage: React.FC<ProductImageProps> = ({
   productId,
   objectFit = 'cover'
 }) => {
-  // 1. Resolve source flexibly across all possible naming conventions
-  const rawSrc = src ?? imageUrl ?? image ?? image_url;
-  const effectiveSrc = typeof rawSrc === 'string' && rawSrc.trim() !== ''
-    ? (rawSrc.startsWith('/') || rawSrc.startsWith('http://') || rawSrc.startsWith('https://') || rawSrc.startsWith('data:')
-        ? rawSrc.trim()
-        : '/' + rawSrc.trim())
-    : null;
+  const effectiveSrc = resolveAssetUrl(src ?? imageUrl ?? image ?? image_url);
 
   const imgRef = useRef<HTMLImageElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);

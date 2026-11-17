@@ -1,4 +1,5 @@
 import { ThemeIcon } from './icons/ThemeIcon';
+import { resolveAssetUrl } from '../utils/assetUrl';
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
@@ -531,7 +532,7 @@ export const ShopAdmin = () => {
                     <div key={p.id} className="bg-white/5 border border-white/10 p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 backdrop-blur-md hover:border-white/25 transition">
                       <div className="flex items-center gap-3">
                         {p.image_url ? (
-                          <img src={p.image_url} alt={p.title} className="w-10 h-10 rounded-lg object-cover bg-black/40 border border-white/10 shrink-0" />
+                          <img src={resolveAssetUrl(p.image_url)} alt={p.title} className="w-10 h-10 rounded-lg object-cover bg-black/40 border border-white/10 shrink-0" />
                         ) : (
                           <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-gray-400 shrink-0">
                             <ThemeIcon.image size={16} />
@@ -596,7 +597,7 @@ export const ShopAdmin = () => {
                       productImages.map(img => (
                         <div key={img.id} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
                           <div className="flex items-center gap-3">
-                            <img src={img.image_path} alt={img.alt_text} className="w-12 h-12 rounded-lg object-cover bg-black" />
+                            <img src={resolveAssetUrl(img.image_path)} alt={img.alt_text} className="w-12 h-12 rounded-lg object-cover bg-black" />
                             <div>
                               <p className="text-xs font-bold text-white truncate max-w-[200px]">{img.alt_text}</p>
                               <span className="text-[10px] text-gray-400 font-mono truncate max-w-[200px] block">{img.image_path}</span>
@@ -639,7 +640,7 @@ export const ShopAdmin = () => {
 
                     {newImagePath && (
                       <div className="flex items-center gap-3 p-2 bg-white/5 border border-white/10 rounded-xl">
-                        <img src={newImagePath} alt="등록 미리보기" className="w-12 h-12 object-cover rounded-lg border border-white/20 shrink-0" />
+                        <img src={resolveAssetUrl(newImagePath)} alt="등록 미리보기" className="w-12 h-12 object-cover rounded-lg border border-white/20 shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="text-[11px] text-gray-200 font-bold truncate">등록 대기 이미지 선택됨</p>
                           <p className="text-[10px] text-gray-400 truncate">{newImagePath.slice(0, 40)}...</p>

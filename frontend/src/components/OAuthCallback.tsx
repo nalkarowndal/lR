@@ -31,11 +31,8 @@ export const OAuthCallback: React.FC = () => {
         setMessage(`${providerName} 로그인 오류: ${errorDesc || error}`);
         showToast(`${providerName} 로그인 오류: ${errorDesc || error}`, 'error');
       }
-      setTimeout(() => {
-        window.history.replaceState({}, document.title, '/');
-        window.location.href = '/';
-      }, 1200);
-      return;
+      const timer = window.setTimeout(() => window.location.replace(import.meta.env.BASE_URL), 1200);
+      return () => window.clearTimeout(timer);
     }
 
     // 2. Validate code & state
@@ -43,11 +40,8 @@ export const OAuthCallback: React.FC = () => {
       setStatus('ERROR');
       setMessage('인증 코드 또는 보안 State가 누락되었습니다.');
       showToast('유효하지 않은 OAuth 접근입니다.', 'error');
-      setTimeout(() => {
-        window.history.replaceState({}, document.title, '/');
-        window.location.href = '/';
-      }, 1200);
-      return;
+      const timer = window.setTimeout(() => window.location.replace(import.meta.env.BASE_URL), 1200);
+      return () => window.clearTimeout(timer);
     }
 
     // 3. Forward to backend callback endpoint with code & state

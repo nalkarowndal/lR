@@ -26,8 +26,11 @@ export interface CatalogProduct {
   assetSource?: 'STUDIO_AI_PHOTOREAL' | 'VECTOR_RENDER' | 'CATALOG_ARCHIVE';
   verifiedDate?: string;
   condition?: string;
-  targetGroup?: string;
+  targetGroup?: TargetGroupType;
 }
+
+export type SubCategoryGender = '여성' | '남성' | '아동';
+export type TargetGroupType = '여성' | '남성' | '아동' | '공용';
 
 // 1. 카테고리 상단 3개 추천 타일 비주얼 데이터
 export interface CategoryTopTile {
@@ -38,29 +41,79 @@ export interface CategoryTopTile {
   targetCategory: string;
 }
 
-export const CATEGORY_TOP_TILES: CategoryTopTile[] = [
-  {
-    id: 'tile-sneakers',
-    title: '오늘의 스니커즈',
-    subtitle: '디자이너 스니커즈 컬렉션',
-    imageUrl: '/assets/categories/sneaker_tile.jpg',
-    targetCategory: '슈즈'
-  },
-  {
-    id: 'tile-jewelry',
-    title: '요즘 이게 잘 나갑니다',
-    subtitle: '하이엔드 파인 주얼리 & 링',
-    imageUrl: '/assets/categories/jewelry_tile.jpg',
-    targetCategory: '시계/액세서리'
-  },
-  {
-    id: 'tile-apparel',
-    title: '봄 신상 코트·자켓',
-    subtitle: '시즌 테일러드 코트 & 아우터',
-    imageUrl: '/assets/categories/apparel_tile.jpg',
-    targetCategory: '의류'
-  }
-];
+export const CATEGORY_TOP_TILES_BY_GENDER: Record<SubCategoryGender, CategoryTopTile[]> = {
+  '여성': [
+    {
+      id: 'w-tile-bag',
+      title: '아이코닉 플랩백',
+      subtitle: '샤넬 & 디올 시그니처 숄더',
+      imageUrl: '/assets/categories/women_bag_tile.jpg',
+      targetCategory: '가방/핸드백'
+    },
+    {
+      id: 'w-tile-shoes',
+      title: '슬링백 & 슈즈',
+      subtitle: '데일리 럭셔리 슈즈 컬렉션',
+      imageUrl: '/assets/categories/women_shoes_tile.jpg',
+      targetCategory: '슈즈'
+    },
+    {
+      id: 'w-tile-jewelry',
+      title: '파인 주얼리 & 링',
+      subtitle: '반클리프 & 까르띠에 펜던트',
+      imageUrl: '/assets/categories/women_jewelry_tile.jpg',
+      targetCategory: '시계/액세서리'
+    }
+  ],
+  '남성': [
+    {
+      id: 'm-tile-apparel',
+      title: '밀리터리 테크웨어',
+      subtitle: '스톤아일랜드 & CP컴퍼니 아우터',
+      imageUrl: '/assets/categories/men_apparel_tile.jpg',
+      targetCategory: '의류'
+    },
+    {
+      id: 'm-tile-watch',
+      title: '마스터피스 워치',
+      subtitle: '롤렉스 서브마리너 & 스포츠',
+      imageUrl: '/assets/categories/men_watch_tile.jpg',
+      targetCategory: '시계/액세서리'
+    },
+    {
+      id: 'm-tile-sneakers',
+      title: '럭셔리 스니커즈',
+      subtitle: '발렌시아가 & 마르지엘라 러너',
+      imageUrl: '/assets/categories/men_sneakers_tile.jpg',
+      targetCategory: '슈즈'
+    }
+  ],
+  '아동': [
+    {
+      id: 'k-tile-apparel',
+      title: '리틀 럭셔리 룩북',
+      subtitle: '버버리 & 구찌 키즈 의류',
+      imageUrl: '/assets/categories/kids_apparel_tile.jpg',
+      targetCategory: '의류'
+    },
+    {
+      id: 'k-tile-bag',
+      title: '미니 백팩 & 토트',
+      subtitle: '구찌 키즈 & 자카드 백팩',
+      imageUrl: '/assets/categories/kids_bag_tile.jpg',
+      targetCategory: '가방/핸드백'
+    },
+    {
+      id: 'k-tile-shoes',
+      title: '베이비 & 주니어 슈즈',
+      subtitle: '베이비 디올 & 키즈 스니커즈',
+      imageUrl: '/assets/categories/kids_shoes_tile.jpg',
+      targetCategory: '슈즈'
+    }
+  ]
+};
+
+export const CATEGORY_TOP_TILES: CategoryTopTile[] = CATEGORY_TOP_TILES_BY_GENDER['여성'];
 
 // 2. 브랜드별 36대 전체 상품 데이터 (안정적인 ID + 실제 이미지 매핑)
 export const BRAND_PRODUCTS_MAP: Record<string, CatalogProduct[]> = {
@@ -1942,6 +1995,241 @@ export const RENT_NEW_ARRIVALS: CatalogProduct[] = [
   }
 ];
 
+// 5. 키즈(아동) 명품 전용 카탈로그 컬렉션 (12개 상품)
+export const KIDS_PRODUCTS: CatalogProduct[] = [
+  {
+    id: 'kids-01',
+    brand: '구찌',
+    title: '키즈 GG 수프림 스타 토트백',
+    category: 'bag',
+    targetGroup: '아동',
+    price: '14,000원',
+    originalPrice: '1,250,000원',
+    discount: '15%',
+    unit: '/1일',
+    tag: '키즈인기',
+    isExcellent: true,
+    imageUrl: '/assets/products/kids/gucci_kids_star_tote.jpg',
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-17'
+  },
+  {
+    id: 'kids-02',
+    brand: '구찌',
+    title: '키즈 에이스 GG 웹 스니커즈',
+    category: 'shoes',
+    targetGroup: '아동',
+    price: '9,800원',
+    originalPrice: '620,000원',
+    discount: '18%',
+    unit: '/1일',
+    tag: '베스트',
+    isExcellent: false,
+    imageUrl: '/assets/products/kids/gucci_kids_ace_sneakers.jpg',
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-17'
+  },
+  {
+    id: 'kids-03',
+    brand: '구찌',
+    title: '키즈 웹 스트라이프 폴로셔츠',
+    category: 'clothing',
+    targetGroup: '아동',
+    price: '7,500원',
+    originalPrice: '450,000원',
+    discount: '12%',
+    unit: '/1일',
+    tag: '신규등록',
+    isExcellent: false,
+    imageUrl: '/assets/products/kids/gucci_kids_polo.jpg',
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-17'
+  },
+  {
+    id: 'kids-04',
+    brand: '버버리',
+    title: '칠드런 빈티지 체크 트렌치코트',
+    category: 'clothing',
+    targetGroup: '아동',
+    price: '18,500원',
+    originalPrice: '1,420,000원',
+    discount: '20%',
+    unit: '/1일',
+    tag: '아이코닉',
+    isExcellent: true,
+    imageUrl: '/assets/products/kids/burberry_kids_trench.jpg',
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-17'
+  },
+  {
+    id: 'kids-05',
+    brand: '버버리',
+    title: '토마스 베어 체크 나일론 백팩',
+    category: 'bag',
+    targetGroup: '아동',
+    price: '11,000원',
+    originalPrice: '980,000원',
+    discount: '16%',
+    unit: '/1일',
+    tag: '추천',
+    isExcellent: false,
+    imageUrl: '/assets/products/kids/burberry_kids_backpack.jpg',
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-17'
+  },
+  {
+    id: 'kids-06',
+    brand: '버버리',
+    title: '칠드런 체크 플리츠 코튼 원피스',
+    category: 'clothing',
+    targetGroup: '아동',
+    price: '12,500원',
+    originalPrice: '820,000원',
+    discount: '14%',
+    unit: '/1일',
+    tag: '인기상품',
+    isExcellent: true,
+    imageUrl: '/assets/products/kids/burberry_kids_dress.jpg',
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-17'
+  },
+  {
+    id: 'kids-07',
+    brand: '몽클레르',
+    title: '앙팡 바디 다운 패딩 네이비',
+    category: 'clothing',
+    targetGroup: '아동',
+    price: '22,000원',
+    originalPrice: '1,350,000원',
+    discount: '19%',
+    unit: '/1일',
+    tag: '겨울필수',
+    isExcellent: true,
+    imageUrl: '/assets/products/kids/moncler_kids_down_jacket.jpg',
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-17'
+  },
+  {
+    id: 'kids-08',
+    brand: '몽클레르',
+    title: '키즈 펠트 로고 트랙 팬츠',
+    category: 'clothing',
+    targetGroup: '아동',
+    price: '8,000원',
+    originalPrice: '480,000원',
+    discount: '15%',
+    unit: '/1일',
+    tag: '데일리',
+    isExcellent: false,
+    imageUrl: '/assets/products/kids/moncler_kids_sweatpants.jpg',
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-17'
+  },
+  {
+    id: 'kids-09',
+    brand: '디올',
+    title: '베이비 디올 오블리크 B23 슈즈',
+    category: 'shoes',
+    targetGroup: '아동',
+    price: '15,000원',
+    originalPrice: '990,000원',
+    discount: '17%',
+    unit: '/1일',
+    tag: '프리미엄',
+    isExcellent: true,
+    imageUrl: '/assets/products/kids/baby_dior_b23_sneakers.jpg',
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-17'
+  },
+  {
+    id: 'kids-10',
+    brand: '디올',
+    title: '베이비 디올 테디베어 플러시 참',
+    category: 'jewelry',
+    targetGroup: '아동',
+    price: '6,500원',
+    originalPrice: '520,000원',
+    discount: '10%',
+    unit: '/1일',
+    tag: '선물추천',
+    isExcellent: false,
+    imageUrl: '/assets/products/kids/baby_dior_teddy_charm.jpg',
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-17'
+  },
+  {
+    id: 'kids-11',
+    brand: '펜디',
+    title: '키즈 FF 로고 자카드 벨트백',
+    category: 'bag',
+    targetGroup: '아동',
+    price: '13,000원',
+    originalPrice: '890,000원',
+    discount: '15%',
+    unit: '/1일',
+    tag: '유니크',
+    isExcellent: false,
+    imageUrl: '/assets/products/kids/fendi_kids_beltbag.jpg',
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-17'
+  },
+  {
+    id: 'kids-12',
+    brand: '펜디',
+    title: '주니어 FF 올오버 윈드브레이커',
+    category: 'clothing',
+    targetGroup: '아동',
+    price: '16,500원',
+    originalPrice: '1,150,000원',
+    discount: '18%',
+    unit: '/1일',
+    tag: '스페셜',
+    isExcellent: true,
+    imageUrl: '/assets/products/kids/fendi_kids_windbreaker.jpg',
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-17'
+  }
+];
+
+export function inferTargetGroup(p: CatalogProduct): TargetGroupType {
+  if (p.targetGroup) return p.targetGroup;
+  const t = (p.title + ' ' + p.brand + ' ' + (p.tag || '')).toLowerCase();
+  if (t.includes('키즈') || t.includes('아동') || t.includes('베이비') || t.includes('칠드런') || t.includes('주니어') || t.includes('앙팡')) {
+    return '아동';
+  }
+  if (p.brand === '스톤 아일랜드' || p.brand === 'CP 컴퍼니' || p.brand === '톰브라운' || p.brand === '아미' || t.includes('남성') || t.includes('맨즈') || t.includes('서브마리너') || t.includes('데이토나') || t.includes('브리프케이스')) {
+    return '남성';
+  }
+  if (p.brand === '샤넬' || p.brand === '디올' || p.brand === '셀린느' || p.brand === '에르메스' || p.brand === '생로랑' || t.includes('여성') || t.includes('플랩백') || t.includes('호보백') || t.includes('원피스') || t.includes('스커트') || t.includes('펌프스') || t.includes('힐') || t.includes('버킨') || t.includes('켈리')) {
+    return '여성';
+  }
+  return '공용';
+}
+
 // Helper: 전체 상품 목록 플랫화
 export function getAllCatalogProducts(): CatalogProduct[] {
   const list: CatalogProduct[] = [];
@@ -1950,7 +2238,8 @@ export function getAllCatalogProducts(): CatalogProduct[] {
   const addIfUnique = (p: CatalogProduct) => {
     if (!seenIds.has(p.id)) {
       seenIds.add(p.id);
-      list.push(p);
+      const cloned = { ...p, targetGroup: p.targetGroup || inferTargetGroup(p) };
+      list.push(cloned);
     }
   };
 
@@ -1959,12 +2248,18 @@ export function getAllCatalogProducts(): CatalogProduct[] {
     products.forEach(addIfUnique);
   });
 
+  // Kids products
+  KIDS_PRODUCTS.forEach(addIfUnique);
+
   // Search catalog
   SEARCH_CATALOG.forEach(addIfUnique);
 
   // Recommendations
-  Object.values(RECOMMENDATIONS_DATA).forEach(products => {
-    products.forEach(addIfUnique);
+  Object.entries(RECOMMENDATIONS_DATA).forEach(([groupName, products]) => {
+    const isMen = groupName.includes('남성');
+    const isKids = groupName.includes('아동') || groupName.includes('키즈');
+    const groupTarget: TargetGroupType = isKids ? '아동' : (isMen ? '남성' : '여성');
+    products.forEach(p => addIfUnique({ ...p, targetGroup: p.targetGroup || groupTarget }));
   });
 
   // New arrivals
