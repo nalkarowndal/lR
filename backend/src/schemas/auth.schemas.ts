@@ -29,6 +29,6 @@ export const forgotPasswordSchema = z.object({
 });
 
 export const resetPasswordSchema = z.object({
-  token: z.string().min(1, '유효한 재설정 토큰이 필요합니다.'),
+  token: z.string().min(1, '유효한 인증 번호가 필요합니다.'),
   newPassword: z.string().min(6, '새 비밀번호는 최소 6자 이상이어야 합니다.')
 });

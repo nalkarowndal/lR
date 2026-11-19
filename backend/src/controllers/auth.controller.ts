@@ -195,7 +195,7 @@ export function forgotPassword(req: Request, res: Response, next: NextFunction) 
     console.log(`[Email Service Dispatch]
 --------------------------------------------------------------------------------
 To: ${user.email} (${user.name})
-Subject: [LuxuryRental] 비밀번호 재설정 링크 및 인증 토큰
+Subject: [LuxuryRental] 비밀번호 재설정 인증 번호 안내
 Reset URL: ${resetUrl}
 Token: ${resetToken}
 Expires: 1 hour
@@ -203,7 +203,7 @@ Expires: 1 hour
 
     const responsePayload: Record<string, any> = {
       success: true,
-      message: '등록된 이메일 계정으로 비밀번호 재설정 링크가 전송되었습니다. 전달받은 링크 또는 토큰을 확인해주세요.'
+      message: '등록된 이메일 계정으로 비밀번호 재설정 안내가 전송되었습니다. 전달받은 링크 또는 인증 번호를 확인해주세요.'
     };
 
     // Strictly restrict token inclusion in response to automated test runner environments only
@@ -231,7 +231,7 @@ export function resetPassword(req: Request, res: Response, next: NextFunction) {
     if (!record) {
       return res.status(400).json({
         success: false,
-        error: '만료되었거나 이미 사용된 재설정 토큰입니다.'
+        error: '만료되었거나 이미 사용된 인증 번호입니다.'
       });
     }
 

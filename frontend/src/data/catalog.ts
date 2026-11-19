@@ -3,7 +3,7 @@
  * Single Source of Truth for Main, Category, Brand, Search, Wishlist, and Admin
  */
 
-export type AssetQualityStatus = 
+export type AssetQualityStatus =
   | 'APPROVED_PHOTOREAL'     // Verified high-resolution genuine studio photograph
   | 'REGENERATE_REQUIRED'    // Vector/geometric art requiring photoreal AI generation
   | 'PRODUCT_MISMATCH'
@@ -1501,10 +1501,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '예약 마감',
     category: 'bag',
     imageUrl: '/assets/products/bags/chanel_classic_flap.jpg',
-      imageStatus: 'READY',
-      assetQuality: 'APPROVED_PHOTOREAL',
-      assetSource: 'STUDIO_AI_PHOTOREAL',
-      verifiedDate: '2026-11-05'
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-05'
   },
   {
     id: 'search-02',
@@ -1514,10 +1514,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '앱전용',
     category: 'bag',
     imageUrl: '/assets/products/bags/chanel_22_mini.jpg',
-      imageStatus: 'READY',
-      assetQuality: 'APPROVED_PHOTOREAL',
-      assetSource: 'STUDIO_AI_PHOTOREAL',
-      verifiedDate: '2026-11-05'
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-05'
   },
   {
     id: 'search-03',
@@ -1527,10 +1527,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '예약 마감',
     category: 'watch',
     imageUrl: '/assets/products/watches/cartier_tank_must.jpg',
-      imageStatus: 'READY',
-      assetQuality: 'APPROVED_PHOTOREAL',
-      assetSource: 'STUDIO_AI_PHOTOREAL',
-      verifiedDate: '2026-11-05'
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-05'
   },
   {
     id: 'search-04',
@@ -1540,10 +1540,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '앱전용',
     category: 'jewelry',
     imageUrl: '/assets/products/jewelry/cartier_love_bracelet.jpg',
-      imageStatus: 'READY',
-      assetQuality: 'APPROVED_PHOTOREAL',
-      assetSource: 'STUDIO_AI_PHOTOREAL',
-      verifiedDate: '2026-11-05'
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-05'
   },
   {
     id: 'search-05',
@@ -1553,10 +1553,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '예약 마감',
     category: 'bag',
     imageUrl: '/assets/products/bags/balenciaga_le_city.jpg',
-      imageStatus: 'READY',
-      assetQuality: 'APPROVED_PHOTOREAL',
-      assetSource: 'STUDIO_AI_PHOTOREAL',
-      verifiedDate: '2026-11-05'
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-05'
   },
   {
     id: 'search-06',
@@ -1566,10 +1566,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '예약 마감',
     category: 'bag',
     imageUrl: '/assets/products/bags/celine_triomphe.jpg',
-      imageStatus: 'READY',
-      assetQuality: 'APPROVED_PHOTOREAL',
-      assetSource: 'STUDIO_AI_PHOTOREAL',
-      verifiedDate: '2026-11-05'
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-05'
   },
   {
     id: 'search-07',
@@ -1579,10 +1579,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '예약 마감',
     category: 'bag',
     imageUrl: '/assets/products/bags/dior_lady_djoy.jpg',
-      imageStatus: 'READY',
-      assetQuality: 'APPROVED_PHOTOREAL',
-      assetSource: 'STUDIO_AI_PHOTOREAL',
-      verifiedDate: '2026-11-05'
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-05'
   },
   {
     id: 'search-08',
@@ -1592,10 +1592,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '앱전용',
     category: 'bag',
     imageUrl: '/assets/products/bags/prada_renylon_belt.jpg',
-      imageStatus: 'READY',
-      assetQuality: 'APPROVED_PHOTOREAL',
-      assetSource: 'STUDIO_AI_PHOTOREAL',
-      verifiedDate: '2026-11-05'
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-05'
   },
   {
     id: 'search-09',
@@ -1605,10 +1605,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '예약 마감',
     category: 'bag',
     imageUrl: '/assets/products/bags/louisvuitton_neonoe_bb.jpg',
-      imageStatus: 'READY',
-      assetQuality: 'APPROVED_PHOTOREAL',
-      assetSource: 'STUDIO_AI_PHOTOREAL',
-      verifiedDate: '2026-11-05'
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-05'
   },
   {
     id: 'search-10',
@@ -1618,10 +1618,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '예약 마감',
     category: 'bag',
     imageUrl: '/assets/products/bags/goyard_saint_louis_pm.jpg',
-      imageStatus: 'READY',
-      assetQuality: 'APPROVED_PHOTOREAL',
-      assetSource: 'STUDIO_AI_PHOTOREAL',
-      verifiedDate: '2026-11-05'
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-05'
   },
   {
     id: 'search-11',
@@ -1631,10 +1631,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '앱전용',
     category: 'bag',
     imageUrl: '/assets/products/bags/gucci_horsebit_1955.jpg',
-      imageStatus: 'READY',
-      assetQuality: 'APPROVED_PHOTOREAL',
-      assetSource: 'STUDIO_AI_PHOTOREAL',
-      verifiedDate: '2026-11-05'
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-05'
   },
   {
     id: 'search-12',
@@ -1644,10 +1644,10 @@ export const SEARCH_CATALOG: CatalogProduct[] = [
     tag: '예약 마감',
     category: 'bag',
     imageUrl: '/assets/products/bags/hermes_evelyne_tpm.jpg',
-      imageStatus: 'READY',
-      assetQuality: 'APPROVED_PHOTOREAL',
-      assetSource: 'STUDIO_AI_PHOTOREAL',
-      verifiedDate: '2026-11-05'
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-05'
   }
 ];
 
@@ -1975,10 +1975,10 @@ export const RENT_NEW_ARRIVALS: CatalogProduct[] = [
     unit: '1일',
     category: 'bag',
     imageUrl: '/assets/products/bags/balenciaga_le_city.jpg',
-      imageStatus: 'READY',
-      assetQuality: 'APPROVED_PHOTOREAL',
-      assetSource: 'STUDIO_AI_PHOTOREAL',
-      verifiedDate: '2026-11-05'
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-05'
   },
   {
     id: 'arr-02',
@@ -1988,10 +1988,10 @@ export const RENT_NEW_ARRIVALS: CatalogProduct[] = [
     unit: '1일',
     category: 'bag',
     imageUrl: '/assets/products/bags/dior_lady_djoy.jpg',
-      imageStatus: 'READY',
-      assetQuality: 'APPROVED_PHOTOREAL',
-      assetSource: 'STUDIO_AI_PHOTOREAL',
-      verifiedDate: '2026-11-05'
+    imageStatus: 'READY',
+    assetQuality: 'APPROVED_PHOTOREAL',
+    assetSource: 'STUDIO_AI_PHOTOREAL',
+    verifiedDate: '2026-11-05'
   }
 ];
 

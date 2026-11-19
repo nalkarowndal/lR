@@ -63,7 +63,7 @@ export const ShopPasswordReset = () => {
       if (urlToken) {
         setToken(urlToken);
         setStep('RESET');
-        setSuccessMsg('이메일 재설정 링크가 확인되었습니다. 변경하실 새 비밀번호를 입력해주세요.');
+        setSuccessMsg('이메일 인증 링크가 확인되었습니다. 변경하실 새 비밀번호를 입력해주세요.');
       }
 
       return () => {
@@ -87,7 +87,7 @@ export const ShopPasswordReset = () => {
     try {
       const res = await api.forgotPassword(email.trim());
       if (res?.success) {
-        setSuccessMsg(res.message || '등록된 이메일 계정으로 재설정 링크가 전송되었습니다.');
+        setSuccessMsg(res.message || '등록된 이메일 계정으로 인증 번호가 전송되었습니다.');
         if (res.resetToken) {
           setToken(res.resetToken);
         }
@@ -155,8 +155,8 @@ export const ShopPasswordReset = () => {
           <h2 className="text-xl font-black text-gray-950 mb-1">비밀번호 재설정</h2>
           <p className="text-xs text-gray-500">
             {step === 'REQUEST' 
-              ? '가입하신 이메일 주소를 입력하시면 재설정 토큰을 안내해 드립니다.' 
-              : '인증 토큰과 변경하실 새 비밀번호를 입력해주세요.'}
+              ? '가입하신 이메일 주소를 입력하시면 비밀번호 재설정 인증 번호를 발송해 드립니다.' 
+              : '발송된 인증 번호와 변경하실 새 비밀번호를 입력해주세요.'}
           </p>
         </div>
 
@@ -193,24 +193,24 @@ export const ShopPasswordReset = () => {
               disabled={isLoading}
               className="w-full bg-gray-950 hover:bg-black active:scale-[0.98] text-white py-3.5 rounded-xl font-bold text-sm transition shadow-sm disabled:opacity-50"
             >
-              {isLoading ? '확인 중...' : '재설정 링크 받기'}
+              {isLoading ? '발송 중...' : '인증 번호 받기'}
             </button>
           </form>
         ) : (
           <form onSubmit={handleResetPassword} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1.5">재설정 인증 토큰</label>
+              <label className="block text-xs font-bold text-gray-700 mb-1.5">인증 번호</label>
               <input 
                 ref={firstInputRef}
                 type="text"
                 value={token}
                 onChange={(e) => setToken(e.target.value)}
-                placeholder="발급된 토큰 입력"
+                placeholder="발급된 인증 번호 입력"
                 required
                 className="w-full border border-gray-200 focus:border-gray-950 rounded-xl p-3.5 text-sm font-mono outline-none transition"
               />
               <p className="text-[11px] text-gray-500 mt-1.5 leading-normal">
-                이메일 링크로 접속하신 경우 토큰이 자동 입력됩니다. 수동 입력 시 발송된 안내 메일 또는 서버 콘솔의 인증 토큰을 입력해주세요.
+                이메일 링크로 접속하신 경우 인증 번호가 자동 입력됩니다. 수동 입력 시 발송된 안내 메일의 인증 번호를 입력해주세요.
               </p>
             </div>
             <div>
