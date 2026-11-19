@@ -151,10 +151,10 @@ export const ShopAdmin = () => {
         setNewImageAlt('');
         showAlert('이미지 등록 완료', '상품 실사 이미지가 서버에 정상 업로드 및 등록되었습니다.');
       } else {
-        throw new Error(res?.message || '이미지 등록 실패');
+        throw new Error(res?.message || '이미지 등록에 실패했습니다.');
       }
     } catch (err: any) {
-      showAlert('등록 실패', err.message || '이미지 등록 실패');
+      showAlert('등록 실패', err.message || '이미지를 등록하는 중 일시적인 지연이 발생했습니다. 다시 시도해주세요.');
     } finally {
       setIsUploading(false);
     }
@@ -167,7 +167,7 @@ export const ShopAdmin = () => {
       setProductImages(prev => prev.filter(img => img.id !== imageId));
       showAlert('삭제 완료', '이미지가 삭제되었습니다.');
     } catch (err: any) {
-      showAlert('삭제 실패', err.message || '이미지 삭제 실패');
+      showAlert('삭제 실패', err.message || '이미지를 삭제하는 중 일시적인 지연이 발생했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -200,7 +200,7 @@ export const ShopAdmin = () => {
       }
     } catch (err: any) {
       console.error('[Admin] Product creation failed:', err);
-      showAlert('등록 실패', err.message || '서버 상품 등록 중 오류가 발생했습니다.');
+      showAlert('등록 실패', err.message || '상품 정보를 저장하는 중 일시적인 지연이 발생했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -221,7 +221,7 @@ export const ShopAdmin = () => {
       }
     } catch (err: any) {
       console.error('[Admin] Recruit request failed:', err);
-      showAlert('접수 실패', err.message || '서버 구인 요청 저장 중 오류가 발생했습니다.');
+      showAlert('접수 실패', err.message || '구인 요청 정보를 저장하는 중 일시적인 지연이 발생했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -245,7 +245,7 @@ export const ShopAdmin = () => {
       }
     } catch (err: any) {
       console.error('[Admin] Message send failed:', err);
-      showAlert('전송 실패', err.message || '메시지 전송 중 오류가 발생했습니다.');
+      showAlert('전송 실패', err.message || '메시지를 전송하는 중 일시적인 지연이 발생했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -278,7 +278,7 @@ export const ShopAdmin = () => {
       }
     } catch (err: any) {
       console.error('[Admin] Worker registration failed:', err);
-      showAlert('등록 실패', err.message || '근무자 정보를 서버에 저장하지 못했습니다.');
+      showAlert('등록 실패', err.message || '근무자 정보를 저장하는 중 일시적인 지연이 발생했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -309,10 +309,10 @@ export const ShopAdmin = () => {
         setAdminSellRequests(prev => prev.map(s => s.id === id ? { ...s, status: nextStatus } : s));
         showAlert('상태 변경 완료', `신청 건의 상태가 '${nextStatus}'(으)로 변경되었습니다.`);
       } else {
-        throw new Error(res?.message || '상태 변경 실패');
+        throw new Error(res?.message || '상태 변경에 실패했습니다.');
       }
     } catch (err: any) {
-      showAlert('변경 실패', err?.message || '상태 변경 중 오류가 발생했습니다.');
+      showAlert('변경 실패', err?.message || '상태를 변경하는 중 일시적인 지연이 발생했습니다. 다시 시도해주세요.');
     }
   };
 

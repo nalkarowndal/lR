@@ -146,7 +146,7 @@ export const ShopMyPage: React.FC = () => {
         setShowEditModal(false);
       }
     } catch (err: any) {
-      setEditError(err?.message || '프로필 수정 중 오류가 발생했습니다.');
+      setEditError(err?.message || '프로필 정보를 저장하는 중 일시적인 지연이 발생했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
       setIsSavingProfile(false);
     }

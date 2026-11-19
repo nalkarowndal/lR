@@ -175,7 +175,7 @@ export const ShopLike = () => {
         if (socialTimeoutRef.current) clearTimeout(socialTimeoutRef.current);
         setLoggingInProvider(null);
         showToast(
-          '카카오 REST API 키 설정이 필요합니다. docs/auth/KAKAO_LOGIN_SETUP.md를 확인해주세요.',
+          '카카오 간편 로그인 서비스 준비 중입니다. 잠시 후 다시 시도해주시거나 이메일 로그인을 이용해주세요.',
           'info'
         );
         return;
@@ -192,7 +192,7 @@ export const ShopLike = () => {
     } catch (err: any) {
       if (socialTimeoutRef.current) clearTimeout(socialTimeoutRef.current);
       setLoggingInProvider(null);
-      setErrorMsg('카카오 로그인 서버 연결에 실패했습니다. 백엔드 서버 상태를 확인해주세요.');
+      setErrorMsg('카카오 로그인 연결에 일시적인 지연이 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
   };
 
@@ -214,7 +214,7 @@ export const ShopLike = () => {
         if (socialTimeoutRef.current) clearTimeout(socialTimeoutRef.current);
         setLoggingInProvider(null);
         showToast(
-          'Google Client ID 설정이 필요합니다. .env 환경변수를 확인해주세요.',
+          '구글 간편 로그인 서비스 준비 중입니다. 잠시 후 다시 시도해주시거나 이메일 로그인을 이용해주세요.',
           'info'
         );
         return;
@@ -231,7 +231,7 @@ export const ShopLike = () => {
     } catch (err: any) {
       if (socialTimeoutRef.current) clearTimeout(socialTimeoutRef.current);
       setLoggingInProvider(null);
-      setErrorMsg('Google 로그인 서버 연결에 실패했습니다. 백엔드 서버 상태를 확인해주세요.');
+      setErrorMsg('Google 로그인 연결에 일시적인 지연이 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
   };
 

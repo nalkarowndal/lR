@@ -115,7 +115,7 @@ export const ShopSell = () => {
     } catch (err: any) {
       setErrorModal({
         isOpen: true,
-        message: err.message || '판매 신청 접수 중 네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+        message: err.message || '위탁 판매 신청 접수 중 일시적인 연결 지연이 발생했습니다. 입력 정보를 확인 후 다시 시도해주세요.'
       });
     } finally {
       setIsSubmitting(false);

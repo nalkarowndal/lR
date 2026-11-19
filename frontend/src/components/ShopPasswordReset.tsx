@@ -94,7 +94,7 @@ export const ShopPasswordReset = () => {
         setStep('RESET');
       }
     } catch (err: any) {
-      setErrorMsg(err.message || '요청 중 오류가 발생했습니다.');
+      setErrorMsg(err.message || '인증 번호 발송 요청 중 일시적인 지연이 발생했습니다. 이메일 주소를 확인 후 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
     }

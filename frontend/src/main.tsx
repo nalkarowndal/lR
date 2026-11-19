@@ -67,24 +67,24 @@ export const MainRouter = () => {
             showToast(`${user.name}님, ${provider} 계정으로 로그인되었습니다!`, 'success');
             setActiveOverlay(null);
           } else {
-            showToast('로그인 세션 확인 중 오류가 발생했습니다. 다시 시도해주세요.', 'error');
+            showToast('로그인 세션 확인 중 일시적인 지연이 발생했습니다. 다시 로그인해주세요.', 'error');
           }
         }).catch(() => {
-          showToast('로그인 세션 확인 중 오류가 발생했습니다.', 'error');
+          showToast('로그인 세션 확인 중 일시적인 지연이 발생했습니다. 다시 로그인해주세요.', 'error');
         });
       } else if (oauthStatus === 'cancelled') {
         showToast(`${provider} 로그인이 취소되었습니다.`, 'info');
       } else if (oauthStatus === 'config_required') {
         const providerName = provider === 'google' || provider === '구글' ? 'Google' : '카카오';
-        showToast(`서버에 ${providerName} OAuth 설정이 필요합니다. 환경변수를 확인해주세요.`, 'error');
+        showToast(`${providerName} 간편 로그인 서비스 점검 중입니다. 잠시 후 다시 시도해주시거나 이메일 로그인을 이용해주세요.`, 'error');
       } else if (oauthStatus === 'email_conflict') {
         const email = params.get('email') || '';
         showToast(`동일한 이메일(${email})로 등록된 기존 계정이 있습니다. 이메일 로그인 후 계정을 연동해주세요.`, 'error');
       } else if (oauthStatus === 'invalid_state') {
-        showToast('유효하지 않거나 만료된 요청입니다 (CSRF 검증 실패). 다시 시도해주세요.', 'error');
+        showToast('보안 인증 시간이 만료되었습니다. 다시 로그인해주세요.', 'error');
       } else {
         const reason = params.get('reason') || oauthStatus;
-        showToast(`${provider} 로그인에 실패했습니다. (${reason})`, 'error');
+        showToast(`${provider} 로그인 처리 중 오류가 발생했습니다. (${reason})`, 'error');
       }
     }
   }, [checkUserAuth, setActiveOverlay, showToast]);

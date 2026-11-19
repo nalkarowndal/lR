@@ -35,7 +35,7 @@ export const ShopSettings: React.FC = () => {
       await updateUserSettings({ [key]: nextVal });
       showToast('설정이 성공적으로 저장되었습니다.', 'info');
     } catch (err: any) {
-      showToast('설정 저장 실패: ' + (err?.message || '네트워크 오류'), 'error');
+      showToast('설정을 저장하는 중 일시적인 지연이 발생했습니다. 다시 시도해주세요.', 'error');
     }
   };
 
@@ -63,7 +63,7 @@ export const ShopSettings: React.FC = () => {
         setConfirmPassword('');
       }
     } catch (err: any) {
-      setPwError(err?.message || '비밀번호 변경 중 오류가 발생했습니다.');
+      setPwError(err?.message || '비밀번호 변경 처리 중 오류가 발생했습니다. 현재 비밀번호를 확인 후 다시 시도해주세요.');
     } finally {
       setIsChangingPw(false);
     }

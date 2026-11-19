@@ -162,7 +162,7 @@ export const ShopRegister = () => {
         }, 1200);
       }
     } catch (err: any) {
-      setErrorMsg(err.message || '회원가입 중 오류가 발생했습니다.');
+      setErrorMsg(err.message || '회원가입 처리 중 일시적인 지연이 발생했습니다. 입력 정보를 확인 후 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
     }

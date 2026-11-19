@@ -368,7 +368,7 @@ export const ShopSearch = () => {
                                 const isNowFav = await toggleFavorite(numericId);
                                 showToast(isNowFav ? `'${item.title}' 관심 상품에 추가되었습니다.` : `'${item.title}' 관심 상품에서 해제되었습니다.`, 'info');
                               } catch (err: any) {
-                                showToast('좋아요 저장 중 서버 오류가 발생했습니다. 다시 시도해주세요.', 'error');
+                                showToast('관심 상품을 변경하는 중 일시적인 연결 지연이 발생했습니다. 다시 시도해주세요.', 'error');
                               }
                             }
                           }}
