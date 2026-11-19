@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { GoogleOfficialSymbol, KakaoOfficialSymbol } from './ui/AuthSymbols';
+import { API_BASE_URL } from '../services/api';
 
 export const OAuthCallback: React.FC = () => {
   const { checkUserAuth } = useApp();
@@ -46,8 +47,7 @@ export const OAuthCallback: React.FC = () => {
 
     // 3. Forward to backend callback endpoint with code & state
     setMessage(`${providerName} 세션 연결 및 보안 토큰을 발급하고 있습니다...`);
-    const apiBaseUrl = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:4000/api/v1';
-    const targetUrl = `${apiBaseUrl}/auth/${providerSlug}/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
+    const targetUrl = `${API_BASE_URL}/auth/${providerSlug}/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
 
     // Direct browser redirect to let backend set the HttpOnly lr_session cookie seamlessly
     window.location.href = targetUrl;

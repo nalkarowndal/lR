@@ -18,7 +18,8 @@ app.use(helmet({
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || config.clientOrigins.includes(origin) || config.nodeEnv === 'development') {
+    const cleanOrigin = origin ? origin.replace(/\/$/, '') : '';
+    if (!origin || config.clientOrigins.includes(cleanOrigin) || config.clientOrigins.includes(origin) || config.nodeEnv === 'development') {
       callback(null, true);
     } else {
       callback(new Error('CORS 정책에 의해 차단되었습니다.'));

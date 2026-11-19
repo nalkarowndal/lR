@@ -29,9 +29,9 @@
      ```text
      http://localhost:4000/api/v1/auth/kakao/callback
      ```
-   - **프로덕션 운영 환경**:
+   - **프로덕션 Render 운영 환경**:
      ```text
-     https://api.yourdomain.com/api/v1/auth/kakao/callback
+     https://com-api-ow0l.onrender.com/api/v1/auth/kakao/callback
      ```
    > [!IMPORTANT]
    > 서버의 `KAKAO_REDIRECT_URI`와 카카오 개발자 콘솔에 등록된 Redirect URI는 프로토콜, 포트, 경로까지 완전히 일치해야 합니다. 불일치 시 `KOE006` 오류가 발생합니다.

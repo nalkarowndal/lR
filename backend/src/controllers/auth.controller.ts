@@ -191,7 +191,7 @@ export function forgotPassword(req: Request, res: Response, next: NextFunction) 
 
     // OWASP Recovery Compliance:
     // Secure email dispatch pipeline. Never expose resetToken in client response for production or development.
-    const resetUrl = `http://localhost:5173/?resetToken=${resetToken}`;
+    const resetUrl = `${config.frontendUrl}/?resetToken=${resetToken}`;
     console.log(`[Email Service Dispatch]
 --------------------------------------------------------------------------------
 To: ${user.email} (${user.name})

@@ -7,6 +7,10 @@
   },
   "servers": [
     {
+      "url": "https://com-api-ow0l.onrender.com/api/v1",
+      "description": "Render Production Server"
+    },
+    {
       "url": "http://localhost:4000/api/v1",
       "description": "Local Development Server"
     }

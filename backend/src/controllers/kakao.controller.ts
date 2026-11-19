@@ -65,7 +65,7 @@ export function startKakaoLogin(req: Request, res: Response) {
     // 5. Store state in HttpOnly Cookie for double-submit / CSRF defense
     res.cookie('kakao_oauth_state', state, {
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
       secure: config.nodeEnv === 'production',
       maxAge: 10 * 60 * 1000,
       path: '/'
@@ -328,7 +328,7 @@ export async function handleKakaoCallback(req: Request, res: Response) {
     // 8. Set secure HttpOnly session cookie
     res.cookie('lr_session', sessionToken, {
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
       secure: config.nodeEnv === 'production',
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000

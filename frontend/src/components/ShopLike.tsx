@@ -2,7 +2,7 @@ import { ThemeIcon } from './icons/ThemeIcon';
 import React, { useEffect, useState, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
-import { api, setAuthToken } from '../services/api';
+import { api, setAuthToken, API_BASE_URL } from '../services/api';
 import {
   KakaoOfficialSymbol,
   GoogleOfficialSymbol,
@@ -182,8 +182,7 @@ export const ShopLike = () => {
       }
 
       // 2. 카카오 OAuth 인가 화면으로 리다이렉트
-      const apiBaseUrl = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:4000/api/v1';
-      window.location.href = `${apiBaseUrl}/auth/kakao`;
+      window.location.href = `${API_BASE_URL}/auth/kakao`;
 
       // 브라우저가 외부 페이지로 전환되기 직전 또는 bfcache 저장 스냅샷 대비 1.2초 후 해제
       setTimeout(() => {
@@ -221,8 +220,7 @@ export const ShopLike = () => {
       }
 
       // 2. 구글 OAuth 인가 화면으로 리다이렉트
-      const apiBaseUrl = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:4000/api/v1';
-      window.location.href = `${apiBaseUrl}/auth/google`;
+      window.location.href = `${API_BASE_URL}/auth/google`;
 
       // 브라우저가 외부 페이지로 전환되기 직전 또는 bfcache 저장 스냅샷 대비 1.2초 후 해제
       setTimeout(() => {
