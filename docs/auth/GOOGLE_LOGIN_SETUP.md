@@ -19,13 +19,13 @@
    - 애플리케이션 유형: **웹 애플리케이션(Web application)**
    - 이름: `luxuryRental Web Client`
    - **승인된 자바스크립트 원본(Authorized JavaScript origins)**:
-     - `https://com-web-x8qu.onrender.com`
+     - `https://lenra-web.onrender.com`
      - `http://localhost:5173`
      - `http://localhost:4000`
    - **승인된 리디렉션 URI(Authorized redirect URIs)**:
-     - `https://com-api-ow0l.onrender.com/api/v1/auth/google/callback` (프로덕션 Render API)
+     - `https://lenra-api.onrender.com/api/v1/auth/google/callback` (프로덕션 Render API)
      - `http://localhost:4000/api/v1/auth/google/callback` (로컬 백엔드)
-     - `https://com-web-x8qu.onrender.com/oauth/callback/google` (프런트엔드 SPA 라우트)
+     - `https://lenra-web.onrender.com/oauth/callback/google` (프런트엔드 SPA 라우트)
      - `http://localhost:5173/auth/google/callback` (로컬 프런트엔드 라우트)
 4. **발급된 키 확인**:
    - **클라이언트 ID** (예: `1234567890-abcdef.apps.googleusercontent.com`)
@@ -40,8 +40,8 @@
 ```dotenv
 GOOGLE_CLIENT_ID=your_google_client_id_here
 GOOGLE_CLIENT_SECRET=your_google_client_secret_here
-GOOGLE_REDIRECT_URI=https://com-api-ow0l.onrender.com/api/v1/auth/google/callback
-FRONTEND_URL=https://com-web-x8qu.onrender.com
-CLIENT_ORIGIN=https://com-web-x8qu.onrender.com,http://localhost:5173,http://127.0.0.1:5173
+GOOGLE_REDIRECT_URI=https://lenra-api.onrender.com/api/v1/auth/google/callback
+FRONTEND_URL=https://lenra-web.onrender.com
+CLIENT_ORIGIN=https://lenra-web.onrender.com,http://localhost:5173,http://127.0.0.1:5173
 ```
 

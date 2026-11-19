@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://com-api-ow0l.onrender.com/api/v1",
+      "url": "https://lenra-api.onrender.com/api/v1",
       "description": "Render Production Server"
     },
     {

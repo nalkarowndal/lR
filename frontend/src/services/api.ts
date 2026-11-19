@@ -4,8 +4,8 @@
  */
 
 const defaultBaseUrl = (typeof window !== 'undefined' && window.location.origin.includes('onrender.com'))
-  ? 'https://com-api-ow0l.onrender.com/api/v1'
-  : (import.meta.env.PROD ? 'https://com-api-ow0l.onrender.com/api/v1' : 'http://localhost:4000/api/v1');
+  ? 'https://lenra-api.onrender.com/api/v1'
+  : (import.meta.env.PROD ? 'https://lenra-api.onrender.com/api/v1' : 'http://localhost:4000/api/v1');
 
 export const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || defaultBaseUrl;
 
