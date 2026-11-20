@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { register, login, getMe, logout, forgotPassword, resetPassword } from '../controllers/auth.controller.js';
-import { getKakaoStatus, startKakaoLogin, handleKakaoCallback, unlinkKakao } from '../controllers/kakao.controller.js';
+import { getKakaoStatus, startKakaoLogin, handleKakaoCallback, unlinkKakao, searchKakaoAddress } from '../controllers/kakao.controller.js';
 import { getGoogleStatus, startGoogleLogin, handleGoogleCallback, unlinkGoogle } from '../controllers/google.controller.js';
 import { requireAuth } from '../middlewares/auth.js';
 
@@ -14,8 +14,9 @@ authRouter.post('/logout', logout);
 authRouter.post('/forgot-password', forgotPassword);
 authRouter.post('/reset-password', resetPassword);
 
-// Kakao OAuth 2.0 Endpoints
+// Kakao OAuth 2.0 & Postcode Address Search Endpoints
 authRouter.get('/kakao/status', getKakaoStatus);
+authRouter.get('/kakao/address', searchKakaoAddress);
 authRouter.get('/kakao', startKakaoLogin);
 authRouter.get('/kakao/callback', handleKakaoCallback);
 authRouter.post('/kakao/unlink', requireAuth, unlinkKakao);

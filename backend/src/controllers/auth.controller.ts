@@ -22,14 +22,17 @@ export function register(req: Request, res: Response, next: NextFunction) {
     // 2. Hash password & insert user
     const passwordHash = hashPassword(validated.password);
     const insertUser = db.prepare(`
-      INSERT INTO users (email, password_hash, name, phone, role, marketing_consent)
-      VALUES (?, ?, ?, ?, 'USER', ?)
+      INSERT INTO users (email, password_hash, name, phone, postcode, address, detail_address, role, marketing_consent)
+      VALUES (?, ?, ?, ?, ?, ?, ?, 'USER', ?)
     `);
     const result = insertUser.run(
       validated.email,
       passwordHash,
       validated.name,
       validated.phone || '',
+      validated.postcode || '',
+      validated.address || '',
+      validated.detailAddress || '',
       validated.marketingConsent ? 1 : 0
     );
 
@@ -67,6 +70,9 @@ export function register(req: Request, res: Response, next: NextFunction) {
         email: validated.email,
         name: validated.name,
         phone: validated.phone || '',
+        postcode: validated.postcode || '',
+        address: validated.address || '',
+        detail_address: validated.detailAddress || '',
         role: 'USER'
       }
     });
@@ -80,12 +86,15 @@ export function login(req: Request, res: Response, next: NextFunction) {
     const validated = loginSchema.parse(req.body);
     const db = getDatabase();
 
-    const user = db.prepare('SELECT id, email, password_hash, name, phone, role FROM users WHERE email = ?').get(validated.email) as {
+    const user = db.prepare('SELECT id, email, password_hash, name, phone, postcode, address, detail_address, role FROM users WHERE email = ?').get(validated.email) as {
       id: number;
       email: string;
       password_hash: string;
       name: string;
       phone: string;
+      postcode: string;
+      address: string;
+      detail_address: string;
       role: string;
     } | undefined;
 
@@ -112,6 +121,9 @@ export function login(req: Request, res: Response, next: NextFunction) {
         email: user.email,
         name: user.name,
         phone: user.phone,
+        postcode: user.postcode || '',
+        address: user.address || '',
+        detail_address: user.detail_address || '',
         role: user.role
       }
     });

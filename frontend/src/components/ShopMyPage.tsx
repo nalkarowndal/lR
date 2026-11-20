@@ -6,6 +6,7 @@ import { Modal } from './ui/Modal';
 import { ProductImage } from './ui/ProductImage';
 import { api } from '../services/api';
 import { GoogleOfficialSymbol } from './ui/AuthSymbols';
+import { KakaoPostcodeModal } from './ui/KakaoPostcodeModal';
 
 export const ShopMyPage: React.FC = () => {
   const { 
@@ -40,10 +41,15 @@ export const ShopMyPage: React.FC = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editName, setEditName] = useState('');
   const [editPhone, setEditPhone] = useState('');
+  const [editPostcode, setEditPostcode] = useState('');
+  const [editAddress, setEditAddress] = useState('');
+  const [editDetailAddress, setEditDetailAddress] = useState('');
+  const [isEditPostcodeOpen, setIsEditPostcodeOpen] = useState(false);
   const [editAvatar, setEditAvatar] = useState('');
   const [editError, setEditError] = useState('');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const editDetailAddrRef = useRef<HTMLInputElement>(null);
 
   const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -99,6 +105,9 @@ export const ShopMyPage: React.FC = () => {
     if (!user) return;
     setEditName(user.name || '');
     setEditPhone(user.phone || '');
+    setEditPostcode(user.postcode || '');
+    setEditAddress(user.address || '');
+    setEditDetailAddress(user.detail_address || '');
     setEditAvatar(user.avatar_url || '');
     setEditError('');
     setShowEditModal(true);
@@ -132,6 +141,9 @@ export const ShopMyPage: React.FC = () => {
       const res = await api.updateMyProfile({
         name: editName.trim(),
         phone: editPhone.trim(),
+        postcode: editPostcode.trim(),
+        address: editAddress.trim(),
+        detail_address: editDetailAddress.trim(),
         avatar_url: finalAvatarUrl
       });
 
@@ -140,6 +152,9 @@ export const ShopMyPage: React.FC = () => {
           ...prev,
           name: res.profile.name,
           phone: res.profile.phone,
+          postcode: res.profile.postcode,
+          address: res.profile.address,
+          detail_address: res.profile.detail_address,
           avatar_url: res.profile.avatar_url
         } : null);
         showToast('프로필 정보가 수정되었습니다.', 'success');
@@ -218,6 +233,11 @@ export const ShopMyPage: React.FC = () => {
                   </div>
                   <p className="text-xs text-gray-500 mt-1">{user.email}</p>
                   {user.phone && <p className="text-[11px] text-gray-400 mt-0.5">{user.phone}</p>}
+                  {user.address && (
+                    <p className="text-[11px] text-gray-500 mt-0.5 line-clamp-1">
+                      {user.postcode ? `[${user.postcode}] ` : ''}{user.address} {user.detail_address || ''}
+                    </p>
+                  )}
                 </div>
               </div>
               <button
@@ -569,6 +589,44 @@ export const ShopMyPage: React.FC = () => {
             />
           </div>
 
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-gray-700">주소 (배송지)</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={editPostcode}
+                readOnly
+                onClick={() => setIsEditPostcodeOpen(true)}
+                placeholder="우편번호"
+                className="w-24 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold cursor-pointer"
+              />
+              <button
+                type="button"
+                onClick={() => setIsEditPostcodeOpen(true)}
+                className="px-3 py-2 bg-[#FEE500] hover:bg-[#FDD800] text-gray-950 rounded-xl text-xs font-black transition flex items-center gap-1 border border-yellow-300"
+              >
+                <ThemeIcon.search size={13} />
+                <span>카카오 우편번호 찾기</span>
+              </button>
+            </div>
+            <input
+              type="text"
+              value={editAddress}
+              readOnly
+              onClick={() => setIsEditPostcodeOpen(true)}
+              placeholder="기본 주소"
+              className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs cursor-pointer"
+            />
+            <input
+              ref={editDetailAddrRef}
+              type="text"
+              value={editDetailAddress}
+              onChange={e => setEditDetailAddress(e.target.value)}
+              placeholder="상세 주소 입력 (동·호수 등)"
+              className="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-black"
+            />
+          </div>
+
           {/* 프로필 이미지 선택 및 미리보기 */}
           <div>
             <label className="block text-xs font-bold text-gray-700 mb-2">프로필 사진</label>
@@ -644,6 +702,16 @@ export const ShopMyPage: React.FC = () => {
           </div>
         </form>
       </Modal>
+
+      <KakaoPostcodeModal
+        isOpen={isEditPostcodeOpen}
+        onClose={() => setIsEditPostcodeOpen(false)}
+        onSelect={(res) => {
+          setEditPostcode(res.postcode);
+          setEditAddress(res.address);
+          setTimeout(() => editDetailAddrRef.current?.focus(), 100);
+        }}
+      />
     </div>
   );
 };

@@ -75,6 +75,9 @@ export const api = {
     password: string; 
     name: string; 
     phone?: string; 
+    postcode?: string;
+    address?: string;
+    detailAddress?: string;
     termsAgreed?: boolean;
     serviceTermsAgreed?: boolean;
     privacyPolicyAgreed?: boolean;
@@ -84,6 +87,19 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(payload)
     });
+  },
+
+  searchKakaoAddress: async (q: string) => {
+    return fetchJson<{
+      success: boolean;
+      source?: string;
+      documents: Array<{
+        postcode: string;
+        roadAddress: string;
+        jibunAddress: string;
+        buildingName?: string;
+      }>;
+    }>(`/auth/kakao/address?q=${encodeURIComponent(q)}`);
   },
 
   login: async (payload: { email: string; password: string }) => {
@@ -156,7 +172,7 @@ export const api = {
     return fetchJson<{ success: boolean; profile: any }>('/users/me');
   },
 
-  updateMyProfile: async (payload: { name?: string; phone?: string; avatar_url?: string }) => {
+  updateMyProfile: async (payload: { name?: string; phone?: string; postcode?: string; address?: string; detail_address?: string; avatar_url?: string }) => {
     return fetchJson<{ success: boolean; message: string; profile: any }>('/users/me', {
       method: 'PATCH',
       body: JSON.stringify(payload)

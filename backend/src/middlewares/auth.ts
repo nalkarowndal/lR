@@ -8,6 +8,9 @@ export interface AuthUser {
   name: string;
   role: 'USER' | 'ADMIN';
   phone?: string;
+  postcode?: string;
+  address?: string;
+  detail_address?: string;
   avatar_url?: string;
 }
 
@@ -54,7 +57,7 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
   try {
     const db = getDatabase();
     const row = db.prepare(`
-      SELECT u.id, u.email, u.name, u.role, u.phone, u.avatar_url 
+      SELECT u.id, u.email, u.name, u.role, u.phone, u.postcode, u.address, u.detail_address, u.avatar_url 
       FROM sessions s
       JOIN users u ON u.id = s.user_id
       WHERE s.token = ? AND s.expires_at > datetime('now')

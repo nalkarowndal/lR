@@ -124,6 +124,9 @@ function initSchema(db: DatabaseSync) {
       password_hash TEXT NOT NULL,
       name TEXT NOT NULL,
       phone TEXT DEFAULT '',
+      postcode TEXT DEFAULT '',
+      address TEXT DEFAULT '',
+      detail_address TEXT DEFAULT '',
       avatar_url TEXT DEFAULT '',
       role TEXT NOT NULL DEFAULT 'USER',
       marketing_consent INTEGER NOT NULL DEFAULT 0,
@@ -257,6 +260,18 @@ function initSchema(db: DatabaseSync) {
 
   try {
     db.exec(`ALTER TABLE users ADD COLUMN avatar_url TEXT DEFAULT '';`);
+  } catch {}
+
+  try {
+    db.exec(`ALTER TABLE users ADD COLUMN postcode TEXT DEFAULT '';`);
+  } catch {}
+
+  try {
+    db.exec(`ALTER TABLE users ADD COLUMN address TEXT DEFAULT '';`);
+  } catch {}
+
+  try {
+    db.exec(`ALTER TABLE users ADD COLUMN detail_address TEXT DEFAULT '';`);
   } catch {}
 
   try {

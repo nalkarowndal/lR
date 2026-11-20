@@ -4,12 +4,14 @@ import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { api, setAuthToken } from '../services/api';
 import { LegalTermsModal } from './ui/LegalTermsModal';
+import { KakaoPostcodeModal } from './ui/KakaoPostcodeModal';
 
 export const ShopRegister = () => {
   const { activeOverlay, setActiveOverlay, setUser } = useApp();
   const { showToast } = useToast();
   const dialogRef = useRef<HTMLDivElement>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
+  const detailAddressInputRef = useRef<HTMLInputElement>(null);
 
   const isOpen = activeOverlay === 'REGISTER';
 
@@ -18,6 +20,10 @@ export const ShopRegister = () => {
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [postcode, setPostcode] = useState('');
+  const [address, setAddress] = useState('');
+  const [detailAddress, setDetailAddress] = useState('');
+  const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   // Granular Terms Consent State
@@ -69,7 +75,9 @@ export const ShopRegister = () => {
 
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
-          if (activeLegalDoc) {
+          if (isPostcodeOpen) {
+            setIsPostcodeOpen(false);
+          } else if (activeLegalDoc) {
             setActiveLegalDoc(null);
           } else {
             setActiveOverlay(null);
@@ -77,7 +85,7 @@ export const ShopRegister = () => {
         }
 
         // W3C Modal Dialog Focus Trap
-        if (e.key === 'Tab' && dialogRef.current && !activeLegalDoc) {
+        if (e.key === 'Tab' && dialogRef.current && !activeLegalDoc && !isPostcodeOpen) {
           const focusables = dialogRef.current.querySelectorAll<HTMLElement>(
             'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
           );
@@ -110,8 +118,9 @@ export const ShopRegister = () => {
       setIsLoading(false);
       setSuccessRegistered(false);
       setActiveLegalDoc(null);
+      setIsPostcodeOpen(false);
     }
-  }, [isOpen, setActiveOverlay, activeLegalDoc]);
+  }, [isOpen, setActiveOverlay, activeLegalDoc, isPostcodeOpen]);
 
   // Password strength check
   const hasMinLen = password.length >= 6;
@@ -144,6 +153,9 @@ export const ShopRegister = () => {
         password,
         name: name.trim(),
         phone: phone.trim(),
+        postcode: postcode.trim(),
+        address: address.trim(),
+        detailAddress: detailAddress.trim(),
         termsAgreed: true,
         serviceTermsAgreed: true,
         privacyPolicyAgreed: true,
@@ -255,6 +267,65 @@ export const ShopRegister = () => {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="010-0000-0000"
+              className="w-full border border-gray-200 focus:border-gray-950 rounded-xl p-3.5 text-sm outline-none transition"
+            />
+          </div>
+
+          {/* 주소 및 우편번호 입력 (카카오 우편번호 API 연동) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-bold text-gray-700">
+                주소 (배송지) <span className="text-gray-400 font-normal">(선택)</span>
+              </label>
+              {(postcode || address || detailAddress) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPostcode('');
+                    setAddress('');
+                    setDetailAddress('');
+                  }}
+                  className="text-[11px] text-gray-400 hover:text-gray-700 underline"
+                >
+                  초기화
+                </button>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={postcode}
+                readOnly
+                onClick={() => setIsPostcodeOpen(true)}
+                placeholder="우편번호"
+                aria-label="우편번호"
+                className="w-28 border border-gray-200 bg-gray-50/70 focus:border-gray-950 rounded-xl p-3.5 text-sm outline-none transition cursor-pointer font-semibold text-gray-800"
+              />
+              <button
+                type="button"
+                onClick={() => setIsPostcodeOpen(true)}
+                className="flex-1 px-4 py-3.5 bg-[#FEE500] hover:bg-[#FDD800] active:scale-[0.99] text-gray-950 text-xs font-black rounded-xl transition flex items-center justify-center gap-1.5 border border-yellow-300/80 shadow-2xs"
+              >
+                <ThemeIcon.search size={15} />
+                <span>카카오 우편번호 찾기</span>
+              </button>
+            </div>
+            <input
+              type="text"
+              value={address}
+              readOnly
+              onClick={() => setIsPostcodeOpen(true)}
+              placeholder="도로명 또는 지번 주소 (우편번호 찾기로 자동 입력)"
+              aria-label="기본 주소"
+              className="w-full border border-gray-200 bg-gray-50/70 focus:border-gray-950 rounded-xl p-3.5 text-sm outline-none transition cursor-pointer text-gray-800"
+            />
+            <input
+              ref={detailAddressInputRef}
+              type="text"
+              value={detailAddress}
+              onChange={(e) => setDetailAddress(e.target.value)}
+              placeholder="상세 주소 입력 (동·호수, 층수 등)"
+              aria-label="상세 주소"
               className="w-full border border-gray-200 focus:border-gray-950 rounded-xl p-3.5 text-sm outline-none transition"
             />
           </div>
@@ -450,6 +521,20 @@ export const ShopRegister = () => {
         docType={activeLegalDoc}
         onClose={() => setActiveLegalDoc(null)}
         onAgree={handleModalAgree}
+      />
+
+      {/* Kakao (Daum) Postcode Address Search Modal */}
+      <KakaoPostcodeModal
+        isOpen={isPostcodeOpen}
+        onClose={() => setIsPostcodeOpen(false)}
+        onSelect={(result) => {
+          setPostcode(result.postcode);
+          setAddress(result.address);
+          showToast('주소가 입력되었습니다. 상세 주소를 입력해주세요.', 'info');
+          setTimeout(() => {
+            detailAddressInputRef.current?.focus();
+          }, 120);
+        }}
       />
     </div>
   );

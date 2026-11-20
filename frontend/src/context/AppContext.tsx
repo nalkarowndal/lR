@@ -30,6 +30,9 @@ export interface User {
   name: string;
   role: 'USER' | 'ADMIN';
   phone?: string;
+  postcode?: string;
+  address?: string;
+  detail_address?: string;
   avatar_url?: string;
   oauth_accounts?: string[];
   is_oauth_user?: boolean;
@@ -253,6 +256,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           name: res.profile.name,
           role: res.profile.role,
           phone: res.profile.phone,
+          postcode: res.profile.postcode,
+          address: res.profile.address,
+          detail_address: res.profile.detail_address,
           avatar_url: res.profile.avatar_url,
           oauth_accounts: res.profile.oauth_accounts,
           is_oauth_user: res.profile.is_oauth_user

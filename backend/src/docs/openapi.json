@@ -28,7 +28,11 @@
     "/health": {
       "get": {
         "summary": "Health check",
-        "responses": { "200": { "description": "OK" } }
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/auth/register": {
@@ -40,22 +44,45 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["email", "password", "name", "termsAgreed"],
+                "required": [
+                  "email",
+                  "password",
+                  "name",
+                  "termsAgreed"
+                ],
                 "properties": {
-                  "email": { "type": "string", "format": "email" },
-                  "password": { "type": "string", "minLength": 6 },
-                  "name": { "type": "string" },
-                  "phone": { "type": "string" },
-                  "termsAgreed": { "type": "boolean" },
-                  "marketingConsent": { "type": "boolean" }
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 6
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "termsAgreed": {
+                    "type": "boolean"
+                  },
+                  "marketingConsent": {
+                    "type": "boolean"
+                  }
                 }
               }
             }
           }
         },
         "responses": {
-          "201": { "description": "User registered and session token issued" },
-          "409": { "description": "Duplicate email address" }
+          "201": {
+            "description": "User registered and session token issued"
+          },
+          "409": {
+            "description": "Duplicate email address"
+          }
         }
       }
     },
@@ -68,37 +95,63 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["email", "password"],
+                "required": [
+                  "email",
+                  "password"
+                ],
                 "properties": {
-                  "email": { "type": "string", "format": "email" },
-                  "password": { "type": "string" }
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "Login successful with token and user object" },
-          "401": { "description": "Invalid credentials" }
+          "200": {
+            "description": "Login successful with token and user object"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
         }
       }
     },
     "/auth/me": {
       "get": {
         "summary": "Get current authenticated user session",
-        "security": [{ "BearerAuth": [] }],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "responses": {
-          "200": { "description": "Current user profile" },
-          "401": { "description": "Unauthorized" }
+          "200": {
+            "description": "Current user profile"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
         }
       }
     },
     "/auth/logout": {
       "post": {
         "summary": "Logout and revoke session token",
-        "security": [{ "BearerAuth": [] }],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "responses": {
-          "200": { "description": "Successfully logged out" }
+          "200": {
+            "description": "Successfully logged out"
+          }
         }
       }
     },
@@ -111,13 +164,24 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["email"],
-                "properties": { "email": { "type": "string", "format": "email" } }
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
               }
             }
           }
         },
-        "responses": { "200": { "description": "Reset token generated" } }
+        "responses": {
+          "200": {
+            "description": "Reset token generated"
+          }
+        }
       }
     },
     "/auth/reset-password": {
@@ -129,18 +193,30 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["token", "newPassword"],
+                "required": [
+                  "token",
+                  "newPassword"
+                ],
                 "properties": {
-                  "token": { "type": "string" },
-                  "newPassword": { "type": "string", "minLength": 6 }
+                  "token": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "minLength": 6
+                  }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "Password updated successfully" },
-          "400": { "description": "Invalid or expired token" }
+          "200": {
+            "description": "Password updated successfully"
+          },
+          "400": {
+            "description": "Invalid or expired token"
+          }
         }
       }
     },
@@ -148,53 +224,126 @@
       "get": {
         "summary": "Get product list with optional filters",
         "parameters": [
-          { "name": "brand", "in": "query", "schema": { "type": "string" } },
-          { "name": "category", "in": "query", "schema": { "type": "string" } },
-          { "name": "type", "in": "query", "schema": { "type": "string", "enum": ["RENT", "BUY"] } }
+          {
+            "name": "brand",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "RENT",
+                "BUY"
+              ]
+            }
+          }
         ],
-        "responses": { "200": { "description": "List of products" } }
+        "responses": {
+          "200": {
+            "description": "List of products"
+          }
+        }
       }
     },
     "/products/recommendations": {
       "get": {
         "summary": "Get personalized recommendations by age and gender",
         "parameters": [
-          { "name": "target", "in": "query", "schema": { "type": "string", "example": "20대 여성" } }
+          {
+            "name": "target",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "20대 여성"
+            }
+          }
         ],
-        "responses": { "200": { "description": "Recommendations list" } }
+        "responses": {
+          "200": {
+            "description": "Recommendations list"
+          }
+        }
       }
     },
     "/products/{id}/images": {
       "get": {
         "summary": "Get gallery images for a specific product",
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
         ],
-        "responses": { "200": { "description": "List of product images" } }
+        "responses": {
+          "200": {
+            "description": "List of product images"
+          }
+        }
       }
     },
     "/categories": {
       "get": {
         "summary": "Get all categories and subcategories",
-        "responses": { "200": { "description": "Category tree" } }
+        "responses": {
+          "200": {
+            "description": "Category tree"
+          }
+        }
       }
     },
     "/categories/brands": {
       "get": {
         "summary": "Get luxury brands list",
         "parameters": [
-          { "name": "popular", "in": "query", "schema": { "type": "boolean" } }
+          {
+            "name": "popular",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
         ],
-        "responses": { "200": { "description": "Brand list" } }
+        "responses": {
+          "200": {
+            "description": "Brand list"
+          }
+        }
       }
     },
     "/search": {
       "get": {
         "summary": "Search products by keyword",
         "parameters": [
-          { "name": "q", "in": "query", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
-        "responses": { "200": { "description": "Search results" } }
+        "responses": {
+          "200": {
+            "description": "Search results"
+          }
+        }
       }
     },
     "/sell-requests": {
@@ -206,36 +355,73 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["brandName"],
+                "required": [
+                  "brandName"
+                ],
                 "properties": {
-                  "brandName": { "type": "string" },
-                  "userName": { "type": "string" }
+                  "brandName": {
+                    "type": "string"
+                  },
+                  "userName": {
+                    "type": "string"
+                  }
                 }
               }
             }
           }
         },
-        "responses": { "201": { "description": "Request submitted" } }
+        "responses": {
+          "201": {
+            "description": "Request submitted"
+          }
+        }
       }
     },
     "/admin/products": {
       "get": {
         "summary": "Admin: get all products",
-        "security": [{ "BearerAuth": [] }],
-        "responses": { "200": { "description": "Admin products list" } }
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Admin products list"
+          }
+        }
       },
       "post": {
         "summary": "Admin: create new product",
-        "security": [{ "BearerAuth": [] }],
-        "responses": { "201": { "description": "Product created" } }
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Product created"
+          }
+        }
       }
     },
     "/admin/products/{id}/images": {
       "post": {
         "summary": "Admin: upload/register product image to gallery",
-        "security": [{ "BearerAuth": [] }],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
         ],
         "requestBody": {
           "required": true,
@@ -243,53 +429,117 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["imagePath"],
+                "required": [
+                  "imagePath"
+                ],
                 "properties": {
-                  "imagePath": { "type": "string" },
-                  "altText": { "type": "string" },
-                  "isPrimary": { "type": "integer", "enum": [0, 1] }
+                  "imagePath": {
+                    "type": "string"
+                  },
+                  "altText": {
+                    "type": "string"
+                  },
+                  "isPrimary": {
+                    "type": "integer",
+                    "enum": [
+                      0,
+                      1
+                    ]
+                  }
                 }
               }
             }
           }
         },
-        "responses": { "201": { "description": "Image registered" } }
+        "responses": {
+          "201": {
+            "description": "Image registered"
+          }
+        }
       }
     },
     "/admin/recruit/requests": {
       "get": {
         "summary": "Admin: get recruit requests",
-        "security": [{ "BearerAuth": [] }],
-        "responses": { "200": { "description": "Recruit requests list" } }
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recruit requests list"
+          }
+        }
       },
       "post": {
         "summary": "Admin: create recruit request",
-        "security": [{ "BearerAuth": [] }],
-        "responses": { "201": { "description": "Recruit request created" } }
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Recruit request created"
+          }
+        }
       }
     },
     "/admin/workers": {
       "get": {
         "summary": "Admin: get workers database",
-        "security": [{ "BearerAuth": [] }],
-        "responses": { "200": { "description": "Worker list" } }
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Worker list"
+          }
+        }
       },
       "post": {
         "summary": "Admin: register new worker",
-        "security": [{ "BearerAuth": [] }],
-        "responses": { "201": { "description": "Worker created" } }
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Worker created"
+          }
+        }
       }
     },
     "/admin/messages": {
       "get": {
         "summary": "Admin: get communication messages",
-        "security": [{ "BearerAuth": [] }],
-        "responses": { "200": { "description": "Messages list" } }
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Messages list"
+          }
+        }
       },
       "post": {
         "summary": "Admin: send message",
-        "security": [{ "BearerAuth": [] }],
-        "responses": { "201": { "description": "Message sent" } }
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Message sent"
+          }
+        }
       }
     }
   }

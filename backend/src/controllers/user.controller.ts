@@ -8,6 +8,9 @@ import { z } from 'zod';
 const updateProfileSchema = z.object({
   name: z.string().min(2, '이름은 최소 2글자 이상이어야 합니다.').max(50).optional(),
   phone: z.string().max(20).optional(),
+  postcode: z.string().max(20).optional(),
+  address: z.string().max(255).optional(),
+  detail_address: z.string().max(255).optional(),
   avatar_url: z.string().max(500).optional()
 });
 
@@ -36,7 +39,7 @@ export function getMyProfile(req: Request, res: Response, next: NextFunction) {
 
     const db = getDatabase();
     const userRow = db.prepare(`
-      SELECT id, email, name, role, phone, avatar_url, created_at
+      SELECT id, email, name, role, phone, postcode, address, detail_address, avatar_url, created_at
       FROM users WHERE id = ?
     `).get(req.user.id) as any;
 
@@ -87,6 +90,9 @@ export function getMyProfile(req: Request, res: Response, next: NextFunction) {
         name: userRow.name,
         role: userRow.role,
         phone: userRow.phone || '',
+        postcode: userRow.postcode || '',
+        address: userRow.address || '',
+        detail_address: userRow.detail_address || '',
         avatar_url: userRow.avatar_url || '',
         created_at: userRow.created_at,
         oauth_accounts: oauthRows.map(r => r.provider),
@@ -134,6 +140,18 @@ export function updateMyProfile(req: Request, res: Response, next: NextFunction)
       updates.push('phone = ?');
       params.push(validated.phone);
     }
+    if (validated.postcode !== undefined) {
+      updates.push('postcode = ?');
+      params.push(validated.postcode);
+    }
+    if (validated.address !== undefined) {
+      updates.push('address = ?');
+      params.push(validated.address);
+    }
+    if (validated.detail_address !== undefined) {
+      updates.push('detail_address = ?');
+      params.push(validated.detail_address);
+    }
     if (validated.avatar_url !== undefined) {
       updates.push('avatar_url = ?');
       params.push(validated.avatar_url);
@@ -145,7 +163,7 @@ export function updateMyProfile(req: Request, res: Response, next: NextFunction)
     }
 
     const updated = db.prepare(`
-      SELECT id, email, name, role, phone, avatar_url, created_at
+      SELECT id, email, name, role, phone, postcode, address, detail_address, avatar_url, created_at
       FROM users WHERE id = ?
     `).get(req.user.id) as any;
 

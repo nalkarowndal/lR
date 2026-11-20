@@ -382,3 +382,42 @@ export async function unlinkKakao(req: Request, res: Response, next: NextFunctio
     next(err);
   }
 }
+
+/**
+ * GET /api/v1/auth/kakao/address?q=...
+ * Searches Korean road/jibun addresses and postcodes (zone_no) via Kakao Local REST API
+ */
+export async function searchKakaoAddress(req: Request, res: Response) {
+  const query = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+  if (!query) {
+    return res.json({ success: true, documents: [] });
+  }
+
+  try {
+    if (config.kakaoRestApiKey) {
+      const apiUrl = `https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(query)}&size=15`;
+      const response = await fetch(apiUrl, {
+        headers: {
+          Authorization: `KakaoAK ${config.kakaoRestApiKey}`
+        }
+      });
+
+      if (response.ok) {
+        const data = (await response.json()) as any;
+        if (Array.isArray(data.documents) && data.documents.length > 0) {
+          const formatted = data.documents.map((doc: any) => ({
+            postcode: doc.road_address?.zone_no || doc.address?.zip_code || '06000',
+            roadAddress: doc.road_address?.address_name || doc.address_name || '',
+            jibunAddress: doc.address?.address_name || doc.address_name || '',
+            buildingName: doc.road_address?.building_name || ''
+          }));
+          return res.json({ success: true, source: 'kakao_rest_api', documents: formatted });
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[KakaoAddressAPI] Direct REST query fallback:', err);
+  }
+
+  return res.json({ success: true, source: 'daum_postcode_widget', documents: [] });
+}
