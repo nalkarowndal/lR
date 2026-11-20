@@ -204,21 +204,19 @@ export const KakaoPostcodeModal: React.FC<KakaoPostcodeModalProps> = ({
     >
       <div className="bg-white w-full max-w-[400px] rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col h-[500px] max-h-[85vh]">
         {/* Header */}
-        <div className="px-4 py-3.5 bg-[#FEE500] text-gray-950 flex items-center justify-between border-b border-yellow-300 shrink-0">
+        <div className="px-4 py-3.5 bg-gray-950 text-white flex items-center justify-between border-b border-gray-800 shrink-0">
           <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-lg bg-gray-950 text-[#FEE500] flex items-center justify-center text-xs font-black">
-              K
-            </span>
+            <ThemeIcon.search size={16} className="text-white" />
             <div>
-              <h3 className="text-xs font-black tracking-tight text-gray-950">카카오 우편번호·주소 검색</h3>
-              <p className="text-[10px] font-semibold text-gray-800">도로명, 건물명 또는 지번을 검색하세요</p>
+              <h3 className="text-xs font-black tracking-tight text-white">우편번호 찾기</h3>
+              <p className="text-[10px] font-medium text-gray-400">도로명, 건물명 또는 지번을 검색하세요</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="주소 검색창 닫기"
-            className="w-7 h-7 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center text-gray-950 transition"
+            className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition"
           >
             <ThemeIcon.close size={16} />
           </button>

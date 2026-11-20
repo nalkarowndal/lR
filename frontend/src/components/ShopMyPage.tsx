@@ -590,7 +590,7 @@ export const ShopMyPage: React.FC = () => {
           </div>
 
           <div className="space-y-2">
-            <label className="block text-xs font-bold text-gray-700">주소 (배송지)</label>
+            <label className="block text-xs font-bold text-gray-700">주소</label>
             <div className="flex gap-2">
               <input
                 type="text"
@@ -603,10 +603,10 @@ export const ShopMyPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsEditPostcodeOpen(true)}
-                className="px-3 py-2 bg-[#FEE500] hover:bg-[#FDD800] text-gray-950 rounded-xl text-xs font-black transition flex items-center gap-1 border border-yellow-300"
+                className="px-3 py-2 bg-gray-950 hover:bg-black text-white rounded-xl text-xs font-extrabold transition flex items-center gap-1"
               >
                 <ThemeIcon.search size={13} />
-                <span>카카오 우편번호 찾기</span>
+                <span>우편번호 찾기</span>
               </button>
             </div>
             <input

@@ -136,6 +136,11 @@ export const ShopRegister = () => {
       return;
     }
 
+    if (!postcode.trim() || !address.trim()) {
+      setErrorMsg('우편번호 찾기를 통해 주소를 입력해주세요.');
+      return;
+    }
+
     if (!hasMinLen) {
       setErrorMsg('비밀번호는 최소 6자 이상이어야 합니다.');
       return;
@@ -271,11 +276,11 @@ export const ShopRegister = () => {
             />
           </div>
 
-          {/* 주소 및 우편번호 입력 (카카오 우편번호 API 연동) */}
+          {/* 주소 및 우편번호 입력 (우편번호 API 연동) */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="block text-xs font-bold text-gray-700">
-                주소 (배송지) <span className="text-gray-400 font-normal">(선택)</span>
+                주소 <span className="text-rose-500">*</span>
               </label>
               {(postcode || address || detailAddress) && (
                 <button
@@ -296,6 +301,7 @@ export const ShopRegister = () => {
                 type="text"
                 value={postcode}
                 readOnly
+                required
                 onClick={() => setIsPostcodeOpen(true)}
                 placeholder="우편번호"
                 aria-label="우편번호"
@@ -304,16 +310,17 @@ export const ShopRegister = () => {
               <button
                 type="button"
                 onClick={() => setIsPostcodeOpen(true)}
-                className="flex-1 px-4 py-3.5 bg-[#FEE500] hover:bg-[#FDD800] active:scale-[0.99] text-gray-950 text-xs font-black rounded-xl transition flex items-center justify-center gap-1.5 border border-yellow-300/80 shadow-2xs"
+                className="flex-1 px-4 py-3.5 bg-gray-950 hover:bg-black active:scale-[0.99] text-white text-xs font-extrabold rounded-xl transition flex items-center justify-center gap-1.5 shadow-2xs"
               >
                 <ThemeIcon.search size={15} />
-                <span>카카오 우편번호 찾기</span>
+                <span>우편번호 찾기</span>
               </button>
             </div>
             <input
               type="text"
               value={address}
               readOnly
+              required
               onClick={() => setIsPostcodeOpen(true)}
               placeholder="도로명 또는 지번 주소 (우편번호 찾기로 자동 입력)"
               aria-label="기본 주소"
