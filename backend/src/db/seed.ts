@@ -5,39 +5,69 @@ import { config } from '../config/env.js';
 export function seedDatabase() {
   const db = getDatabase();
 
-  // 0. Seed Users (Admin & Customer) in development/test environment
-  if (config.nodeEnv === 'production') {
-    console.log('[Database] Production mode: skipping dev user seeding.');
-  } else {
-    try {
-      const userCount = db.prepare('SELECT count(*) as count FROM users').get() as { count: number };
-      if (userCount.count === 0) {
-        console.log('[Database] Seeding default development users (admin & customer)...');
-        const adminHash = hashPassword(process.env.DEV_ADMIN_PASSWORD || 'admin1234!');
-        const customerHash = hashPassword(process.env.DEV_CUSTOMER_PASSWORD || 'luxury1234!');
+  // 0. Ensure Default & Environment-Configured Admin Accounts exist (both Dev & Production/Render)
+  try {
+    const insertSettings = db.prepare(`
+      INSERT OR IGNORE INTO user_settings (user_id, service_notifications, marketing_notifications, product_notifications, reduce_animations, theme)
+      VALUES (?, 1, 0, 1, 0, 'light')
+    `);
 
-        const adminResult = db.prepare(`
-          INSERT INTO users (email, password_hash, name, phone, avatar_url, role, marketing_consent)
-          VALUES (?, ?, ?, ?, ?, 'ADMIN', 1)
-        `).run('admin@luxuryrental.com', adminHash, '최고관리자', '010-9999-8888', '');
+    // A. Always ensure primary admin account (admin@luxuryrental.com / admin1234!) exists
+    const defaultAdminEmail = 'admin@luxuryrental.com';
+    const defaultAdminPw = process.env.DEV_ADMIN_PASSWORD || 'admin1234!';
+    const existingDefaultAdmin = db.prepare('SELECT id, role FROM users WHERE email = ?').get(defaultAdminEmail) as { id: number; role: string } | undefined;
 
-        const customerResult = db.prepare(`
-          INSERT INTO users (email, password_hash, name, phone, avatar_url, role, marketing_consent)
-          VALUES (?, ?, ?, ?, ?, 'USER', 1)
-        `).run('customer@luxuryrental.com', customerHash, '김명품', '010-1234-5678', '');
-
-        // Seed initial user settings
-        const insertSettings = db.prepare(`
-          INSERT OR IGNORE INTO user_settings (user_id, service_notifications, marketing_notifications, product_notifications, reduce_animations, theme)
-          VALUES (?, 1, 0, 1, 0, 'light')
-        `);
-
-        if (adminResult.lastInsertRowid) insertSettings.run(adminResult.lastInsertRowid);
-        if (customerResult.lastInsertRowid) insertSettings.run(customerResult.lastInsertRowid);
-      }
-    } catch (err) {
-      console.warn('[Database] User seed note:', err);
+    if (!existingDefaultAdmin) {
+      const adminHash = hashPassword(defaultAdminPw);
+      const adminResult = db.prepare(`
+        INSERT INTO users (email, password_hash, name, phone, avatar_url, role, marketing_consent)
+        VALUES (?, ?, '최고관리자', '010-9999-8888', '', 'ADMIN', 1)
+      `).run(defaultAdminEmail, adminHash);
+      if (adminResult.lastInsertRowid) insertSettings.run(adminResult.lastInsertRowid);
+      console.log(`[Database] Default admin seeded: ${defaultAdminEmail}`);
+    } else if (existingDefaultAdmin.role !== 'ADMIN') {
+      db.prepare(`UPDATE users SET role = 'ADMIN' WHERE id = ?`).run(existingDefaultAdmin.id);
     }
+
+    // B. Support custom ADMIN_EMAIL & ADMIN_PASSWORD from Render Environment Variables
+    const customAdminEmail = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+    const customAdminPassword = (process.env.ADMIN_PASSWORD || '').trim();
+    if (customAdminEmail && customAdminEmail.includes('@') && customAdminPassword.length >= 6) {
+      const existingCustom = db.prepare('SELECT id FROM users WHERE email = ?').get(customAdminEmail) as { id: number } | undefined;
+      const customHash = hashPassword(customAdminPassword);
+      if (!existingCustom) {
+        const res = db.prepare(`
+          INSERT INTO users (email, password_hash, name, phone, avatar_url, role, marketing_consent)
+          VALUES (?, ?, ?, '010-0000-0000', '', 'ADMIN', 1)
+        `).run(customAdminEmail, customHash, process.env.ADMIN_NAME || '운영관리자');
+        if (res.lastInsertRowid) insertSettings.run(res.lastInsertRowid);
+        console.log(`[Database] Custom env admin seeded: ${customAdminEmail}`);
+      } else {
+        db.prepare(`UPDATE users SET role = 'ADMIN', password_hash = ? WHERE id = ?`).run(customHash, existingCustom.id);
+      }
+    }
+
+    // C. Support comma-separated ADMIN_EMAILS for automatic role promotion
+    const adminEmailsEnv = (process.env.ADMIN_EMAILS || '')
+      .split(',')
+      .map(e => e.trim().toLowerCase())
+      .filter(Boolean);
+    for (const email of adminEmailsEnv) {
+      db.prepare(`UPDATE users SET role = 'ADMIN' WHERE lower(email) = ?`).run(email);
+    }
+
+    // D. Seed demo customer account if not present
+    const existingCustomer = db.prepare('SELECT id FROM users WHERE email = ?').get('customer@luxuryrental.com') as { id: number } | undefined;
+    if (!existingCustomer) {
+      const customerHash = hashPassword(process.env.DEV_CUSTOMER_PASSWORD || 'luxury1234!');
+      const customerResult = db.prepare(`
+        INSERT INTO users (email, password_hash, name, phone, avatar_url, role, marketing_consent)
+        VALUES ('customer@luxuryrental.com', ?, '김명품', '010-1234-5678', '', 'USER', 1)
+      `).run(customerHash);
+      if (customerResult.lastInsertRowid) insertSettings.run(customerResult.lastInsertRowid);
+    }
+  } catch (err) {
+    console.warn('[Database] User seed note:', err);
   }
 
   // Check if general catalog already seeded

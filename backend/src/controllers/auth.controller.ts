@@ -19,11 +19,17 @@ export function register(req: Request, res: Response, next: NextFunction) {
       });
     }
 
-    // 2. Hash password & insert user
+    // 2. Hash password & insert user (auto-promote if email is in ADMIN_EMAILS or ADMIN_EMAIL)
+    const adminEmailsList = [
+      ...(process.env.ADMIN_EMAILS || '').split(','),
+      process.env.ADMIN_EMAIL || ''
+    ].map(e => e.trim().toLowerCase()).filter(Boolean);
+    const assignedRole = adminEmailsList.includes(validated.email.trim().toLowerCase()) ? 'ADMIN' : 'USER';
+
     const passwordHash = hashPassword(validated.password);
     const insertUser = db.prepare(`
       INSERT INTO users (email, password_hash, name, phone, postcode, address, detail_address, role, marketing_consent)
-      VALUES (?, ?, ?, ?, ?, ?, ?, 'USER', ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     const result = insertUser.run(
       validated.email,
@@ -33,6 +39,7 @@ export function register(req: Request, res: Response, next: NextFunction) {
       validated.postcode || '',
       validated.address || '',
       validated.detailAddress || '',
+      assignedRole,
       validated.marketingConsent ? 1 : 0
     );
 
@@ -73,7 +80,7 @@ export function register(req: Request, res: Response, next: NextFunction) {
         postcode: validated.postcode || '',
         address: validated.address || '',
         detail_address: validated.detailAddress || '',
-        role: 'USER'
+        role: assignedRole
       }
     });
   } catch (err) {

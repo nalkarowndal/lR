@@ -29,6 +29,9 @@ function getContextualErrorMessage(path: string): string {
   if (normalized.includes('/sell')) {
     return '위탁 판매 신청 접수 중 일시적인 지연이 발생했습니다. 잠시 후 다시 시도해주세요.';
   }
+  if (normalized.includes('/admin/users')) {
+    return '관리자 계정 처리 중 일시적인 지연이 발생했습니다. 다시 시도해주세요.';
+  }
   if (normalized.includes('/admin/products') || normalized.includes('/products')) {
     return '상품 정보 처리 중 일시적인 지연이 발생했습니다. 다시 시도해주세요.';
   }

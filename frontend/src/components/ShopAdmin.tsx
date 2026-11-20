@@ -15,11 +15,20 @@ export const ShopAdmin = () => {
     isBackendConnected
   } = useApp();
 
-  const [mainTab, setMainTab] = useState<'SHOP' | 'RECRUIT' | 'SELL_REQUESTS'>('RECRUIT');
+  const [mainTab, setMainTab] = useState<'SHOP' | 'RECRUIT' | 'SELL_REQUESTS' | 'USERS'>('RECRUIT');
   const [role, setRole] = useState<'STORE' | 'ADMIN'>('STORE');
   const [recruitTab, setRecruitTab] = useState<'dashboard' | 'request' | 'workers' | 'chat'>('dashboard');
   const [adminSellRequests, setAdminSellRequests] = useState<any[]>([]);
   const [isLoadingSells, setIsLoadingSells] = useState(false);
+
+  // 회원 및 관리자 계정 관리 상태
+  const [adminUsers, setAdminUsers] = useState<any[]>([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [newAdminEmail, setNewAdminEmail] = useState('');
+  const [newAdminName, setNewAdminName] = useState('');
+  const [newAdminPassword, setNewAdminPassword] = useState('');
+  const [newAdminPhone, setNewAdminPhone] = useState('');
+  const [isCreatingAdmin, setIsCreatingAdmin] = useState(false);
 
   // 글래스모피즘 커스텀 팝업 상태 관리
   const [modal, setModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm?: () => void }>({
@@ -302,6 +311,66 @@ export const ShopAdmin = () => {
     }
   }, [mainTab, loadAdminSellRequests]);
 
+  const loadAdminUsers = React.useCallback(async () => {
+    try {
+      setIsLoadingUsers(true);
+      const res = await api.getAdminUsers();
+      if (res?.success && Array.isArray(res.data)) {
+        setAdminUsers(res.data);
+      }
+    } catch (err) {
+      console.warn('[Admin] Failed to load users:', err);
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (mainTab === 'USERS') {
+      loadAdminUsers();
+    }
+  }, [mainTab, loadAdminUsers]);
+
+  const handleCreateAdminSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAdminEmail.trim()) return;
+    setIsCreatingAdmin(true);
+    try {
+      const res = await api.createOrPromoteAdminUser({
+        email: newAdminEmail.trim(),
+        name: newAdminName.trim() || '관리자',
+        password: newAdminPassword.trim(),
+        phone: newAdminPhone.trim(),
+        role: 'ADMIN'
+      });
+      if (res?.success) {
+        setNewAdminEmail('');
+        setNewAdminName('');
+        setNewAdminPassword('');
+        setNewAdminPhone('');
+        await loadAdminUsers();
+        showAlert('관리자 계정 등록 완료', res.message || '관리자 계정이 정상 등록되었습니다.');
+      }
+    } catch (err: any) {
+      showAlert('등록 실패', err?.message || '관리자 계정을 생성하는 중 오류가 발생했습니다.');
+    } finally {
+      setIsCreatingAdmin(false);
+    }
+  };
+
+  const handleToggleUserRole = async (u: any) => {
+    const nextRole = u.role === 'ADMIN' ? 'USER' : 'ADMIN';
+    try {
+      const res = await api.updateAdminUserRole(u.id, nextRole);
+      if (res?.success) {
+        setAdminUsers(prev => prev.map(item => item.id === u.id ? { ...item, role: nextRole } : item));
+        showAlert('권한 변경 완료', `${u.email} 계정의 권한이 '${nextRole === 'ADMIN' ? '관리자(ADMIN)' : '일반 회원(USER)'}'(으)로 변경되었습니다.`);
+      }
+    } catch (err: any) {
+      showAlert('권한 변경 실패', err?.message || '권한을 변경하는 중 일시적인 지연이 발생했습니다.');
+    }
+  };
+
   const handleUpdateSellStatus = async (id: number, nextStatus: string) => {
     try {
       const res = await api.updateAdminSellRequest(id, nextStatus);
@@ -449,6 +518,15 @@ export const ShopAdmin = () => {
                 }`}
               >
                 <ThemeIcon.adminConsignment className="w-3.5 h-3.5" /> 위탁 판매 관리
+              </button>
+              <button 
+                type="button"
+                onClick={() => setMainTab('USERS')} 
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  mainTab === 'USERS' ? 'bg-white text-black shadow-md' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <ThemeIcon.adminShield className="w-3.5 h-3.5" /> 관리자 계정 관리
               </button>
             </div>
 
@@ -1265,6 +1343,152 @@ export const ShopAdmin = () => {
                 </table>
               </div>
             )}
+          </div>
+        )}
+
+        {/* [D] 관리자 및 회원 권한 관리 탭 */}
+        {mainTab === 'USERS' && (
+          <div className="space-y-6">
+            {/* 1. 신규 관리자 계정 추가 폼 */}
+            <div className="backdrop-blur-xl bg-white/[0.03] border border-white/10 rounded-3xl shadow-2xl p-8">
+              <div className="mb-6">
+                <h3 className="font-extrabold text-white text-xl tracking-tight flex items-center gap-2">
+                  <ThemeIcon.adminShield className="w-5 h-5 text-amber-300" />
+                  신규 관리자 계정 추가 / 기존 회원 관리자 승격
+                </h3>
+                <p className="text-xs text-gray-400 mt-1">
+                  새로운 관리자 이메일과 비밀번호를 입력해 즉시 생성하거나, 이미 가입된 회원 이메일을 입력해 관리자(ADMIN) 권한을 부여할 수 있습니다.
+                </p>
+              </div>
+
+              <form onSubmit={handleCreateAdminSubmit} className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-300 mb-1.5">관리자 이메일 *</label>
+                  <input
+                    type="email"
+                    required
+                    value={newAdminEmail}
+                    onChange={(e) => setNewAdminEmail(e.target.value)}
+                    placeholder="newadmin@luxuryrental.com"
+                    className="w-full bg-black/50 border border-white/15 focus:border-white/40 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-300 mb-1.5">이름 / 직책</label>
+                  <input
+                    type="text"
+                    value={newAdminName}
+                    onChange={(e) => setNewAdminName(e.target.value)}
+                    placeholder="예: 운영관리자"
+                    className="w-full bg-black/50 border border-white/15 focus:border-white/40 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-300 mb-1.5">비밀번호 (신규 시 6자 이상)</label>
+                  <input
+                    type="password"
+                    value={newAdminPassword}
+                    onChange={(e) => setNewAdminPassword(e.target.value)}
+                    placeholder="6자 이상 입력"
+                    className="w-full bg-black/50 border border-white/15 focus:border-white/40 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-300 mb-1.5">연락처 (선택)</label>
+                  <input
+                    type="text"
+                    value={newAdminPhone}
+                    onChange={(e) => setNewAdminPhone(e.target.value)}
+                    placeholder="010-0000-0000"
+                    className="w-full bg-black/50 border border-white/15 focus:border-white/40 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none"
+                  />
+                </div>
+                <div>
+                  <button
+                    type="submit"
+                    disabled={isCreatingAdmin}
+                    className="w-full bg-white text-black hover:bg-gray-200 font-black py-2.5 px-4 rounded-xl text-xs transition shadow-lg cursor-pointer disabled:opacity-50"
+                  >
+                    {isCreatingAdmin ? '등록 중...' : '+ 관리자 계정 등록'}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* 2. 전체 회원 및 관리자 목록 */}
+            <div className="backdrop-blur-xl bg-white/[0.03] border border-white/10 rounded-3xl shadow-2xl p-8">
+              <div className="flex justify-between items-center mb-6 pb-4 border-b border-white/10">
+                <div>
+                  <h4 className="font-extrabold text-white text-base">등록된 계정 및 권한 현황 ({adminUsers.length}명)</h4>
+                  <p className="text-xs text-gray-400 mt-0.5">우측 버튼으로 일반 회원과 관리자 권한을 즉시 전환할 수 있습니다.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={loadAdminUsers}
+                  className="text-xs bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2 rounded-xl border border-white/10 transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <ThemeIcon.refresh className={`w-3.5 h-3.5 ${isLoadingUsers ? 'animate-spin' : ''}`} /> 새로고침
+                </button>
+              </div>
+
+              {isLoadingUsers ? (
+                <div className="py-16 text-center text-sm text-gray-400">회원 목록을 불러오는 중...</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs text-gray-200">
+                    <thead className="bg-white/5 border-b border-white/10 text-gray-400 uppercase font-mono text-[11px]">
+                      <tr>
+                        <th className="py-3 px-4">ID</th>
+                        <th className="py-3 px-4">이름</th>
+                        <th className="py-3 px-4">이메일</th>
+                        <th className="py-3 px-4">연락처 / 주소</th>
+                        <th className="py-3 px-4">현재 권한</th>
+                        <th className="py-3 px-4 text-right">권한 변경</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {adminUsers.map((u) => (
+                        <tr key={u.id} className="hover:bg-white/[0.02] transition">
+                          <td className="py-3.5 px-4 font-mono text-gray-400">#{u.id}</td>
+                          <td className="py-3.5 px-4 font-bold text-white">{u.name}</td>
+                          <td className="py-3.5 px-4 text-gray-300">{u.email}</td>
+                          <td className="py-3.5 px-4 text-gray-400">
+                            <div>{u.phone || '-'}</div>
+                            {u.address && (
+                              <div className="text-[10px] text-gray-500 truncate max-w-[260px]">
+                                {u.postcode ? `[${u.postcode}] ` : ''}{u.address} {u.detail_address || ''}
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-black ${
+                              u.role === 'ADMIN'
+                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                : 'bg-white/10 text-gray-300 border border-white/10'
+                            }`}>
+                              {u.role === 'ADMIN' ? '👑 ADMIN (관리자)' : 'USER (일반회원)'}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4 text-right">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleUserRole(u)}
+                              className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                                u.role === 'ADMIN'
+                                  ? 'bg-white/10 hover:bg-rose-500/20 text-gray-300 hover:text-rose-300 border border-white/10'
+                                  : 'bg-amber-400 hover:bg-amber-300 text-black font-black'
+                              }`}
+                            >
+                              {u.role === 'ADMIN' ? '일반회원으로 변경' : '관리자로 승격'}
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
         )}
 

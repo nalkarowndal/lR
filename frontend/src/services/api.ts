@@ -315,6 +315,25 @@ export const api = {
     });
   },
 
+  // Admin Users & Role Management
+  getAdminUsers: async () => {
+    return fetchJson<{ success: boolean; count: number; data: any[] }>('/admin/users');
+  },
+
+  createOrPromoteAdminUser: async (payload: { email: string; name?: string; password?: string; phone?: string; role?: 'ADMIN' | 'USER' }) => {
+    return fetchJson<{ success: boolean; message: string; data: any }>('/admin/users', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  updateAdminUserRole: async (id: number, role: 'ADMIN' | 'USER') => {
+    return fetchJson<{ success: boolean; message: string; data: any }>(`/admin/users/${id}/role`, {
+      method: 'PATCH',
+      body: JSON.stringify({ role })
+    });
+  },
+
   deleteProductImage: async (productId: number, imageId: number) => {
     return fetchJson<{ success: boolean; message: string }>(`/admin/products/${productId}/images/${imageId}`, {
       method: 'DELETE'

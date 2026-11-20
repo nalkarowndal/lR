@@ -4,7 +4,8 @@ import {
   getRecruitRequests, createRecruitRequest, updateRecruitRequest,
   getWorkers, createWorker,
   getMessages, createMessage,
-  getAdminSellRequests, updateAdminSellRequest
+  getAdminSellRequests, updateAdminSellRequest,
+  getAdminUsers, createOrPromoteAdminUser, updateAdminUserRole
 } from '../controllers/admin.controller.js';
 import { addProductImage, updateProductImage, deleteProductImage } from '../controllers/image.controller.js';
 import { validateBody } from '../middlewares/validate.js';
@@ -45,3 +46,8 @@ adminRouter.post('/messages', validateBody(CreateMessageSchema), createMessage);
 // Sell Requests Management
 adminRouter.get('/sell-requests', getAdminSellRequests);
 adminRouter.patch('/sell-requests/:id', updateAdminSellRequest);
+
+// Admin Users & Role Management
+adminRouter.get('/users', getAdminUsers);
+adminRouter.post('/users', createOrPromoteAdminUser);
+adminRouter.patch('/users/:id/role', updateAdminUserRole);

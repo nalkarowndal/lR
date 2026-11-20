@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { getDatabase } from '../db/database.js';
+import { hashPassword } from '../utils/crypto.js';
 
 // 1. Admin Products
 export function getAdminProducts(_req: Request, res: Response, next: NextFunction) {
@@ -237,6 +238,101 @@ export function updateAdminSellRequest(req: Request, res: Response, next: NextFu
 
     db.prepare('UPDATE sell_requests SET status = ? WHERE id = ?').run(status, id);
     res.json({ success: true, message: '판매 신청 상태가 성공적으로 변경되었습니다.' });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// 6. Admin Users & Role Management
+export function getAdminUsers(_req: Request, res: Response, next: NextFunction) {
+  try {
+    const db = getDatabase();
+    const rows = db.prepare(`
+      SELECT id, email, name, phone, postcode, address, detail_address, role, created_at
+      FROM users
+      ORDER BY CASE WHEN role = 'ADMIN' THEN 0 ELSE 1 END, id DESC
+    `).all();
+    res.json({ success: true, count: rows.length, data: rows });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export function createOrPromoteAdminUser(req: Request, res: Response, next: NextFunction) {
+  try {
+    const db = getDatabase();
+    const email = (req.body.email || '').trim().toLowerCase();
+    const name = (req.body.name || '관리자').trim();
+    const password = (req.body.password || '').trim();
+    const phone = (req.body.phone || '').trim();
+    const role = req.body.role === 'USER' ? 'USER' : 'ADMIN';
+
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({ success: false, error: '올바른 이메일 주소를 입력해주세요.' });
+    }
+
+    const existing = db.prepare('SELECT id, email, name, role FROM users WHERE lower(email) = ?').get(email) as any;
+    if (existing) {
+      if (password && password.length >= 6) {
+        const pwHash = hashPassword(password);
+        db.prepare('UPDATE users SET role = ?, password_hash = ?, name = COALESCE(NULLIF(?, \'\'), name) WHERE id = ?')
+          .run(role, pwHash, name, existing.id);
+      } else {
+        db.prepare('UPDATE users SET role = ? WHERE id = ?').run(role, existing.id);
+      }
+      const updated = db.prepare('SELECT id, email, name, phone, role, created_at FROM users WHERE id = ?').get(existing.id);
+      return res.json({
+        success: true,
+        message: `기존 회원(${email})의 권한이 ${role === 'ADMIN' ? '관리자(ADMIN)' : '일반 회원(USER)'}(으)로 업데이트되었습니다.`,
+        data: updated
+      });
+    }
+
+    if (!password || password.length < 6) {
+      return res.status(400).json({ success: false, error: '신규 관리자 계정 생성 시 비밀번호는 최소 6자 이상이어야 합니다.' });
+    }
+
+    const pwHash = hashPassword(password);
+    const info = db.prepare(`
+      INSERT INTO users (email, password_hash, name, phone, role, marketing_consent)
+      VALUES (?, ?, ?, ?, ?, 1)
+    `).run(email, pwHash, name, phone, role);
+
+    const newUserId = Number(info.lastInsertRowid);
+    db.prepare(`
+      INSERT OR IGNORE INTO user_settings (user_id, service_notifications, marketing_notifications, product_notifications, reduce_animations, theme)
+      VALUES (?, 1, 0, 1, 0, 'light')
+    `).run(newUserId);
+
+    const created = db.prepare('SELECT id, email, name, phone, role, created_at FROM users WHERE id = ?').get(newUserId);
+    return res.status(201).json({
+      success: true,
+      message: `신규 관리자 계정(${email})이 성공적으로 생성되었습니다.`,
+      data: created
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export function updateAdminUserRole(req: Request, res: Response, next: NextFunction) {
+  try {
+    const db = getDatabase();
+    const targetId = Number(req.params.id);
+    const role = req.body.role === 'ADMIN' ? 'ADMIN' : 'USER';
+
+    if (!targetId) {
+      return res.status(400).json({ success: false, error: '유효한 회원 ID가 필요합니다.' });
+    }
+
+    db.prepare('UPDATE users SET role = ? WHERE id = ?').run(role, targetId);
+    const updated = db.prepare('SELECT id, email, name, phone, role, created_at FROM users WHERE id = ?').get(targetId);
+
+    res.json({
+      success: true,
+      message: `회원 권한이 ${role === 'ADMIN' ? '관리자(ADMIN)' : '일반 회원(USER)'}(으)로 변경되었습니다.`,
+      data: updated
+    });
   } catch (err) {
     next(err);
   }
